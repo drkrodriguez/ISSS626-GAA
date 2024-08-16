@@ -1,8 +1,11 @@
 ---
-title: "ISSS626-GAA"
+title: "ISSS626-Geospatial Analytics and Applications"
+author: "Federico Jose Rodriguez"
 ---
 
-Welcome to my website containing my work for the course **ISSS 626 - Geospatial Analytics and Applications** taken during the August term of 2024.
+Welcome to my website for my work in the course [**ISSS 626 - Geospatial Analytics and Applications**]{.underline} during the August term of 2024.
+
+# Hello
 
 ```{r}
 1 + 1

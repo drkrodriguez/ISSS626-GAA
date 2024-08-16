@@ -1,0 +1,31 @@
+---
+title: "Hands-on Exercise 1"
+author: "Federico Jose Rodriguez"
+---
+
+# Getting Started
+
+## Install and launching R packages
+
+The code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer. If they are, then they will be launched in R.
+
+```{r}
+pacman::p_load(tidyverse)
+```
+
+## Importing the data
+
+```{r}
+data(iris)
+head(iris)
+```
+
+# Exploring the Data
+
+## Plotting a simple chart
+
+```{r}
+ggplot(data = iris,
+       aes(x = Species)) +
+  geom_bar()
+```
