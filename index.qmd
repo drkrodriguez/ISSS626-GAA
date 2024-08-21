@@ -3,14 +3,14 @@ title: "ISSS626-Geospatial Analytics and Applications"
 author: "Federico Jose Rodriguez"
 ---
 
-Welcome to my website for my work in the course [**ISSS 626 - Geospatial Analytics and Applications**]{.underline} during the August term of 2024.
+Welcome to my website for my work in the course [**ISSS 626 - Geospatial Analytics and Applications**]{.underline} during the August term of 2024 under **Dr Kam Tin Seong**.
 
-# Hello
+## Hands-On exercises
 
-```{r}
-1 + 1
-```
+Hands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned.
 
-This is a Quarto website.
+1.  [Geospatial Data Wrangling with R](Hands-on/Hands-on_Ex01/Hands-on_Ex01.html) (for Session 1)
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+2.  Choropleth Mapping with R (for Session 1)
+
+## xxx
