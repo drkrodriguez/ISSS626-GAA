@@ -2,30 +2,30 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "ISSS626-Geospatial Analytics and Applications",
+    "title": "Geospatial Analytics and Applications (in R)",
     "section": "",
-    "text": "Welcome to my website for my work in the course ISSS 626 - Geospatial Analytics and Applications during the August term of 2024 under Dr Kam Tin Seong."
+    "text": "Welcome to my website for my work in the course ISSS 626 - Geospatial Analytics and Applications during the August term of 2024 under Dr Kam Tin Seong.\nThe course covers theory and methods of geospatial analysis and the tools in R to implement such analyses."
   },
   {
     "objectID": "index.html#hands-on-exercises",
     "href": "index.html#hands-on-exercises",
-    "title": "ISSS626-Geospatial Analytics and Applications",
-    "section": "Hands-On exercises",
-    "text": "Hands-On exercises\nHands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned.\n\nGeospatial Data Wrangling with R (for Session 1)\nChoropleth Mapping with R (for Session 1)"
+    "title": "Geospatial Analytics and Applications (in R)",
+    "section": "Hands-On Exercises",
+    "text": "Hands-On Exercises\nHands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations which complement our pre-class reading, and prepares us for the in-class exercises.\n\nGeospatial Data Wrangling with R (for Session 1, 26 Aug ’24)\nChoropleth Mapping with R (for Session 1, 26 Aug ’24)"
   },
   {
-    "objectID": "index.html#xxx",
-    "href": "index.html#xxx",
-    "title": "ISSS626-Geospatial Analytics and Applications",
-    "section": "xxx",
-    "text": "xxx"
+    "objectID": "index.html#in-class-exercises",
+    "href": "index.html#in-class-exercises",
+    "title": "Geospatial Analytics and Applications (in R)",
+    "section": "In-Class Exercises",
+    "text": "In-Class Exercises\nComing soon"
   },
   {
-    "objectID": "about.html#quarto-websites",
-    "href": "about.html#quarto-websites",
-    "title": "About",
-    "section": "Quarto Websites",
-    "text": "Quarto Websites\nThis is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+    "objectID": "index.html#take-home-exercises",
+    "href": "index.html#take-home-exercises",
+    "title": "Geospatial Analytics and Applications (in R)",
+    "section": "Take Home Exercises",
+    "text": "Take Home Exercises\nComing Soon"
   },
   {
     "objectID": "Hands-on/Hands-on_Ex01/Hands-on_Ex01.html",
@@ -131,5 +131,75 @@
     "title": "Geospatial Data Wrangling with R",
     "section": "Point-in-polygon count",
     "text": "Point-in-polygon count\nSCENARIO 1\nA group wants to fund out the number of pre-schools in each planning subzone\nSOLUTION 1\nFirst, use st_intersects to identify preschools located in each planning subzone. (stored as a list) Then use lengths() from Base R to calculate the number of preschools in each planning subzone. This is stored in a new column PreSch Count\n\nmpsz3414$`PreSch Count`&lt;- lengths(st_intersects(mpsz3414, preschool3414))\n\nThe new column can be summarized using summary() as shown. The output shows that the median number of preschools ranges from 0 to 72 and the median is 4.\n\nsummary(mpsz3414$`PreSch Count`)\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n   0.00    0.00    4.00    7.09   10.00   72.00 \n\n\nThe planning subzones with the most number of preschools can be displayed using the top_n() function of the dplyr package. This shows that Tampines East has the maximum number of 72 preschools.\n\ntop_n(mpsz3414, 1, `PreSch Count`)\n\nSimple feature collection with 1 feature and 16 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 39655.33 ymin: 35966 xmax: 42940.57 ymax: 38622.37\nProjected CRS: SVY21 / Singapore TM\n  OBJECTID SUBZONE_NO     SUBZONE_N SUBZONE_C CA_IND PLN_AREA_N PLN_AREA_C\n1      189          2 TAMPINES EAST    TMSZ02      N   TAMPINES         TM\n     REGION_N REGION_C          INC_CRC FMEL_UPD_D   X_ADDR   Y_ADDR SHAPE_Leng\n1 EAST REGION       ER 21658EAAF84F4D8D 2014-12-05 41122.55 37392.39   10180.62\n  SHAPE_Area                       geometry PreSch Count\n1    4339824 MULTIPOLYGON (((42196.76 38...           72\n\n\nSCENARIO 2\nThe group also wants to understand the density of preschools. Larger subzones are expected to have more preschools so density might be a more appropriate measure to compare\nSOLUTION 2\nWe again use st_area to compute areas. This time we do this to compute for each subzone’s.\n\nmpsz3414$Area &lt;- mpsz3414 %&gt;%\n  st_area()\n\nNext, the mutate() function from the dplyr package is used to compute the density\n\nmpsz3414 &lt;- mpsz3414 %&gt;%\n  mutate(`PreSch Density` = `PreSch Count`/Area * 1000000)\n\nThe top_n() function can be used to fetch the subzone with the highest density, which is Cecil.\n\ntop_n(mpsz3414, 1, `PreSch Density`)\n\nSimple feature collection with 1 feature and 18 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 29501.64 ymin: 28623.75 xmax: 29976.93 ymax: 29362.03\nProjected CRS: SVY21 / Singapore TM\n  OBJECTID SUBZONE_NO SUBZONE_N SUBZONE_C CA_IND    PLN_AREA_N PLN_AREA_C\n1       27          8     CECIL    DTSZ08      Y DOWNTOWN CORE         DT\n        REGION_N REGION_C          INC_CRC FMEL_UPD_D  X_ADDR   Y_ADDR\n1 CENTRAL REGION       CR 65AA82AF6F4D925D 2014-12-05 29730.2 29011.33\n  SHAPE_Leng SHAPE_Area                       geometry PreSch Count\n1   2116.095   196619.9 MULTIPOLYGON (((29808.18 28...            7\n            Area   PreSch Density\n1 196619.9 [m^2] 35.60169 [1/m^2]"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Hi there! I’m Derek (Federico Jose Rodriguez) and I built this website as I started taking my Geospatial Analytics and Applications course in the MITB Program of Singapore Management University in 2024."
+  },
+  {
+    "objectID": "about.html#about-this-site",
+    "href": "about.html#about-this-site",
+    "title": "About",
+    "section": "",
+    "text": "Hi there! I’m Derek (Federico Jose Rodriguez) and I built this website as I started taking my Geospatial Analytics and Applications course in the MITB Program of Singapore Management University in 2024."
+  },
+  {
+    "objectID": "about.html#quarto-websites",
+    "href": "about.html#quarto-websites",
+    "title": "About",
+    "section": "Quarto Websites",
+    "text": "Quarto Websites\nThis is a Quarto website.\nTo learn more about Quarto websites and start creating your own, please visit https://quarto.org/docs/websites."
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html",
+    "href": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html",
+    "title": "Choropleth Mapping with R",
+    "section": "",
+    "text": "For this hands-on exercise, we learn how to plot choropleth maps by using an R package called tmap"
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#data-sources",
+    "href": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#data-sources",
+    "title": "Choropleth Mapping with R",
+    "section": "Data Sources",
+    "text": "Data Sources\nThe exercise will use the following publicly available datasets:\n\nMaster Plan 2014 Subzone Boundary from data.gov.sg\nSingapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020 from singstat.gov\n\nThe first one is geospatial data and was also used in the previous hands-on exercise. The second source is for aspatial data but the PA and SZ fields in it allows geocoding into the shapefile."
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#installing-and-launching-r-packages",
+    "href": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#installing-and-launching-r-packages",
+    "title": "Choropleth Mapping with R",
+    "section": "Installing and launching R packages",
+    "text": "Installing and launching R packages\nThis exercise will make use of three R packages: sf, tidyverse and tmap. We have already introduced the first two in the last exercise: tidyverse is a family of R packages used for data wrangling and visualization, while sf is used for importing, managing and processing geospatial data. Tidyverse is made up of multiple packages which include tidyr and dplyr which will be the specific packages where the functions we use will come from.\nTmap stands for thematic map and will enable us to create the functional choropleth maps that go beyond the capabilities of plot()\nThe code chunk below uses p_load() of pacman package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.\n\npacman::p_load(sf, tidyverse, tmap)"
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#importing-geospatial-data-into-r",
+    "href": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#importing-geospatial-data-into-r",
+    "title": "Choropleth Mapping with R",
+    "section": "Importing Geospatial Data into R",
+    "text": "Importing Geospatial Data into R\nWe first import MP14_SUBZONE_WEB_PL using st_read() function by providing the path and the layer name as parameters.\n\nmpsz &lt;- st_read(dsn = \"data/geospatial\", \n                layer = \"MP14_SUBZONE_WEB_PL\")\n\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `C:\\drkrodriguez\\ISSS626-GAA\\Hands-on\\Hands-On_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n\n\nWe can examine the contents by calling the dataframe like in the code chunk below. This function call only shows the first 10 features or rows of the dataframe.\n\nmpsz\n\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\nFirst 10 features:\n   OBJECTID SUBZONE_NO       SUBZONE_N SUBZONE_C CA_IND      PLN_AREA_N\n1         1          1    MARINA SOUTH    MSSZ01      Y    MARINA SOUTH\n2         2          1    PEARL'S HILL    OTSZ01      Y          OUTRAM\n3         3          3       BOAT QUAY    SRSZ03      Y SINGAPORE RIVER\n4         4          8  HENDERSON HILL    BMSZ08      N     BUKIT MERAH\n5         5          3         REDHILL    BMSZ03      N     BUKIT MERAH\n6         6          7  ALEXANDRA HILL    BMSZ07      N     BUKIT MERAH\n7         7          9   BUKIT HO SWEE    BMSZ09      N     BUKIT MERAH\n8         8          2     CLARKE QUAY    SRSZ02      Y SINGAPORE RIVER\n9         9         13 PASIR PANJANG 1    QTSZ13      N      QUEENSTOWN\n10       10          7       QUEENSWAY    QTSZ07      N      QUEENSTOWN\n   PLN_AREA_C       REGION_N REGION_C          INC_CRC FMEL_UPD_D   X_ADDR\n1          MS CENTRAL REGION       CR 5ED7EB253F99252E 2014-12-05 31595.84\n2          OT CENTRAL REGION       CR 8C7149B9EB32EEFC 2014-12-05 28679.06\n3          SR CENTRAL REGION       CR C35FEFF02B13E0E5 2014-12-05 29654.96\n4          BM CENTRAL REGION       CR 3775D82C5DDBEFBD 2014-12-05 26782.83\n5          BM CENTRAL REGION       CR 85D9ABEF0A40678F 2014-12-05 26201.96\n6          BM CENTRAL REGION       CR 9D286521EF5E3B59 2014-12-05 25358.82\n7          BM CENTRAL REGION       CR 7839A8577144EFE2 2014-12-05 27680.06\n8          SR CENTRAL REGION       CR 48661DC0FBA09F7A 2014-12-05 29253.21\n9          QT CENTRAL REGION       CR 1F721290C421BFAB 2014-12-05 22077.34\n10         QT CENTRAL REGION       CR 3580D2AFFBEE914C 2014-12-05 24168.31\n     Y_ADDR SHAPE_Leng SHAPE_Area                       geometry\n1  29220.19   5267.381  1630379.3 MULTIPOLYGON (((31495.56 30...\n2  29782.05   3506.107   559816.2 MULTIPOLYGON (((29092.28 30...\n3  29974.66   1740.926   160807.5 MULTIPOLYGON (((29932.33 29...\n4  29933.77   3313.625   595428.9 MULTIPOLYGON (((27131.28 30...\n5  30005.70   2825.594   387429.4 MULTIPOLYGON (((26451.03 30...\n6  29991.38   4428.913  1030378.8 MULTIPOLYGON (((25899.7 297...\n7  30230.86   3275.312   551732.0 MULTIPOLYGON (((27746.95 30...\n8  30222.86   2208.619   290184.7 MULTIPOLYGON (((29351.26 29...\n9  29893.78   6571.323  1084792.3 MULTIPOLYGON (((20996.49 30...\n10 30104.18   3454.239   631644.3 MULTIPOLYGON (((24472.11 29..."
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#importing-attribute-data-into-r",
+    "href": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#importing-attribute-data-into-r",
+    "title": "Choropleth Mapping with R",
+    "section": "Importing Attribute Data into R",
+    "text": "Importing Attribute Data into R\nOur remaining data is in a csv file which we will load into a dataframe called popdata using read_csv() which comes from the readr package that is included in tidyverse.\n\npopdata &lt;- read_csv(\"data/aspatial/respopagesexfa2011to2020.csv\")\n\nRows: 738492 Columns: 7\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (5): PA, SZ, AG, Sex, FA\ndbl (2): Pop, Time\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.\n\n\nWe can quickly examine the data by calling the dataframe name. This shows that popdata consists of 738K records or rows with 7 attributes or columns.\n\npopdata\n\n# A tibble: 738,492 × 7\n   PA         SZ                     AG     Sex     FA              Pop  Time\n   &lt;chr&gt;      &lt;chr&gt;                  &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;\n 1 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Males   &lt;= 60             0  2011\n 2 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Males   &gt;60 to 80        10  2011\n 3 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Males   &gt;80 to 100       30  2011\n 4 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Males   &gt;100 to 120      80  2011\n 5 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Males   &gt;120             20  2011\n 6 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Males   Not Available     0  2011\n 7 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Females &lt;= 60             0  2011\n 8 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Females &gt;60 to 80        10  2011\n 9 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Females &gt;80 to 100       40  2011\n10 Ang Mo Kio Ang Mo Kio Town Centre 0_to_4 Females &gt;100 to 120      90  2011\n# ℹ 738,482 more rows\n\n\nWe will use the 2020 information from this to build a new data table popdata2020 which includes the following variables:\n\nPA and SZ give information on the location (planning area and township)\nYOUNG is the population for those aged 0 to 24\nECONOMY ACTIVE is the population for those aged 25 to 64\nAGED is the population for those aged 65 and above\nTOTAL is the total population across all age groups\nDEPENDENCY is the ratio between young and aged against the economy active group"
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#data-wrangling",
+    "href": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#data-wrangling",
+    "title": "Choropleth Mapping with R",
+    "section": "Data Wrangling",
+    "text": "Data Wrangling\nTo generate the required table from popdata, we will use pivot_wider() of tidyr package, mutate(), filter(), group_by() and select() of dplyr package. All of these are included in tidyverse.\n\npopdata2020 &lt;- popdata %&gt;%\n  filter(Time == 2020) %&gt;%\n  group_by(PA, SZ, AG) %&gt;%\n  summarise(`POP` = sum(`Pop`)) %&gt;%\n  ungroup()%&gt;%\n  pivot_wider(names_from=AG, \n              values_from=POP) %&gt;%\n  mutate(YOUNG = rowSums(.[3:6])\n         +rowSums(.[12])) %&gt;%\nmutate(`ECONOMY ACTIVE` = rowSums(.[7:11])+\nrowSums(.[13:15]))%&gt;%\nmutate(`AGED`=rowSums(.[16:21])) %&gt;%\nmutate(`TOTAL`=rowSums(.[3:21])) %&gt;%  \nmutate(`DEPENDENCY` = (`YOUNG` + `AGED`)\n/`ECONOMY ACTIVE`) %&gt;%\n  select(`PA`, `SZ`, `YOUNG`, \n       `ECONOMY ACTIVE`, `AGED`, \n       `TOTAL`, `DEPENDENCY`)\n\n`summarise()` has grouped output by 'PA', 'SZ'. You can override using the\n`.groups` argument.\n\n\nWe can check that the transformation has been executed properly by displaying the new dataframe.\n\npopdata2020\n\n# A tibble: 332 × 7\n   PA         SZ                   YOUNG `ECONOMY ACTIVE`  AGED TOTAL DEPENDENCY\n   &lt;chr&gt;      &lt;chr&gt;                &lt;dbl&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;\n 1 Ang Mo Kio Ang Mo Kio Town Cen…  1440             2640   770  4850      0.837\n 2 Ang Mo Kio Cheng San             6660            15380  6080 28120      0.828\n 3 Ang Mo Kio Chong Boon            6150            13970  6450 26570      0.902\n 4 Ang Mo Kio Kebun Bahru           5500            12040  5080 22620      0.879\n 5 Ang Mo Kio Sembawang Hills       2130             3390  1270  6790      1.00 \n 6 Ang Mo Kio Shangri-La            3970             8430  3540 15940      0.891\n 7 Ang Mo Kio Tagore                2220             4160  1520  7900      0.899\n 8 Ang Mo Kio Townsville            4720            11430  5050 21200      0.855\n 9 Ang Mo Kio Yio Chu Kang             0                0     0     0    NaN    \n10 Ang Mo Kio Yio Chu Kang East     1190             2230   740  4160      0.865\n# ℹ 322 more rows"
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#joining-the-attribute-and-geospatial-data",
+    "href": "Hands-on/Hands-On_Ex02/Hands-On_Ex02.html#joining-the-attribute-and-geospatial-data",
+    "title": "Choropleth Mapping with R",
+    "section": "Joining the attribute and geospatial data",
+    "text": "Joining the attribute and geospatial data\nTo use this attribute data for our analysis, we need to join it with the geospatial data. The first step will be to convert the PA and SZ values to uppercase to make sure that they follow the same convention as the geospatial data. We use the mutate_at() function to apply this transformation.\n\npopdata2020 &lt;- popdata2020 %&gt;%\n  mutate_at(.vars = vars(PA, SZ), \n          .funs = list(toupper)) %&gt;%\n  filter(`ECONOMY ACTIVE` &gt; 0)\n\nThe next step is to use left_join() from dplyr to merge the two tables using SZ.\n\nmpsz_pop2020 &lt;- left_join(mpsz, popdata2020,\n                          by = c(\"SUBZONE_N\" = \"SZ\"))\n\nAs the left side is an sf dataframe, the resulting object is also an sf dataframe and we write this into a file to store for future use without rerunning all the transformations so far.\n\nwrite_rds(mpsz_pop2020, \"data/mpszpop2020.rds\")"
   }
 ]

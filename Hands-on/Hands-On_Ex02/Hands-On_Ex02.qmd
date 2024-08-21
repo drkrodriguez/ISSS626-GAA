@@ -1,0 +1,133 @@
+---
+title: "Choropleth Mapping with R"
+---
+
+For this hands-on exercise, we learn how to plot choropleth maps by using an R package called **tmap**
+
+# Getting Started
+
+## Data Sources
+
+The exercise will use the following publicly available datasets:
+
+-   Master Plan 2014 Subzone Boundary from [data.gov.sg](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view)
+
+-   Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020 from [singstat.gov](https://www.singstat.gov.sg/-/media/files/find_data/population/statistical_tables/respopagesexfa2011to2020.ashx)
+
+The first one is geospatial data and was also used in the previous hands-on exercise. The second source is for aspatial data but the `PA` and `SZ` fields in it allows geocoding into the shapefile.
+
+## Installing and launching R packages
+
+This exercise will make use of three R packages: **sf**, **tidyverse** and **tmap**. We have already introduced the first two in the last exercise: **tidyverse** is a family of R packages used for data wrangling and visualization, while **sf** is used for importing, managing and processing geospatial data. Tidyverse is made up of multiple packages which include **tidyr** and **dplyr** which will be the specific packages where the functions we use will come from.
+
+**Tmap** stands for thematic map and will enable us to create the functional choropleth maps that go beyond the capabilities of `plot()`
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, tidyverse, tmap)
+```
+
+# Data Loading and Preparation
+
+## Importing Geospatial Data into R
+
+We first import `MP14_SUBZONE_WEB_PL` using `st_read()` function by providing the path and the layer name as parameters.
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial", 
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+We can examine the contents by calling the dataframe like in the code chunk below. This function call only shows the first 10 features or rows of the dataframe.
+
+```{r}
+mpsz
+```
+
+## Importing Attribute Data into R
+
+Our remaining data is in a csv file which we will load into a dataframe called `popdata` using `read_csv()` which comes from the **readr** package that is included in **tidyverse**.
+
+```{r}
+popdata <- read_csv("data/aspatial/respopagesexfa2011to2020.csv")
+```
+
+We can quickly examine the data by calling the dataframe name. This shows that `popdata` consists of 738K records or rows with 7 attributes or columns.
+
+```{r}
+popdata
+```
+
+We will use the 2020 information from this to build a new data table `popdata2020` which includes the following variables:
+
+-   `PA` and `SZ` give information on the location (planning area and township)
+
+-   `YOUNG` is the population for those aged 0 to 24
+
+-   `ECONOMY ACTIVE` is the population for those aged 25 to 64
+
+-   `AGED` is the population for those aged 65 and above
+
+-   `TOTAL` is the total population across all age groups
+
+-   `DEPENDENCY` is the ratio between young and aged against the economy active group
+
+## Data Wrangling
+
+To generate the required table from `popdata`, we will use `pivot_wider()` of **tidyr** package, `mutate()`, `filter()`, `group_by()` and `select()` of dplyr package. All of these are included in tidyverse.
+
+```{r}
+popdata2020 <- popdata %>%
+  filter(Time == 2020) %>%
+  group_by(PA, SZ, AG) %>%
+  summarise(`POP` = sum(`Pop`)) %>%
+  ungroup()%>%
+  pivot_wider(names_from=AG, 
+              values_from=POP) %>%
+  mutate(YOUNG = rowSums(.[3:6])
+         +rowSums(.[12])) %>%
+mutate(`ECONOMY ACTIVE` = rowSums(.[7:11])+
+rowSums(.[13:15]))%>%
+mutate(`AGED`=rowSums(.[16:21])) %>%
+mutate(`TOTAL`=rowSums(.[3:21])) %>%  
+mutate(`DEPENDENCY` = (`YOUNG` + `AGED`)
+/`ECONOMY ACTIVE`) %>%
+  select(`PA`, `SZ`, `YOUNG`, 
+       `ECONOMY ACTIVE`, `AGED`, 
+       `TOTAL`, `DEPENDENCY`)
+```
+
+We can check that the transformation has been executed properly by displaying the new dataframe.
+
+```{r}
+popdata2020
+```
+
+##  Joining the attribute and geospatial data
+
+To use this attribute data for our analysis, we need to join it with the geospatial data. The first step will be to convert the PA and SZ values to uppercase to make sure that they follow the same convention as the geospatial data. We use the `mutate_at()` function to apply this transformation.
+
+```{r}
+popdata2020 <- popdata2020 %>%
+  mutate_at(.vars = vars(PA, SZ), 
+          .funs = list(toupper)) %>%
+  filter(`ECONOMY ACTIVE` > 0)
+```
+
+The next step is to use left_join() from dplyr to merge the two tables using `SZ`.
+
+```{r}
+mpsz_pop2020 <- left_join(mpsz, popdata2020,
+                          by = c("SUBZONE_N" = "SZ"))
+```
+
+As the left side is an sf dataframe, the resulting object is also an sf dataframe and we write this into a file to store for future use without rerunning all the transformations so far.
+
+```{r}
+write_rds(mpsz_pop2020, "data/mpszpop2020.rds")
+```
+
+# Choropleth Mapping Geospatial Data using tmap
+
+WIP

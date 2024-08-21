@@ -1,16 +1,24 @@
 ---
-title: "ISSS626-Geospatial Analytics and Applications"
+title: "Geospatial Analytics and Applications (in R)"
 author: "Federico Jose Rodriguez"
 ---
 
 Welcome to my website for my work in the course [**ISSS 626 - Geospatial Analytics and Applications**]{.underline} during the August term of 2024 under **Dr Kam Tin Seong**.
 
-## Hands-On exercises
+The course covers theory and methods of geospatial analysis and the tools in R to implement such analyses.
 
-Hands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned.
+## Hands-On Exercises
 
-1.  [Geospatial Data Wrangling with R](Hands-on/Hands-on_Ex01/Hands-on_Ex01.html) (for Session 1)
+Hands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations which complement our pre-class reading, and prepares us for the in-class exercises.
 
-2.  Choropleth Mapping with R (for Session 1)
+1.  [Geospatial Data Wrangling with R](Hands-on/Hands-on_Ex01/Hands-on_Ex01.html) (for Session 1, 26 Aug '24)
 
-## xxx
+2.  [Choropleth Mapping with R](Hands-on/Hands-on_Ex02/Hands-on_Ex02.html) (for Session 1, 26 Aug '24)
+
+## In-Class Exercises
+
+Coming soon
+
+## Take Home Exercises
+
+Coming Soon
