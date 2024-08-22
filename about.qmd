@@ -2,7 +2,7 @@
 title: "About"
 ---
 
-## About this site
+## About me and this site
 
 Hi there! I'm **Derek (Federico Jose Rodriguez)** and I built this website as I started taking my **Geospatial Analytics and Applications** course in the **MITB** Program of **Singapore Management University** in 2024.
 

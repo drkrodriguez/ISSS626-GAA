@@ -2,7 +2,9 @@
 title: "Geospatial Data Wrangling with R"
 ---
 
-For this hands-on exercise, we perform basic data wrangling tasks using the sf package in R. The content is based on
+For this hands-on exercise, we performed basic data wrangling tasks using the sf package in R.
+
+This exercise is based on Chapter 1 of Dr Kam's online book which can be accessed [here](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam").
 
 # Getting Started
 

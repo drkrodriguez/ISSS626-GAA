@@ -9,7 +9,7 @@ The course covers theory and methods of geospatial analysis and the tools in R t
 
 ## Hands-On Exercises
 
-Hands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations which complement our pre-class reading, and prepares us for the in-class exercises.
+Hands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations (through Dr Kam's online [book](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam")) which complement our pre-class reading, and prepares us for the in-class exercises.
 
 1.  [Geospatial Data Wrangling with R](Hands-on/Hands-on_Ex01/Hands-on_Ex01.html) (for Session 1, 26 Aug '24)
 
