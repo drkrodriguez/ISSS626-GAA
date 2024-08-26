@@ -2,6 +2,11 @@
 title: "Choropleth Mapping with R"
 author: "Federico Jose Rodriguez"
 date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
 ---
 
 For this hands-on exercise, we learned how to plot choropleth maps by using an R package called **tmap**
@@ -109,7 +114,7 @@ We can check that the transformation has been executed properly by displaying th
 popdata2020
 ```
 
-##  Joining the attribute and geospatial data
+## Joining the attribute and geospatial data
 
 To use this attribute data for our analysis, we need to join it with the geospatial data. The first step will be to convert the PA and SZ values to uppercase to make sure that they follow the same convention as the geospatial data. We use the `mutate_at()` function to apply this transformation.
 
@@ -143,7 +148,7 @@ There are two preparation approaches available using tmap:
 
 -   Using tmap elements to highly customize and plot a map
 
-## Plotting a choropleth map quickly using `qtm()` 
+## Plotting a choropleth map quickly using `qtm()`
 
 `qtm()` is a convenient way to produce a thematic or choropleth map. It provides a good default or initial visualization.
 

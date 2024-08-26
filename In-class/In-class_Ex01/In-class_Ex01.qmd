@@ -3,8 +3,95 @@ title: "In-Class Exercise 1: Introduction to Geospatial Analytics"
 author: "Federico Jose Rodriguez"
 date: "Aug 26 2024"
 date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
 ---
 
-XXXXX
+In this exercise, XXXXX
 
 # Getting Started
+
+## Data Sources
+
+The exercise uses the following data sources:
+
+-   Master Plan 2014 Subzone Boundary from data.gov.sg in [SHP](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view) and [KML](https://beta.data.gov.sg/datasets/d_5cb80a95445f236737f6bc2bfe5f159d/view) formats
+
+-   Master Plan 2019 Subzone Boundary from [data.gov.sg](https://beta.data.gov.sg/datasets/d_0900fdcfdb4666fe2a630f37a532fc06/view)
+
+-   Pre-school locations from [data.gov.sg](https://beta.data.gov.sg/datasets/d_a72bcd23e208d995f3bd4eececeaca43/view)
+
+## Installing and launching R packages
+
+This exercise will make use of four R packages: **sf**, **tidyverse, ggstatsplot** and **tmap**.
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, tidyverse, tmap, ggstatsplot)
+```
+
+## Importing the Geospatial Data
+
+The code chunk below loads the Masterplan subzone boundary shape file as a dataframe `mpsz14_shp`
+
+```{r}
+mpsz14_shp = st_read(dsn = "data/geospatial", 
+                  layer = "MP14_SUBZONE_WEB_PL")
+```
+
+The code chunk below loads the Masterplan subzone boundary KML file as a dataframe `mpsz14_kml`
+
+```{r}
+mpsz14_kml = st_read("data/geospatial/MasterPlan2014SubzoneBoundary.kml")
+```
+
+It appears that the data uploaded in the portal is corrupted as it is not being properly loaded into R. To illustrate loading the same data in KML format, we can create a clean KML file using `st_write()`
+
+```{r}
+st_write(mpsz14_shp,
+         "data/geospatial/MP14SubzoneBoundary.kml",
+         delete_dsn = TRUE)
+
+mpsz14_kml = st_read("data/geospatial/MP14SubzoneBoundary.kml")
+```
+
+The code chunk below loads the 2019 Masterplan subzone boundary SHP file as a dataframe `mpsz19_shp`
+
+```{r}
+mpsz19_shp = st_read(dsn = "data/geospatial", 
+                  layer = "MPSZ-2019")
+```
+
+The output shows that the data uses a geographic coordinate system instead of a projected coordinate system that we need for analysis. This needs to be translated before we can analyze this data with our other datasets. To do this, we can revise the code to:
+
+```{r}
+mpsz19_shp = st_read(dsn = "data/geospatial", 
+                  layer = "MPSZ-2019") %>%
+  st_transform(crs = 3414)
+```
+
+The code chunk below loads the KML file and also shows we have it in geographic coordinate system.
+
+```{r}
+mpsz19_kml = st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
+```
+
+## Importing Aspatial Data
+
+We load the 2023 population data into a dataframe called `popdata` and see that there are 101K rows and 7 columns.
+
+```{r}
+popdata = read_csv("data/aspatial/respopagesextod2023.csv")
+```
+
+xxx
+
+xxx
+
+xxx
+
+xxx

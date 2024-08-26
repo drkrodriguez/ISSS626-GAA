@@ -2,6 +2,11 @@
 title: "Geospatial Data Wrangling with R"
 author: "Federico Jose Rodriguez"
 date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
 ---
 
 For this hands-on exercise, we performed basic data wrangling tasks using the sf package in R.
