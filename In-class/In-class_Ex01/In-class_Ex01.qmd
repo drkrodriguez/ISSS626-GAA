@@ -1,0 +1,10 @@
+---
+title: "In-Class Exercise 1: Introduction to Geospatial Analytics"
+author: "Federico Jose Rodriguez"
+date: "Aug 26 2024"
+date-modified: "last-modified"
+---
+
+XXXXX
+
+# Getting Started

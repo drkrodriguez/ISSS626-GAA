@@ -1,5 +1,7 @@
 ---
 title: "Choropleth Mapping with R"
+author: "Federico Jose Rodriguez"
+date-modified: "last-modified"
 ---
 
 For this hands-on exercise, we learned how to plot choropleth maps by using an R package called **tmap**

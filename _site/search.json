@@ -11,14 +11,14 @@
     "href": "index.html#hands-on-exercises",
     "title": "Geospatial Analytics and Applications (in R)",
     "section": "Hands-On Exercises",
-    "text": "Hands-On Exercises\nHands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations (through Dr Kam’s online book) which complement our pre-class reading, and prepares us for the in-class exercises.\n\nGeospatial Data Wrangling with R (for Session 1, 26 Aug ’24)\nChoropleth Mapping with R (for Session 1, 26 Aug ’24)"
+    "text": "Hands-On Exercises\nHands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations (through Dr Kam’s online book) which complement our pre-class reading, and prepares us for the in-class exercises.\n\nGeospatial Data Wrangling with R (for Session 1, 26 Aug ’24)\nChoropleth Mapping with R (for Session 1, 26 Aug ’24)\n1st Order Spatial Point Patterns Analysis Methods (for Session 2, 2 Sept ’24)\n2nd Order Spatial Point Patterns Analysis Methods (for Session 2, 2 Sept ’24)"
   },
   {
     "objectID": "index.html#in-class-exercises",
     "href": "index.html#in-class-exercises",
     "title": "Geospatial Analytics and Applications (in R)",
     "section": "In-Class Exercises",
-    "text": "In-Class Exercises\nComing soon"
+    "text": "In-Class Exercises\nIn each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.\n\nIntroduction to Geospatial Analytics (26 Aug ’24)"
   },
   {
     "objectID": "index.html#take-home-exercises",
@@ -257,5 +257,19 @@
     "title": "About",
     "section": "",
     "text": "Hi there! I’m Derek (Federico Jose Rodriguez) and I built this website as I started taking my Geospatial Analytics and Applications course in the MITB Program of Singapore Management University in 2024."
+  },
+  {
+    "objectID": "In-class/In-class_Ex01/In-class_Ex01.html",
+    "href": "In-class/In-class_Ex01/In-class_Ex01.html",
+    "title": "In-Class Exercise 1: Introduction to Geospatial Analytics",
+    "section": "",
+    "text": "XXXXX\n\nGetting Started"
+  },
+  {
+    "objectID": "In-class/In-class_Ex01/data/geospatial/MPSZ-2019.html",
+    "href": "In-class/In-class_Ex01/data/geospatial/MPSZ-2019.html",
+    "title": "Geospatial Analytics w/ Derek",
+    "section": "",
+    "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     dataset\n\n\n        0 0     false"
   }
 ]
