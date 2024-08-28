@@ -1,0 +1,45 @@
+---
+title: "First Order Spatial Points Analysis Methods"
+author: "Federico Jose Rodriguez"
+date: "Aug 28 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+For this hands-on exercise, we start learning about Spatial Point pattern analysis, starting with First Order effects. (based on an underlying property or location)
+
+We will be using the functions of the spatstat package, and applying it to an analysis on the location of childcare centres in Singapore.
+
+# Getting Started
+
+## Data Sources
+
+Data for this exercise are from public sources and include:
+
+-   Location and attribute information of childcare centres in Singapore from data.gov.sg
+
+-   Master Plan 2014 Subzone Boundary from [data.gov.sg](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view)
+
+-   National boundary of Singapore provided in SLA and ESRI shapefile format
+
+## Installing and launching R packages
+
+This exercise will make use of five R packages: **sf**, **tidyverse, spatstat, raster, maptools** and **tmap**. Among these, the new ones we are using are:
+
+-   **spatstat** - offers a wide range of functions for point pattern analysis (PPA)
+
+-   **raster** - used to read, write, manipulate and analyse models of gridded spatial data
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, tidyverse, tmap, spatstat, raster)
+```
+
+# Data Loading and Preparation
+
+## Importing the Geospatial Data

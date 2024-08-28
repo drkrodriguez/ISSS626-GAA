@@ -292,5 +292,33 @@
     "title": "In-Class Exercise 1: Introduction to Geospatial Analytics",
     "section": "",
     "text": "We load the 2023 population data into a dataframe called popdata and see that there are 101K rows and 7 columns.\n\npopdata = read_csv(\"data/aspatial/respopagesextod2023.csv\")\n\nRows: 100928 Columns: 7\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (5): PA, SZ, AG, Sex, TOD\ndbl (2): Pop, Time\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.\n\n\nxxx\nxxx\nxxx\nxxx"
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html",
+    "href": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html",
+    "title": "First Order Spatial Points Analysis Methods",
+    "section": "",
+    "text": "For this hands-on exercise, we start learning about Spatial Point pattern analysis, starting with First Order effects. (based on an underlying property or location)\nWe will be using the functions of the spatstat package, and applying it to an analysis on the location of childcare centres in Singapore."
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html#data-sources",
+    "href": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html#data-sources",
+    "title": "First Order Spatial Points Analysis Methods",
+    "section": "Data Sources",
+    "text": "Data Sources\nData for this exercise are from public sources and include:\n\nLocation and attribute information of childcare centres in Singapore from data.gov.sg\nMaster Plan 2014 Subzone Boundary from data.gov.sg\nNational boundary of Singapore provided in SLA and ESRI shapefile format"
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html#installing-and-launching-r-packages",
+    "href": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html#installing-and-launching-r-packages",
+    "title": "First Order Spatial Points Analysis Methods",
+    "section": "Installing and launching R packages",
+    "text": "Installing and launching R packages\nThis exercise will make use of five R packages: sf, tidyverse, spatstat, raster, maptools and tmap. Among these, the new ones we are using are:\n\nspatstat - offers a wide range of functions for point pattern analysis (PPA)\nraster - used to read, write, manipulate and analyse models of gridded spatial data\n\nThe code chunk below uses p_load() of pacman package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.\n\npacman::p_load(sf, tidyverse, tmap, spatstat, raster)"
+  },
+  {
+    "objectID": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html#importing-the-geospatial-data",
+    "href": "Hands-on/Hands-On_Ex03/Hands-On_Ex03.html#importing-the-geospatial-data",
+    "title": "First Order Spatial Points Analysis Methods",
+    "section": "Importing the Geospatial Data",
+    "text": "Importing the Geospatial Data"
   }
 ]

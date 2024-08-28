@@ -81,6 +81,35 @@ The code chunk below loads the KML file and also shows we have it in geographic 
 mpsz19_kml = st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
 ```
 
+The code chunk below loads the preschool location in KML format into a dataframe
+
+```{r}
+preschool_kml = st_read("data/geospatial/PreSchoolsLocation.kml")
+```
+
+The code chunk below loads the preschool location in GeoJSON format into a dataframe
+
+```{r}
+preschool_geojson = st_read("data/geospatial/PreSchoolsLocation.geojson") 
+```
+
+The last two files are again in GCS (WGS84) rather than projected coordinate system (SVY21) We can reconfirm this with the next code chunk
+
+```{r}
+st_crs(preschool_kml)
+```
+
+We can use the following code to import the preschool location and project it into SVY21
+
+```{r}
+preschool <- st_read("data/geospatial/PreSchoolsLocation.kml") %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+st_crs(preschool)
+```
+
 ## Importing Aspatial Data
 
 We load the 2023 population data into a dataframe called `popdata` and see that there are 101K rows and 7 columns.

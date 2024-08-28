@@ -1,0 +1,15 @@
+{
+  "hash": "571fa20886a33516c6c036302ccf3624",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"First Order Spatial Points Analysis Methods\"\nauthor: \"Federico Jose Rodriguez\"\ndate: \"Aug 28 2024\"\ndate-modified: \"last-modified\"\nexecute: \n  eval: true\n  echo: true\n  message: false\n  freeze: true\n---\n\n\n\n\n\nFor this hands-on exercise, we start learning about Spatial Point pattern analysis, starting with First Order effects. (based on an underlying property or location)\n\nWe will be using the functions of the spatstat package, and applying it to an analysis on the location of childcare centres in Singapore.\n\n# Getting Started\n\n## Data Sources\n\nData for this exercise are from public sources and include:\n\n-   Location and attribute information of childcare centres in Singapore from data.gov.sg\n\n-   Master Plan 2014 Subzone Boundary from [data.gov.sg](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view)\n\n-   National boundary of Singapore provided in SLA and ESRI shapefile format\n\n## Installing and launching R packages\n\nThis exercise will make use of five R packages: **sf**, **tidyverse, spatstat, raster, maptools** and **tmap**. Among these, the new ones we are using are:\n\n-   **spatstat** - offers a wide range of functions for point pattern analysis (PPA)\n\n-   **raster** - used to read, write, manipulate and analyse models of gridded spatial data\n\nThe code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.\n\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(sf, tidyverse, tmap, spatstat, raster)\n```\n:::\n\n\n\n\n\n# Data Loading and Preparation\n\n## Importing the Geospatial Data\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
