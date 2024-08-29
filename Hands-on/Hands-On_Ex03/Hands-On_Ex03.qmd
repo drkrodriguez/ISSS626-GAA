@@ -43,3 +43,109 @@ pacman::p_load(sf, tidyverse, tmap, spatstat, raster)
 # Data Loading and Preparation
 
 ## Importing the Geospatial Data
+
+We use the `st_read()` function of the **sf** package to load the different geospatial datasets into R.
+
+The code below loads the preschool location geoJSON file into the dataframe `childcare_sf` and projects it into SVY21.
+
+```{r}
+childcare_sf <- st_read("data/geospatial/child-care-services-geojson.geojson") %>%
+  st_transform(crs = 3414)
+```
+
+The code chunk below loads the Singapore National boundary shapefile into the dataframe `sg_sf`.
+
+```{r}
+sg_sf <- st_read(dsn = "data/geospatial", layer="CostalOutline")
+```
+
+The code chunk below loads the Master Plan 2014 subzone boundary shapefile into another dataframe called mpsz_sf
+
+```{r}
+mpsz_sf <- st_read(dsn = "data/geospatial", 
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+We can use st_crs() to check what coordinate systems are used in each of the three sf dataframes.
+
+`childcare_sf` is in SVY21 using EPSG code 3414 after our load and transform operation above.
+
+```{r}
+st_crs(childcare_sf)
+```
+
+While `sg_sf` and `mpsz_sf` appeared to be in SVY21, running `st_crs()` reveals that they are not using the correct EPSG code.
+
+```{r}
+st_crs(sg_sf)
+```
+
+```{r}
+st_crs(mpsz_sf)
+```
+
+Using `st_set_crs()` we can convert these and correct the crs information.
+
+```{r}
+sg_sf = st_set_crs(sg_sf, 3414)
+mpsz_sf = st_set_crs(mpsz_sf, 3414)
+```
+
+Rerunning `st_crs()` shows that the correct EPSG code is now reflected.
+
+```{r}
+st_crs(mpsz_sf)
+```
+
+## Mapping the Geospatial Data Sets
+
+With all three datasets in the same coordinate system, we can draw them in a single map as different layers using `tm_shape()` as in the following code chunk. See how the planning subzones extend beyond the defined coastal borders.
+
+```{r}
+tm_shape(sg_sf)+
+    tm_fill("lightblue") +
+    tm_borders(lwd = 0.1,  alpha = 1)+
+    tm_shape(mpsz_sf) +
+    tm_fill("grey", alpha = 0.5) +
+    tm_borders(lwd = 0.1,  alpha = 1) +
+    tm_shape(childcare_sf) +
+    tm_dots(col = "darkgreen")
+```
+
+The previous map shows the importance of using the same reference system across three different data sets for mapping and for analysis.
+
+Alternatively, we can prepare a pin map using the code below which switches to interactive mode using `tmap_mode()`
+
+```{r}
+tmap_mode('view')
+tm_shape(childcare_sf)+
+  tm_dots()
+```
+
+Interactive maps allow the user to navigate and zoom in and out of the map freely. Features can also be queried by clicking on them. The background map layer is defaulted to ESRI.WorldGrayCanvas. There are two other available background map layers (ESRI.WorldToolMap and OpenStreetMap)
+
+It is important to switch back to static mode (using the code below) when interactive maps are not required. This is as each interactive map uses a connection. The use of of interactive maps should be limited when publishing.
+
+```{r}
+tmap_mode('plot')
+```
+
+# Spatial Data Wrangling
+
+While **sf** is gaining popularity, some geospatial analysis require that the input data is in **sp**'s spatial class. It is therefore important to learn about converting an dataframe from sf to sp.
+
+## Converting sf dataframe sp spatial class
+
+The code chunk below converts the three dataframes using `as_Spatial()` from the **sf** package.
+
+```{r}
+childcare <- as_Spatial(childcare_sf)
+mpsz <- as_Spatial(mpsz_sf)
+sg <- as_Spatial(sg_sf)
+```
+
+xxx
+
+```{r}
+childcare
+```
