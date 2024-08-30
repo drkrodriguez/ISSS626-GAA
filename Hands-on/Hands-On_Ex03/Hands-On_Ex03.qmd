@@ -12,7 +12,9 @@ execute:
 
 For this hands-on exercise, we start learning about Spatial Point pattern analysis, starting with First Order effects. (based on an underlying property or location)
 
-We will be using the functions of the spatstat package, and applying it to an analysis on the location of childcare centres in Singapore.
+We will be using the functions of the **spatstat** package, and applying it to an analysis on the location of childcare centres in Singapore.
+
+This exercise is based on Chapter 4 of Dr Kam's online book which can be accessed [here](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam").
 
 # Getting Started
 
@@ -144,8 +146,114 @@ mpsz <- as_Spatial(mpsz_sf)
 sg <- as_Spatial(sg_sf)
 ```
 
-xxx
+We can check the contents of the new dataframes by calling them. This confirms that they are in the spatial\* class format.
 
 ```{r}
 childcare
 ```
+
+## Converting the spatial class to generic sp format
+
+**spatstat** requires that the data is in ***ppp*** object form. There is no direct way to do this from spatial\* class. We need to convert spatial\* class to a spatial object first.
+
+The code chunk below transform two of the spatial\* objects into generic sp objects.
+
+```{r}
+childcare_sp <- as(childcare, "SpatialPoints")
+sg_sp <- as(sg, "SpatialPolygons")
+```
+
+Calling `childcare_sp` and `sg_sp` lets us check their properties.
+
+```{r}
+childcare_sp
+```
+
+```{r}
+sg_sp
+```
+
+## Converting generic sp format into spatstat's ppp format
+
+We will then use `as.ppp()` from **spatstat** package to convert the (spatial) data into spatstat's ppp object format.
+
+```{r}
+childcare_ppp <- as.ppp(childcare_sf)
+childcare_ppp
+```
+
+We see the difference of this format when we use `plot()` (from R Graphics) to produce a quick map of the data.
+
+```{r}
+plot(childcare_ppp)
+```
+
+We can see summary information on the new ppp object using the code chunk below.
+
+```{r}
+summary(childcare_ppp)
+```
+
+## Handling duplicated points
+
+We can check duplication in a ppp object using the code chunk below.
+
+```{r}
+any(duplicated(childcare_ppp))
+```
+
+To count the number of coincident points, we can use the `multiplicity()` function.
+
+```{r}
+multiplicity(childcare_ppp)
+```
+
+We can wrap this in `sum()` to count the number of locations with more than one event.
+
+```{r}
+sum(multiplicity(childcare_ppp) > 1)
+```
+
+The outputs show that there are no duplication in `childcare_ppp`
+
+If there are any duplicates, there are three possible approaches to handle them:
+
+1.  **Delete the duplicates.** The downside of this is that some (useful) information will be lost
+
+2.  **Jittering**. Adding a small perturbation to the duplicate points so they do not occupy the exact same space
+
+3.  **Make each point unique**, then attach the duplicates of the points as marks or attributes to the point
+
+The code chunk below shows how jittering can be applied using `rjitter()`
+
+```{r}
+#| eval: false
+childcare_ppp_jit <- rjitter(childcare_ppp, 
+                             retry=TRUE, 
+                             nsim=1, 
+                             drop=TRUE)
+```
+
+## Creating owin object
+
+When analysing spatial point patterns, it is best to confine the analysis within a geographical area. In **spatstat**, the object that represents the bounded region is called an **owin**.
+
+The code chunk below creates an **owin** based on the `sg` SpatialPolygon object.
+
+```{r}
+sg_owin <- as.owin(sg_sf)
+```
+
+The owin object can be displayed graphically using `plot()` and summarized using `summary()`
+
+```{r}
+plot(sg_owin)
+```
+
+```{r}
+summary(sg_owin)
+```
+
+## Combining point events object and owin object
+
+In this last step,

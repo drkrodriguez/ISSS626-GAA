@@ -121,7 +121,7 @@ The `plot()` function of R Graphic allows us to display the content of an sf dat
 plot(mpsz)
 ```
 
-The default output of from running an sf object in `plot()` is a multi-plot of all attributes, or a reasonable number of attributes. For the case of `mpsz`, the function gives a multiplot of the first 9 attributes. We can generate a plot for just `geometry` by using the following code:
+The default output of running an sf object in `plot()` is a multi-plot of all attributes, or a reasonable number of attributes. For the case of `mpsz`, the function gives a multiplot of the first 9 attributes. We can generate a plot for just `geometry` by using the following code:
 
 ```{r}
 plot(st_geometry(mpsz))
