@@ -256,4 +256,204 @@ summary(sg_owin)
 
 ## Combining point events object and owin object
 
-In this last step,
+In this last step, we extract childcare events (locations) that are within Singapore, as depicted by the owin, using the code chunk below.
+
+```{r}
+childcareSG_ppp = childcare_ppp[sg_owin]
+```
+
+The output is a combination of the point feature and the polygon feature into a single ppp object:
+
+```{r}
+summary(childcareSG_ppp)
+```
+
+Running `plot()` on this shows both the owin and the preschool locations in a single map.
+
+```{r}
+plot(childcareSG_ppp)
+```
+
+# First-order Spatial Point Pattern Analysis (SPPA)
+
+In this section, we perform first-order SPPA by using the **spatstat** package. This exercise will focus on:
+
+1.  deriving the **KDE (Kernel Density Estimation)** layer for visualizing and exploring the intensity of point processes; and,
+
+2.  performing **Confirmatory SPPA** by using **Nearest Neighbour** statistics
+
+## Kernel Density Estimation (KDE)
+
+### Computing KDE using automatic bandwidth selection method
+
+The following code chunk computes the KDE for childcare services using `density()` from **spatstat** with the following parameters:
+
+-   `bw.diggle()` for automatic bandwidth selection method. Other recommended methods are `bw.CvL()`, `bw.scott()` or `bw.ppl()`
+
+-   `gaussian` as the smoothing kernel. This is already the default. Other smoothing methods that can be used are `epanechnikov`, `quartic` and `disc`
+
+-   The intensity estimate is corrected for edge effect bias by using the method described by Jones (1993) and Diggle (2010, equation 18.9). The default is FALSE.
+
+```{r}
+kde_childcareSG_bw <- density(childcareSG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+```
+
+Running this new object into `plot()` will display the derived KDE for the childcare events/locations
+
+```{r}
+plot(kde_childcareSG_bw)
+```
+
+The values stand for the density and currently range from 0 to 0.000035. These numbers are small and hard to visualize, but is a result of the unit of measurements used in the reference system, which is svy21. As svy21 uses meter as the unit of measure, the figures stand for number of points per square meter.
+
+We can also retrieve the bandwidth used to compute the kde layer using the code chunk below
+
+```{r}
+bw <- bw.diggle(childcareSG_ppp)
+bw
+```
+
+### Rescaling KDE values
+
+The code chunk below uses `rescale.ppp()` to convert the unit of measure from meter to kilometer.
+
+```{r}
+childcareSG_ppp.km <- rescale.ppp(childcareSG_ppp, 1000, "km")
+```
+
+We can then recompute the KDE and plot the new map with the rescaled data. The map will be the same but the KDE values will now represent the number of points per square kilometer
+
+```{r}
+kde_childcareSG.bw <- density(childcareSG_ppp.km,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                              kernel="gaussian")
+plot(kde_childcareSG.bw)
+```
+
+### Working with different automatic bandwidth methods
+
+There are three other spatstat functions that can be used to determine bandwidth: `bw.CvL()`, `bw.scott()`, and `bw.ppl()`
+
+We can observe the different computed values by using the code chunks below:
+
+```{r}
+ bw.CvL(childcareSG_ppp.km)
+```
+
+```{r}
+bw.scott(childcareSG_ppp.km)
+```
+
+```{r}
+bw.ppl(childcareSG_ppp.km)
+```
+
+```{r}
+bw.diggle(childcareSG_ppp.km)
+```
+
+Baddeley et al (2016) suggested the use of the `bw.ppl()` because in their experience it tends to produce the more appropriate values when the pattern consists predominantly of tight clusters. They also insist that if the purpose of one's study is to detect a single tight cluster in the midst of random noise then `bw.diggle()` seems to work best.
+
+The code chunk beow will be used to compare the output of using `bw.diggle()` and `bw.ppl()`.
+
+```{r}
+kde_childcareSG.ppl <- density(childcareSG_ppp.km, 
+                               sigma=bw.ppl, 
+                               edge=TRUE,
+                               kernel="gaussian")
+par(mfrow=c(1,2))
+plot(kde_childcareSG.bw, main = "bw.diggle")
+plot(kde_childcareSG.ppl, main = "bw.ppl")
+```
+
+### Working with different kernel methods
+
+The default kernel method used is `gaussian`, but, as mentioned, there are three other options.
+
+The code chunk below can be used to compare the KDE of the four different methods based on the output of `plot()`
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(childcareSG_ppp.km, 
+             sigma=bw.ppl, 
+             edge=TRUE, 
+             kernel="gaussian"), 
+     main="Gaussian")
+plot(density(childcareSG_ppp.km, 
+             sigma=bw.ppl, 
+             edge=TRUE, 
+             kernel="epanechnikov"), 
+     main="Epanechnikov")
+plot(density(childcareSG_ppp.km, 
+             sigma=bw.ppl, 
+             edge=TRUE, 
+             kernel="quartic"), 
+     main="Quartic")
+plot(density(childcareSG_ppp.km, 
+             sigma=bw.ppl, 
+             edge=TRUE, 
+             kernel="disc"), 
+     main="Disc")
+```
+
+## Fixed and Adaptive KDE
+
+### Computing the KDE by using a fixed bandwidth
+
+The code chunk below computes a KDE layer with a bandwidth of 600 meters. This is done by setting a `sigma` value of 0.6 as the unit of measurement is kilometer. (600m = 0.6km)
+
+```{r}
+kde_childcareSG_600 <- density(childcareSG_ppp.km,
+                               sigma=0.6,
+                               edge=TRUE,
+                               kernel="gaussian")
+plot(kde_childcareSG_600)
+```
+
+### Computing KDE by using an adaptive bandwidth
+
+Fixed bandwidth will be sensitive to highly skewed distribution over geographic units– for example, in rural vs urban areas. One way to overcome this problem is by using *adaptive* bandwidths.
+
+The code chunk below uses `adaptive.density()` to derive adaptive KDE.
+
+```{r}
+kde_childcareSG_adaptive <- adaptive.density(childcareSG_ppp.km, method="kernel")
+plot(kde_childcareSG_adaptive)
+```
+
+We can use the code chunk below to compare the outputs of using fixed and adaptive bandwidths
+
+```{r}
+par(mfrow=c(1,2))
+plot(kde_childcareSG.bw, main = "Fixed bandwidth")
+plot(kde_childcareSG_adaptive, main = "Adaptive bandwidth")
+```
+
+### Converting KDE output into grid object
+
+We can convert the KDE output into a grid object using the code below
+
+```{r}
+gridded_kde_childcareSG_bw <- as(kde_childcareSG.bw, "SpatialGridDataFrame")
+spplot(gridded_kde_childcareSG_bw)
+```
+
+#### Converting gridded output into raster
+
+We then convert the gridded KDE object into a RasterLayer object using `raster()` of the **raster** package
+
+```{r}
+kde_childcareSG_bw_raster <- raster(gridded_kde_childcareSG_bw)
+```
+
+We can take a look at the properties of thee new raster object by calling it as below. Note that the CRS property of this object is NA
+
+```{r}
+kde_childcareSG_bw_raster
+```
+
+#### xxx
