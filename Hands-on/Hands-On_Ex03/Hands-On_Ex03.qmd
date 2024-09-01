@@ -456,4 +456,219 @@ We can take a look at the properties of thee new raster object by calling it as 
 kde_childcareSG_bw_raster
 ```
 
-#### xxx
+#### Assigning projection systems
+
+The code chunk below will add CRS information into `kde_childcare_SG_bw_raster` raster layer
+
+```{r}
+projection(kde_childcareSG_bw_raster) <- CRS("+init=EPSG:3414")
+kde_childcareSG_bw_raster
+```
+
+## Visualising the output in tmap
+
+The code chunk below will display a raster object into a cartographic quality map using the **tmap** package. Notice that the raster values are encoded explicitly onto the raster pixel using the values in the "v" field.
+
+```{r}
+tm_shape(kde_childcareSG_bw_raster) + 
+  tm_raster(palette = "viridis", title = "layer") +
+  tm_layout(legend.position = c("right", "bottom"), frame = FALSE)
+```
+
+## Comparing spatial point patterns using KDE
+
+In this section, we will compare the KDE of childcare facilities in Punggol, Tampines, Chua Chu Kang and Jurong West (planning areas)
+
+### Extracting study area
+
+The code chunk below extracts the target planning areas from `mpsz_sf`
+
+```{r}
+pg <- mpsz_sf %>%
+  filter(PLN_AREA_N == "PUNGGOL")
+tm <- mpsz_sf %>%
+  filter(PLN_AREA_N == "TAMPINES")
+ck <- mpsz_sf %>%
+  filter(PLN_AREA_N == "CHOA CHU KANG")
+jw <- mpsz_sf %>%
+  filter(PLN_AREA_N == "JURONG WEST")
+```
+
+The code chunks below plot the different target planning areas using `tmap_arrange()`.
+
+```{r}
+punggol <- tm_shape(pg) + 
+  tm_polygons() + tm_layout(title = "Punggol")
+
+cck <- tm_shape(ck) + 
+  tm_polygons() + tm_layout(title = "Chua Chu Kang")
+
+tampines <- tm_shape(tm) + 
+  tm_polygons() + tm_layout(title = "Tampines")
+
+jwest <- tm_shape(jw) + 
+  tm_polygons() + tm_layout(title = "Jurong West")
+
+tmap_arrange(punggol, tampines, cck, jwest, asp=2, ncol=2, nrow = 2)
+```
+
+### Creating owin object
+
+The code chunk below converts the four objeects into owin which is a requirement for analysing with **spatstat**
+
+```{r}
+pg_owin = as.owin(pg)
+tm_owin = as.owin(tm)
+ck_owin = as.owin(ck)
+jw_owin = as.owin(jw)
+```
+
+### Combining childcare points and the study area
+
+The code chunk below extracts the childcare points/events that are within each of the target areas
+
+```{r}
+childcare_pg_ppp = childcare_ppp[pg_owin]
+childcare_tm_ppp = childcare_ppp[tm_owin]
+childcare_ck_ppp = childcare_ppp[ck_owin]
+childcare_jw_ppp = childcare_ppp[jw_owin]
+```
+
+We use `rescale.ppp()` in the next code chunk to transform the unit of measure from meter to kilometer
+
+```{r}
+childcare_pg_ppp.km = rescale.ppp(childcare_pg_ppp, 1000, "km")
+childcare_tm_ppp.km = rescale.ppp(childcare_tm_ppp, 1000, "km")
+childcare_ck_ppp.km = rescale.ppp(childcare_ck_ppp, 1000, "km")
+childcare_jw_ppp.km = rescale.ppp(childcare_jw_ppp, 1000, "km")
+```
+
+The code chunk below s used to plot the four target areas and the locations of their childcare centres
+
+```{r}
+par(mfrow=c(2,2))
+plot(childcare_pg_ppp.km, main="Punggol")
+plot(childcare_tm_ppp.km, main="Tampines")
+plot(childcare_ck_ppp.km, main="Choa Chu Kang")
+plot(childcare_jw_ppp.km, main="Jurong West")
+```
+
+### Computing KDE
+
+The code chunk below computes the KDE of the four target areas. `bw.diggle()` is the method used to compute for the bandwidths
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(childcare_pg_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Punggol")
+plot(density(childcare_tm_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Tempines")
+plot(density(childcare_ck_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Choa Chu Kang")
+plot(density(childcare_jw_ppp.km, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="JUrong West")
+```
+
+### Computing fixed bandwidth KDE
+
+To enable comparisons, we can set the bandwidth to 250m using the code chunk below
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(childcare_ck_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Chou Chu Kang")
+plot(density(childcare_jw_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="JUrong West")
+plot(density(childcare_pg_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Punggol")
+plot(density(childcare_tm_ppp.km, 
+             sigma=0.25, 
+             edge=TRUE, 
+             kernel="gaussian"),
+     main="Tampines")
+```
+
+## Nearest Neighbour Analysis
+
+For the succeeding section, we perform the Clark-Evans test of aggregation for a spatial point pattern by using `clarkevans.test()` from **spatstat**.
+
+The test hypotheses for these are:
+
+-   $H_0$ - The distribution of event locations (childcard service centres) is random
+
+-   $H_1$ - The distribution of event locations is not random
+
+For our testing, 95% confidence interval will be used
+
+### Testing spatial point patterns using Clark-Evans test
+
+The code chunk below runs the test on `childcareSG_ppp`
+
+```{r}
+clarkevans.test(childcareSG_ppp,
+                correction="none",
+                clipregion="sg_owin",
+                alternative=c("clustered"),
+                nsim=99)
+```
+
+The resulting p value ( $2.2 * 10^{-16}$) is very small and is below our significance level of 5%. Based on this, we reject the null hypothesis and conclude that the childcare centres are **not randomly distributed**.
+
+### Clarke-Evans test on individual planning areas
+
+The code chunks below runs `clarkevans.test()` on the target areas separately.
+
+The outputs show that the test rejects the null hypothesis for Tampines and Jurong West, but not for the other two. (i.e., it concludes that the childcare centres in Tampines and in Jurong West are not randomly distributed)
+
+```{r}
+clarkevans.test(childcare_ck_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=999)
+```
+
+```{r}
+clarkevans.test(childcare_tm_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=999)
+```
+
+```{r}
+clarkevans.test(childcare_pg_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=999)
+```
+
+```{r}
+clarkevans.test(childcare_jw_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=999)
+```
