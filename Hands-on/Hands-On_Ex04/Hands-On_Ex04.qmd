@@ -1,0 +1,307 @@
+---
+title: "Second Order Spatial Point Pattern Analysis Methods"
+author: "Federico Jose Rodriguez"
+date: "Sep 1 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this hands-on exercise, we continue learning about Spatial Point pattern analysis with the help of **spatstat** package. We continue looking at the dataset using the location of childcare centres in Singapore.
+
+This exercise is based on Chapter 5 of Dr Kam's online book which can be accessed [here](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam").
+
+# Getting Started
+
+## Data Sources
+
+Data for this exercise are from public sources and are the same as the previous hands-on exercise. This includes:
+
+-   Location and attribute information of childcare centres in Singapore from data.gov.sg
+
+-   Master Plan 2014 Subzone Boundary from [data.gov.sg](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view)
+
+-   National boundary of Singapore provided in SLA and ESRI shapefile format
+
+## Installing and launching R packages
+
+This exercise will make use of five R packages: **sf**, **tidyverse, spatstat, raster** and **tmap**.
+
+-   **sf -** for importing, managing and processing vector-based geospatial data
+
+-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+
+-   **tmap -** for plotting cartographic quality maps
+
+-   **spatstat** - offers a wide range of functions for point pattern analysis (PPA)
+
+-   **raster** - for reading, writing, manipulating and analysing models of gridded spatial data
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
+```
+
+# Spatial Data Wrangling
+
+## Importing the spatial data
+
+The code chunk below uses `st_read()` from the **sf** package to import the geospatial datasets.
+
+```{r}
+childcare_sf <- st_read("data/geospatial/child-care-services-geojson.geojson") %>% st_transform(crs = 3414)
+```
+
+```{r}
+sg_sf <- st_read(dsn = "data/geospatial", layer="CostalOutline")
+```
+
+```{r}
+mpsz_sf <- st_read(dsn = "data/geospatial", 
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+## Checking and converting projection systems
+
+We can use `st_crs()` to check what coordinate systems are used in each of the three sf dataframes.
+
+`childcare_sf` is in SVY21 using EPSG code 3414 after our load and transform operation above. However, `sg_sf` and `mpsz_sf` reveals that they are not using the correct EPSG code.
+
+```{r}
+#| echo: false
+st_crs(childcare_sf)
+```
+
+```{r}
+st_crs(sg_sf)
+```
+
+```{r}
+st_crs(mpsz_sf)
+```
+
+We use the code chunk below to update the EPSG code for the last two objects
+
+```{r}
+sg_sf = st_set_crs(sg_sf, 3414)
+mpsz_sf = st_set_crs(mpsz_sf, 3414)
+```
+
+## Mapping the geospatial datasets
+
+It is always good practice to plot or display imported data to check that they have been loaded and transformed properly. The code chunk below creates a map using tmap with all three objects where they appear to be mapped properly.
+
+```{r}
+tm_shape(sg_sf)+
+    tm_fill("lightblue") +
+    tm_borders(lwd = 0.1,  alpha = 1)+
+    tm_shape(mpsz_sf) +
+    tm_fill("grey", alpha = 0.5) +
+    tm_borders(lwd = 0.1,  alpha = 1) +
+    tm_shape(childcare_sf) +
+    tm_dots(col = "darkgreen")
+```
+
+# Geospatial Data Wrangling
+
+## Converting sf dataframe sp spatial class
+
+The code chunk below converts the three dataframes using `as_Spatial()` from the **sf** package.
+
+```{r}
+childcare <- as_Spatial(childcare_sf)
+mpsz <- as_Spatial(mpsz_sf)
+sg <- as_Spatial(sg_sf)
+```
+
+We can check the contents of the new dataframes by calling them. This confirms that they are in the spatial\* class format.
+
+```{r}
+childcare
+```
+
+## Converting the spatial class to generic sp format
+
+**spatstat** requires that the data is in ***ppp*** object form. There is no direct way to do this from spatial\* class. We need to convert spatial\* class to a spatial object first.
+
+The code chunk below transform two of the spatial\* objects into generic sp objects.
+
+```{r}
+childcare_sp <- as(childcare, "SpatialPoints")
+sg_sp <- as(sg, "SpatialPolygons")
+```
+
+Calling `childcare_sp` and `sg_sp` lets us check their properties.
+
+```{r}
+childcare_sp
+```
+
+```{r}
+sg_sp
+```
+
+## Converting generic sp format into spatstat's ppp format
+
+We will then use `as.ppp()` from **spatstat** package to convert the (spatial) data into spatstat's ppp object format.
+
+```{r}
+childcare_ppp <- as.ppp(childcare_sf)
+childcare_ppp
+```
+
+We see the difference of this format when we use `plot()` (from R Graphics) to produce a quick map of the data.
+
+```{r}
+plot(childcare_ppp)
+```
+
+We can see summary information on the new ppp object using the code chunk below.
+
+```{r}
+summary(childcare_ppp)
+```
+
+## Handling duplicated points
+
+We can check duplication in a ppp object using the code chunk below.
+
+```{r}
+any(duplicated(childcare_ppp))
+```
+
+To count the number of coincident points, we can use the `multiplicity()` function.
+
+```{r}
+multiplicity(childcare_ppp)
+```
+
+We can wrap this in `sum()` to count the number of locations with more than one event.
+
+```{r}
+sum(multiplicity(childcare_ppp) > 1)
+```
+
+The outputs show that there are no duplication in `childcare_ppp`
+
+## Creating owin object
+
+When analysing spatial point patterns, it is best to confine the analysis within a geographical area. In **spatstat**, the object that represents the bounded region is called an **owin**.
+
+The code chunk below creates an **owin** based on the `sg` SpatialPolygon object.
+
+```{r}
+sg_owin <- as.owin(sg_sf)
+```
+
+The owin object can be displayed graphically using `plot()` and summarized using `summary()`
+
+```{r}
+plot(sg_owin)
+```
+
+```{r}
+summary(sg_owin)
+```
+
+## Combining point events object and owin object
+
+In this last step, we extract childcare events (locations) that are within Singapore, as depicted by the owin, using the code chunk below.
+
+```{r}
+childcareSG_ppp = childcare_ppp[sg_owin]
+```
+
+The output is a combination of the point feature and the polygon feature into a single ppp object:
+
+```{r}
+summary(childcareSG_ppp)
+```
+
+Running `plot()` on this shows both the owin and the preschool locations in a single map.
+
+```{r}
+plot(childcareSG_ppp)
+```
+
+## Extracting study areas
+
+The code chunk below extracts the target planning areas from `mpsz_sf`
+
+```{r}
+pg <- mpsz_sf %>%
+  filter(PLN_AREA_N == "PUNGGOL")
+tm <- mpsz_sf %>%
+  filter(PLN_AREA_N == "TAMPINES")
+ck <- mpsz_sf %>%
+  filter(PLN_AREA_N == "CHOA CHU KANG")
+jw <- mpsz_sf %>%
+  filter(PLN_AREA_N == "JURONG WEST")
+```
+
+The code chunks below plot the different target planning areas using `tmap_arrange()`.
+
+```{r}
+punggol <- tm_shape(pg) + 
+  tm_polygons() + tm_layout(title = "Punggol")
+
+cck <- tm_shape(ck) + 
+  tm_polygons() + tm_layout(title = "Chua Chu Kang")
+
+tampines <- tm_shape(tm) + 
+  tm_polygons() + tm_layout(title = "Tampines")
+
+jwest <- tm_shape(jw) + 
+  tm_polygons() + tm_layout(title = "Jurong West")
+
+tmap_arrange(punggol, tampines, cck, jwest, asp=2, ncol=2, nrow = 2)
+```
+
+## Converting target areas into owin objects
+
+The code chunk below converts the four objeects into owin which is a requirement for analysing with **spatstat**
+
+```{r}
+pg_owin = as.owin(pg)
+tm_owin = as.owin(tm)
+ck_owin = as.owin(ck)
+jw_owin = as.owin(jw)
+```
+
+## Combining childcare points and the study area
+
+The code chunk below extracts the childcare points/events that are within each of the target areas
+
+```{r}
+childcare_pg_ppp = childcare_ppp[pg_owin]
+childcare_tm_ppp = childcare_ppp[tm_owin]
+childcare_ck_ppp = childcare_ppp[ck_owin]
+childcare_jw_ppp = childcare_ppp[jw_owin]
+```
+
+We use `rescale.ppp()` in the next code chunk to transform the unit of measure from meter to kilometer
+
+```{r}
+childcare_pg_ppp.km = rescale.ppp(childcare_pg_ppp, 1000, "km")
+childcare_tm_ppp.km = rescale.ppp(childcare_tm_ppp, 1000, "km")
+childcare_ck_ppp.km = rescale.ppp(childcare_ck_ppp, 1000, "km")
+childcare_jw_ppp.km = rescale.ppp(childcare_jw_ppp, 1000, "km")
+```
+
+The code chunk below is used to plot the four target areas and the locations of their childcare centres
+
+```{r}
+par(mfrow=c(2,2))
+plot(childcare_pg_ppp.km, main="Punggol")
+plot(childcare_tm_ppp.km, main="Tampines")
+plot(childcare_ck_ppp.km, main="Choa Chu Kang")
+plot(childcare_jw_ppp.km, main="Jurong West")
+```
+
+# Second-order Spatial Point Patterns Analysis 
+
+WIP

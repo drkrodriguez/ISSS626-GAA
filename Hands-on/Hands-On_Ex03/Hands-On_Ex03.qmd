@@ -30,7 +30,7 @@ Data for this exercise are from public sources and include:
 
 ## Installing and launching R packages
 
-This exercise will make use of five R packages: **sf**, **tidyverse, spatstat, raster, maptools** and **tmap**. Among these, the new ones we are using are:
+This exercise will make use of five R packages: **sf**, **tidyverse, spatstat, raster** and **tmap**. Among these, the new ones we are using are:
 
 -   **spatstat** - offers a wide range of functions for point pattern analysis (PPA)
 
@@ -68,7 +68,7 @@ mpsz_sf <- st_read(dsn = "data/geospatial",
                 layer = "MP14_SUBZONE_WEB_PL")
 ```
 
-We can use st_crs() to check what coordinate systems are used in each of the three sf dataframes.
+We can use `st_crs()` to check what coordinate systems are used in each of the three sf dataframes.
 
 `childcare_sf` is in SVY21 using EPSG code 3414 after our load and transform operation above.
 
@@ -543,7 +543,7 @@ childcare_ck_ppp.km = rescale.ppp(childcare_ck_ppp, 1000, "km")
 childcare_jw_ppp.km = rescale.ppp(childcare_jw_ppp, 1000, "km")
 ```
 
-The code chunk below s used to plot the four target areas and the locations of their childcare centres
+The code chunk below is used to plot the four target areas and the locations of their childcare centres
 
 ```{r}
 par(mfrow=c(2,2))
