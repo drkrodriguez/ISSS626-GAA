@@ -46,6 +46,14 @@ The code chunk below uses `p_load()` of **pacman** package to check if the packa
 pacman::p_load(sf, raster, spatstat, tmap, tidyverse)
 ```
 
+## Setting Random Seed Value
+
+As we are running Monte Carlo simulations, it is advisable to set a seed value to ensure reproducibility of results
+
+```{r}
+set.seed(1234)
+```
+
 # Spatial Data Wrangling
 
 ## Importing the spatial data

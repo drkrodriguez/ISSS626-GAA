@@ -1,0 +1,63 @@
+---
+title: "Spatial Point Pattern Analysis"
+author: "Federico Jose Rodriguez"
+date: "Sep 2 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+# Getting Started
+
+## Data Sources
+
+The exercise uses the data sources to be used in the upcoming Take Home Exercise:
+
+-   Thailand Road accident data from 2019-2022 from [Kaggle](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022)
+
+-   Thailand Roads OpenStreetMap from [HDX](https://data.humdata.org/dataset/hotosm_tha_roads)
+
+-   Thailand - Subnational Administrative Boudaries shapefile from [HDX](https://data.humdata.org/dataset/cod-ab-tha?)
+
+## Installing and launching R packages
+
+This exercise will make use of four R packages: **sf**, **spatstat,** **tidyverse, maptools** and **tmap**.
+
+The code chunk below imports the already retired. We can still download it from Posit Public Package Manager snapshots by using the code below.
+
+```{r}
+#| eval: false
+install.packages("maptools",
+                 repos = "https://packagemanager.posit.com/cran/2023-10-13")
+```
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, tidyverse, tmap, spatstat, maptools)
+```
+
+# Data Importation and Data Wrangling
+
+## Importing the Aspatial Data and converting to sf
+
+The Thailand road accident data is in csv format but contains a field for longitude and another for latitude.
+
+```{r}
+rdacc_sf <- read_csv("data/aspatial/thai_road_accident_2019_2022.csv")  %>%
+  filter(!is.na(longitude) & longitude != "",
+         !is.na(latitude) & latitude != "") %>%
+  st_as_sf(coords = c(
+    "longitude", "latitude"),
+    crs=4326) %>%
+  st_transform(crs = 32647)
+```
+
+The data appears to have been loaded properly. With the code chunk below, we confirm the data is loaded with a little loss of data given we have filtered out records with invalid coordinates.
+
+```{r}
+rdacc_sf
+```

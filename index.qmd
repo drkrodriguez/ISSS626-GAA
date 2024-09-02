@@ -25,6 +25,10 @@ In each session, we go through a hands-on exercise to revise the readings for th
 
 1.  [Introduction to Geospatial Analytics](In-class/In-class_Ex01/In-class_Ex01.html) (26 Aug '24)
 
+2.  [Spatial Point Pattern Analysis]("In-class/In-class_Ex02/In-class_Ex02.html") (2 Sept '24)
+
 ## Take Home Exercises
 
 Coming Soon
+
+1.  Thailand Road Accident Case
