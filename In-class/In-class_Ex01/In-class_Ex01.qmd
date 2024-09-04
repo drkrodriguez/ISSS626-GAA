@@ -34,6 +34,8 @@ The code chunk below uses `p_load()` of **pacman** package to check if the packa
 pacman::p_load(sf, tidyverse, tmap, ggstatsplot)
 ```
 
+# Data Preparation
+
 ## Importing the Geospatial Data
 
 The code chunk below loads the Masterplan subzone boundary shape file as a dataframe `mpsz14_shp`
@@ -110,7 +112,76 @@ preschool <- st_read("data/geospatial/PreSchoolsLocation.kml") %>%
 st_crs(preschool)
 ```
 
-## Importing Aspatial Data
+The code chunks below load the Master Plan 2019 Subzone Boundary Data into R dataframes
+
+```{r}
+mpsz19_shp <- st_read(dsn = "data/geospatial",
+                layer = "MPSZ-2019")
+```
+
+```{r}
+mpsz19_kml <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
+```
+
+The code chunk below checks the CRS information of `mpsz19_shp`
+
+```{r}
+st_crs(mpsz19_shp)
+```
+
+It appears `mpsz19_shp` does not have the correct EPSG code of 3414. The same is true for preschool. The code chunk below reloads the information and already applies the correct EPSG code
+
+```{r}
+mpsz19_shp <- st_read(dsn = "data/geospatial",
+                layer = "MPSZ-2019") %>%
+  st_transform(crs = 3414)
+
+preschool <- st_read("data/geospatial/PreSchoolsLocation.kml") %>%
+  st_transform(crs = 3414)
+```
+
+## Geospatial Data Wrangling
+
+The code chunk below counts the number of preschools in each planning subzone
+
+```{r}
+mpsz19_shp <- mpsz19_shp %>%
+  mutate(`PreSch Count` = lengths(
+    st_intersects(mpsz19_shp, preschool)))
+```
+
+The code below then does the following in one line of code:
+
+1.  Derives the area of each planning zone
+2.  Drops the unit of measurement of the area
+3.  Calculates the density of pre-schools at each planning zone
+
+```{r}
+mpsz19_shp <- mpsz19_shp %>%
+  mutate(Area = units::drop_units(
+    st_area(.)),
+    `PreSch Density` = `PreSch Count` / Area * 1000000
+  )
+```
+
+## Statistical Analysis
+
+Once we have computed the area, we can perform the appropriate analysis to see if there are any relationships.
+
+The code below creates a plot of the preschool density and the preschool count using `ggscatterstats()` of **ggstatsplot** package
+
+```{r}
+mpsz19_shp$`PreSch Density` <- as.numeric(as.character(mpsz19_shp$`PreSch Density`))
+mpsz19_shp$`PreSch Count` <- as.numeric(as.character(mpsz19_shp$`PreSch Count`)) 
+mpsz19_shp <- as.data.frame(mpsz19_shp)
+
+ggscatterstats(data = mpsz19_shp,
+               x = `PreSch Density`,
+               y = `PreSch Count`,
+               type = "parametric")
+```
+
+## Importing and Wrangling Aspatial Data
 
 We load the 2023 population data into a dataframe called `popdata` and see that there are 101K rows and 7 columns.
 
@@ -118,10 +189,48 @@ We load the 2023 population data into a dataframe called `popdata` and see that 
 popdata = read_csv("data/aspatial/respopagesextod2023.csv")
 ```
 
-xxx
+The code chunk below prepares a dataframe showing the population by planning area and planning subzone
 
-xxx
+```{r}
+popdata2023 <- popdata %>% 
+  group_by(PA, SZ, AG) %>% 
+  summarise(`POP`=sum(`Pop`)) %>%  
+  ungroup() %>% 
+  pivot_wider(names_from=AG,
+              values_from = POP)
 
-xxx
+colnames(popdata2023)
+```
 
-xxx
+We then convert the dataframe where the age ranges are grouped into three groups (ECONOMY ACTIVE, AGED, YOUNG) and also introduce the DEPENDENCY column which is the ratio of YOUNG and AGED compared to ECONOMY ACTIVE
+
+```{r}
+popdata2023 <- popdata2023 %>%
+  mutate(YOUNG=rowSums(.[3:6]) # Aged 0 - 24, 10 - 24
+         +rowSums(.[14])) %>% # Aged 5 - 9
+  mutate(`ECONOMY ACTIVE` = rowSums(.[7:13])+ # Aged 25 - 59
+  rowSums(.[15])) %>%  # Aged 60 -64
+  mutate(`AGED`=rowSums(.[16:21])) %>%
+  mutate(`TOTAL`=rowSums(.[3:21])) %>%
+  mutate(`DEPENDENCY`=(`YOUNG` + `AGED`)
+  / `ECONOMY ACTIVE`) %>% 
+  select(`PA`, `SZ`, `YOUNG`, 
+         `ECONOMY ACTIVE`, `AGED`,
+         `TOTAL`, `DEPENDENCY`)
+```
+
+## Joining Aspatial Data with Geospatial Data
+
+the code chunk below combines the population information with the geospatial data for the planning zone boundaries
+
+```{r}
+popdata2023 <- popdata2023 %>%
+  mutate_at(.vars = vars(PA, SZ), 
+          .funs = list(toupper)) 
+
+mpsz_pop2023 <- left_join(mpsz19_shp, popdata2023,
+                          by = c("SUBZONE_N" = "SZ"))
+
+pop2023_mpsz <- left_join(popdata2023, mpsz19_shp, 
+                          by = c("SZ" = "SUBZONE_N"))
+```
