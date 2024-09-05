@@ -1,0 +1,108 @@
+---
+title: "Network Constrained Spatial Point Patterns Analysis"
+author: "Federico Jose Rodriguez"
+date: "Sep 5 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this hands-on exercise, we learn some more SPPA with **Network Constrained Spatial Point Patterns Analysis** or **NetSPPA**. This is a collection of SPPA methods that is used to analyse spatial point events occuring on or alongside a network– which can be a road network, river network, etc.
+
+We will be using the spNetwork package to derive the network kernel density estimation (NKDE) and then we perform analysis on the G-function and K-Function.
+
+This exercise is based on Chapter 7 of Dr Kam's online book which can be accessed [here](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam").
+
+# Getting Started
+
+## Data Sources
+
+Data for this exercise are from public sources and will be used to analyse the distribution of childcare centers in the Punggol planning area. Two datasets in ESRI shapefile format will be used:
+
+-   A line feature geospatial dataset which includes the road network of Punggol planning area
+
+-   A point feature geospatial dataset which includes the location of childcare centers in the Punggol planning area
+
+## Installing and launching R packages
+
+This exercise will make use of five R packages: **sf**, **spNetwork**, **tidyverse,** and **tmap**.
+
+-   **sf -** for importing, managing and processing vector-based geospatial data
+
+-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+
+-   **tmap -** for plotting cartographic quality maps
+
+-   **sPNetwork** - provides functions for performing SPPA methods like KDE and K-function on a network. The package can also be used to build spatial matrices to conduct traditional spatial analyses with spatial weights based on reticular distances
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, spNetwork, tmap, tidyverse)
+```
+
+# Data Import and Preparation
+
+The code chunks below uses `st_read()` of the **sf** package to load the street and childcare data into their respective dataframes.
+
+```{r}
+network <- st_read(dsn="data/geospatial", 
+                   layer="Punggol_St")
+```
+
+```{r}
+childcare <- st_read(dsn="data/geospatial",
+                     layer="Punggol_CC")
+```
+
+We can examine the structure of the two sf tables by calling them as in the display below
+
+::: panel-tabset
+###### Childcare Centres
+
+```{r}
+childcare
+```
+
+###### Network
+
+```{r}
+network
+```
+:::
+
+Note that spNetwork needs the data to have complete CRS information to function.
+
+# Visualizing the Geospatial Data
+
+Before performing the actual analysis, it is always best to perform some EDA, including the visualization of the data. There are two ways to visualize geospatial data. The first is using `plot()` from **Base R** as shown in the code chunk below.
+
+```{r}
+plot(st_geometry(network))
+plot(childcare, add = T, col = 'red', pch = 19)
+```
+
+The second option is using the functions of **tmap** to create cartographic quality maps as seen in the code below
+
+```{r}
+tmap_mode('view')
+tm_shape(childcare) + 
+  tm_dots() + 
+  tm_shape(network) +
+  tm_lines()
+```
+
+After creating an interactive map, (mode = view) we should always go back to static mode so we save on resources.
+
+```{r}
+tmap_mode('plot')
+```
+
+# Network KDE (NKDE) Analysis
+
+We then perform **NKDE** using the functions in the **spNetwork** package.
+
+(Under construction)

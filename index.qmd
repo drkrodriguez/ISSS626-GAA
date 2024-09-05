@@ -17,7 +17,9 @@ Hands-on exercises are assigned before each lesson to give us hands-on experienc
 
 3.  [1st Order Spatial Point Patterns Analysis Methods](Hands-on/Hands-on_Ex03/Hands-on_Ex03.html) (for Session 2, 2 Sept '24)
 
-4.  [2nd Order Spatial Point Patterns Analysis Methods]("Hands-on/Hands-on_Ex04/Hands-on_Ex04.html") (for Session 2, 2 Sept '24)
+4.  [2nd Order Spatial Point Patterns Analysis Methods](%22Hands-on/Hands-on_Ex04/Hands-on_Ex04.html%22) (for Session 2, 2 Sept '24)
+
+5.  [Network Constrained Spatial Point Pattern Analysis]("Hands-on/Hands-on_Ex05/Hands-on_Ex05.html") (for Session 3, 9 Sept 2024)
 
 ## In-Class Exercises
 
@@ -25,7 +27,9 @@ In each session, we go through a hands-on exercise to revise the readings for th
 
 1.  [Introduction to Geospatial Analytics](In-class/In-class_Ex01/In-class_Ex01.html) (26 Aug '24)
 
-2.  [Spatial Point Pattern Analysis]("In-class/In-class_Ex02/In-class_Ex02.html") (2 Sept '24)
+2.  [Spatial Point Pattern Analysis](%22In-class/In-class_Ex02/In-class_Ex02.html%22) (2 Sept '24)
+
+3.  Advanced Spatial Point Patterns Analysis (9 Sept '24)
 
 ## Take Home Exercises
 
