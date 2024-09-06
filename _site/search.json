@@ -383,5 +383,54 @@
     "title": "In-Class Exercise 1: Introduction to Geospatial Analytics",
     "section": "Joining Aspatial Data with Geospatial Data",
     "text": "Joining Aspatial Data with Geospatial Data\nthe code chunk below combines the population information with the geospatial data for the planning zone boundaries\n\npopdata2023 &lt;- popdata2023 %&gt;%\n  mutate_at(.vars = vars(PA, SZ), \n          .funs = list(toupper)) \n\nmpsz_pop2023 &lt;- left_join(mpsz19_shp, popdata2023,\n                          by = c(\"SUBZONE_N\" = \"SZ\"))\n\npop2023_mpsz &lt;- left_join(popdata2023, mpsz19_shp, \n                          by = c(\"SZ\" = \"SUBZONE_N\"))"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Geospatial Analytics and Applications (in R)",
+    "section": "",
+    "text": "Welcome to my website for my work in the course ISSS 626 - Geospatial Analytics and Applications during the August term of 2024 under Dr Kam Tin Seong.\nThe course covers theory and methods of geospatial analysis and the tools in R to implement such analyses."
+  },
+  {
+    "objectID": "index.html#hands-on-exercises",
+    "href": "index.html#hands-on-exercises",
+    "title": "Geospatial Analytics and Applications (in R)",
+    "section": "Hands-On Exercises",
+    "text": "Hands-On Exercises\nHands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations (through Dr Kam’s online book) which complement our pre-class reading, and prepares us for the in-class exercises.\n\nGeospatial Data Wrangling with R (for Session 1, 26 Aug ’24)\nChoropleth Mapping with R (for Session 1, 26 Aug ’24)\n1st Order Spatial Point Patterns Analysis Methods (for Session 2, 2 Sept ’24)\n2nd Order Spatial Point Patterns Analysis Methods (for Session 2, 2 Sept ’24)\nNetwork Constrained Spatial Point Pattern Analysis (for Session 3, 9 Sept 2024)"
+  },
+  {
+    "objectID": "index.html#in-class-exercises",
+    "href": "index.html#in-class-exercises",
+    "title": "Geospatial Analytics and Applications (in R)",
+    "section": "In-Class Exercises",
+    "text": "In-Class Exercises\nIn each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.\n\nIntroduction to Geospatial Analytics (26 Aug ’24)\nSpatial Point Pattern Analysis (2 Sept ’24)\nAdvanced Spatial Point Patterns Analysis (9 Sept ’24)"
+  },
+  {
+    "objectID": "index.html#take-home-exercises",
+    "href": "index.html#take-home-exercises",
+    "title": "Geospatial Analytics and Applications (in R)",
+    "section": "Take Home Exercises",
+    "text": "Take Home Exercises\nComing Soon\n\nThailand Road Accident Case"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "Hi there! I’m Derek (Federico Jose Rodriguez) and I built this website as I started taking my Geospatial Analytics and Applications course in the MITB Program of Singapore Management University in 2024."
+  },
+  {
+    "objectID": "about.html#about-me-and-this-site",
+    "href": "about.html#about-me-and-this-site",
+    "title": "About",
+    "section": "",
+    "text": "Hi there! I’m Derek (Federico Jose Rodriguez) and I built this website as I started taking my Geospatial Analytics and Applications course in the MITB Program of Singapore Management University in 2024."
+  },
+  {
+    "objectID": "about.html#quarto-websites",
+    "href": "about.html#quarto-websites",
+    "title": "About",
+    "section": "Quarto Websites",
+    "text": "Quarto Websites\nThis is a Quarto website.\nTo learn more about Quarto websites and start creating your own, please visit https://quarto.org/docs/websites."
   }
 ]
