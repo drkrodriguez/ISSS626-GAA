@@ -19,7 +19,7 @@ Hands-on exercises are assigned before each lesson to give us hands-on experienc
 
 4.  [2nd Order Spatial Point Patterns Analysis Methods](%22Hands-on/Hands-on_Ex04/Hands-on_Ex04.html%22) (for Session 2, 2 Sept '24)
 
-5.  [Network Constrained Spatial Point Pattern Analysis]("Hands-on/Hands-on_Ex05/Hands-on_Ex05.html") (for Session 3, 9 Sept 2024)
+5.  [Network Constrained Spatial Point Pattern Analysis](%22Hands-on/Hands-on_Ex05/Hands-on_Ex05.html%22) (for Session 3, 9 Sept 2024)
 
 ## In-Class Exercises
 

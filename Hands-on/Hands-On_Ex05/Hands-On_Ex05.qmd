@@ -105,4 +105,155 @@ tmap_mode('plot')
 
 We then perform **NKDE** using the functions in the **spNetwork** package.
 
-(Under construction)
+## Preparing the lixels objects
+
+Before computing the NKDE, SpatialLines objects need to be cut into lixels with a specified minimal distance. We do this using `lixelize_lines()` of **spNetwork** as shown in the code chunk below.
+
+```{r}
+lixels <- lixelize_lines(network, 
+                         700, 
+                         mindist = 375)
+```
+
+The second argument of the function is `lx_length` which stands for the lixel length and was set to 700. The minimum lixel lngth is set to 375 by the `mindist` argument. If the length of the final lixel is shorter than `mindist` then it is added to the previous lixel. If `mindist` is NULL, then it is set to maxdist / 10.
+
+## Generating line centre points
+
+Next, we use `line_center()` of **spNetwork** to generate a SpatialPointsDataFrame with line centre points as in the code chunk below. The centres will be located in the middle of the line based on the length.
+
+```{r}
+samples <- lines_center(lixels) 
+```
+
+## Performing NKDE
+
+The code chunk below computes the NKDE
+
+```{r}
+densities <- nkde(network, 
+                  events = st_zm(childcare),
+                  w = rep(1, nrow(childcare)),
+                  samples = samples,
+                  kernel_name = "quartic",
+                  bw = 300, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+A few points on the arguments in the code chunk above:
+
+-   The `st_zm()` function drops the z coordinate of `childcare` since the function requires two-dimensional inputs, while `childcare` has 3
+
+-   `kernel_name` is set to *quartic* but can be also set to other kernel methods like: *triangle, gaussian, scaled gaussian, tricube, cosine, triweight, epanechnikov* or *uniform*
+
+-   `method` is currently set to use *simple* method to be used to calculate the NKDE. There are three popular methods that are used
+
+    -   *simple* - distances between events and sampling points are replaced by network distances. The formula of the kernel is adapted to calculate the density over a linear instead of an areal unit
+
+    -   *discontinuous* - equally divides the mass density of an event at the intersection of the lixels.
+
+    -   *continuous* - divides the mass of the density at the intersection but adjusts the density before the intersection to make the function continuous
+
+## Visualizing NKDE
+
+We first insert the computed density values into the `samples` and `lixels` objects as a field density
+
+```{r}
+samples$density <- densities
+lixels$density <- densities
+```
+
+Before plotting, we rescale the distances of the objects from the current SVY21 default of meter to kilometer, by using a multiple of 1000
+
+```{r}
+# rescaling to help the mapping
+samples$density <- samples$density*1000
+lixels$density <- lixels$density*1000
+```
+
+The code chunk below produces an interactive map using tmap. The resulting map reveals road segments with high density of childcare centres based on the intensity of the color (i.e., darker shading is more dense)
+
+```{r}
+tmap_mode('view')
+tm_shape(lixels)+
+  tm_lines(col="density")+
+tm_shape(childcare)+
+  tm_dots()
+tmap_mode('plot')
+```
+
+# Network Constrained G- and K-Function Analyses
+
+In this section, we test for CSR (Complete Spatial Randomness) by using functions of the **spNetwork** package. The test hypotheses for our problems are:
+
+-   $H_0$ - The observed spatial points, or the locations of childcare service centres, are randomly distributed over the street network in the Punggol Planning Area
+
+-   $H_1$ - The observed spatial points, or the locations of childcare service centres, are **not** randomly distributed over the street network in the Punggol Planning Area
+
+For our testing, we will use a p-value smaller than α = 0.05 to reject the null hypothesis, or a 95% confidence interval.
+
+The code chunk below runs the test.
+
+```{r}
+kfun_childcare <- kfunctions(network, 
+                             childcare,
+                             start = 0, 
+                             end = 1000, 
+                             step = 50, 
+                             width = 50, 
+                             nsim = 50, 
+                             resolution = 50,
+                             verbose = FALSE, 
+                             conf_int = 0.05)
+```
+
+the `kfunctions()` accepts multiple arguments, ten of which are used in our code. We give a few points on the arguments below:
+
+1.  `lines` - the first argument is a SpatialLinesDataFrame (currently set to `network` or the Punggol Planning area road network)
+
+2.  *points* - the second argument is a SpatialPointsDataFrame (currently set to `childcare` or the location of childcare service centres)
+
+3.  *start* - the start value/distance for evaluating the K and G functions
+
+4.  *end* - the last value/distance for evaluating the K and G functions
+
+5.  *step* - the jump or spacing between two evaluations of the K and G functions
+
+6.  *width* - the width of each donut for the G-function
+
+7.  *nsim* - the number of Monte Carlo simulations to perform. (currently set to 50) A high number of simulations are required to build a proper inference
+
+8.  *resolution* - can reduce calculation time in simulating by splitting the edges (based on this value) and the random points are selected vertices in the new network. If this is not set, then random points can occur anywhere on the graph
+
+9.  *conf_int* - indicates the width of the confidence interval (currently set to 0.05 or 5%)
+
+10. *verbose* - indicates whether progress messages should be displayed (currently set to FALSE)
+
+The function outputs a list with the following values:
+
+-   `plotk` - a ggplot2 object representing the value of the K-function
+
+-   `plotg` - a ggplot2 object representing the value of the G-function
+
+-   `values` - a dataframe with the values used to build the plots
+
+We can display the K-function output using the code below.
+
+```{r}
+kfun_childcare$plotk
+```
+
+The plot shows the empirical or observed K-function as a blue line while the gray area is an envelop representing the 95% confidence interval from the simulations. The graph shows that below \~450m the distribution resembles a regular pattern (below envelop resembles regular, above resembles/indicates clustering)
+
+Similarly, we can visualize the G-function using the code chunk below.
+
+```{r}
+kfun_childcare$plotg
+```
