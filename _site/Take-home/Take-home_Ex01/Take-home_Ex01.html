@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Federico Jose Rodriguez">
+<meta name="dcterms.date" content="2024-09-08">
 
-<title>Geospatial Analytics and Applications (in R) – Geospatial Analytics w/ Derek</title>
+<title>Geospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region – Geospatial Analytics w/ Derek</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,25 +22,59 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -69,7 +104,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -79,7 +114,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Geospatial Analytics w/ Derek</span>
     </a>
   </div>
@@ -95,23 +130,23 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex01/Hands-on_Ex01.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex01/Hands-on_Ex01.html">
  <span class="dropdown-text">Hands-on Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex02/Hands-on_Ex02.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex02/Hands-on_Ex02.html">
  <span class="dropdown-text">Hands-on Exercise 2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex03/Hands-on_Ex03.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex03/Hands-on_Ex03.html">
  <span class="dropdown-text">Hands-on Exercise 3</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex04/Hands-on_Ex04.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex04/Hands-on_Ex04.html">
  <span class="dropdown-text">Hands-on Exercise 4</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex05/Hands-on_Ex05.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex05/Hands-on_Ex05.html">
  <span class="dropdown-text">Hands-on Exercise 5</span></a>
   </li>  
     </ul>
@@ -122,11 +157,11 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
-    <a class="dropdown-item" href="./In-class/In-class_Ex01/In-class_Ex01.html">
+    <a class="dropdown-item" href="../../In-class/In-class_Ex01/In-class_Ex01.html">
  <span class="dropdown-text">In-Class Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class/In-class_Ex02/In-class_Ex02.html">
+    <a class="dropdown-item" href="../../In-class/In-class_Ex02/In-class_Ex02.html">
  <span class="dropdown-text">In-Class Exercise 2</span></a>
   </li>  
     </ul>
@@ -137,7 +172,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
         <li>
-    <a class="dropdown-item" href="./Take-home/Take-home_Ex01/Take-home_Ex01.html">
+    <a class="dropdown-item" href="../../Take-home/Take-home_Ex01/Take-home_Ex01.html">
  <span class="dropdown-text">Take Home Exercise 1</span></a>
   </li>  
     </ul>
@@ -145,11 +180,11 @@ ul.task-list li input[type="checkbox"] {
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -168,9 +203,20 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#hands-on-exercises" id="toc-hands-on-exercises" class="nav-link active" data-scroll-target="#hands-on-exercises">Hands-On Exercises</a></li>
-  <li><a href="#in-class-exercises" id="toc-in-class-exercises" class="nav-link" data-scroll-target="#in-class-exercises">In-Class Exercises</a></li>
-  <li><a href="#take-home-exercises" id="toc-take-home-exercises" class="nav-link" data-scroll-target="#take-home-exercises">Take-Home Exercises</a></li>
+  <li><a href="#a.-getting-started" id="toc-a.-getting-started" class="nav-link active" data-scroll-target="#a.-getting-started">A. Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#a.1-background" id="toc-a.1-background" class="nav-link" data-scroll-target="#a.1-background">A.1 Background</a></li>
+  <li><a href="#a.2-objectives" id="toc-a.2-objectives" class="nav-link" data-scroll-target="#a.2-objectives">A.2 Objectives</a></li>
+  <li><a href="#a.3-data-sources" id="toc-a.3-data-sources" class="nav-link" data-scroll-target="#a.3-data-sources">A.3 Data Sources</a></li>
+  <li><a href="#a.4-importing-and-launching-r-packages" id="toc-a.4-importing-and-launching-r-packages" class="nav-link" data-scroll-target="#a.4-importing-and-launching-r-packages">A.4 Importing and Launching R Packages</a></li>
+  </ul></li>
+  <li><a href="#b.-data-loading-and-preparation" id="toc-b.-data-loading-and-preparation" class="nav-link" data-scroll-target="#b.-data-loading-and-preparation">B. Data Loading and Preparation</a>
+  <ul class="collapse">
+  <li><a href="#b.1-thsab-thailand-subnational-administrative-boundary-shapefile" id="toc-b.1-thsab-thailand-subnational-administrative-boundary-shapefile" class="nav-link" data-scroll-target="#b.1-thsab-thailand-subnational-administrative-boundary-shapefile">B.1 THSAB (Thailand Subnational Administrative Boundary, Shapefile)</a></li>
+  <li><a href="#b.2-thosm-thailand-roads-open-streetmap-shapefile" id="toc-b.2-thosm-thailand-roads-open-streetmap-shapefile" class="nav-link" data-scroll-target="#b.2-thosm-thailand-roads-open-streetmap-shapefile">B.2 THOSM (Thailand Roads Open StreetMap, Shapefile)</a></li>
+  <li><a href="#b.3-thra-thailand-road-accident-data-aspatial-csv" id="toc-b.3-thra-thailand-road-accident-data-aspatial-csv" class="nav-link" data-scroll-target="#b.3-thra-thailand-road-accident-data-aspatial-csv">B.3 THRA (Thailand Road Accident Data, Aspatial, csv)</a></li>
+  <li><a href="#b.4-joining-the-aspatial-and-geospatial-data" id="toc-b.4-joining-the-aspatial-and-geospatial-data" class="nav-link" data-scroll-target="#b.4-joining-the-aspatial-and-geospatial-data">B.4 Joining the Aspatial and Geospatial Data</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -179,7 +225,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Geospatial Analytics and Applications (in R)</h1>
+<h1 class="title">Geospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region</h1>
 </div>
 
 
@@ -193,7 +239,19 @@ ul.task-list li input[type="checkbox"] {
           </div>
   </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 8, 2024</p>
+    </div>
+  </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 8, 2024</p>
+    </div>
+  </div>
     
   </div>
   
@@ -202,37 +260,108 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Welcome to my website for my work in the course <u><strong>ISSS 626 - Geospatial Analytics and Applications</strong></u> during the August term of 2024 under <strong>Dr Kam Tin Seong</strong>.</p>
-<p>The course covers theory and methods of geospatial analysis and the tools in R to implement such analyses.</p>
-<section id="hands-on-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="hands-on-exercises">Hands-On Exercises</h2>
-<p>Hands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations (through Dr Kam’s online <a href="https://r4gdsa.netlify.app/" title="R for Geospatial Data Science and Analytics by Dr Kam">book</a>) which complement our pre-class reading, and prepares us for the in-class exercises.</p>
-<ol type="1">
-<li><p><a href="Hands-on/Hands-on_Ex01/Hands-on_Ex01.html">Geospatial Data Wrangling with R</a> (for Session 1, 26 Aug ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex02/Hands-on_Ex02.html">Choropleth Mapping with R</a> (for Session 1, 26 Aug ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex03/Hands-on_Ex03.html">1st Order Spatial Point Patterns Analysis Methods</a> (for Session 2, 2 Sept ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex04/Hands-on_Ex04.html">2nd Order Spatial Point Patterns Analysis Methods</a> (for Session 2, 2 Sept ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex05/Hands-on_Ex05.html">Network Constrained Spatial Point Pattern Analysis</a> (for Session 3, 9 Sept 2024)</p></li>
-</ol>
+<p>(Summary here. WIP)</p>
+<section id="a.-getting-started" class="level1">
+<h1>A. Getting Started</h1>
+<section id="a.1-background" class="level2">
+<h2 class="anchored" data-anchor-id="a.1-background">A.1 Background</h2>
+<p>Road traffic accidents account for 1.19million deaths and up to 50 million non-fatal injuries according to a <a href="https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries">report by the WHO</a> last year.</p>
+<p>The same report identifies major risk groups: low- and middle-income countries, (esp in Africa and Europe) the working population, and males. It also identifies some key risk factors which include human error, speeding, driving under the influence of alcohol, distracted driving, unsafe road infrastructure, unsafe vehicles, and law enforcement. Most of the factors identified are behavioral in nature but do not discount that other factors may also contribute to a higher risk of occurrence.</p>
+<p>Within Southeast Asia, Thailand has ranked the highest in terms of incidence of road traffic accidents with an average number of of 20,000 deaths a year or 56 a day. The country has also seen an increase in the number of accidents from 2014 to 2021. A large 19% of these accidents occurred in national highways, and the chances of encountering an accident-prone zone was found to be 66%.</p>
 </section>
-<section id="in-class-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="in-class-exercises">In-Class Exercises</h2>
-<p>In each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.</p>
-<ol type="1">
-<li><p><a href="In-class/In-class_Ex01/In-class_Ex01.html">Introduction to Geospatial Analytics</a> (26 Aug ’24)</p></li>
-<li><p><a href="In-class/In-class_Ex02/In-class_Ex02.html">Spatial Point Pattern Analysis</a> (2 Sept ’24)</p></li>
-<li><p>Advanced Spatial Point Patterns Analysis (9 Sept ’24)</p></li>
-</ol>
+<section id="a.2-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="a.2-objectives">A.2 Objectives</h2>
+<p>This study aims to take a deeper look into the road accidents in Thailand, focusing on the <a href="https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region">Bangkok Metropolitan Region (BMR)</a> which contains the capital Bangkok, and five neighboring provinces. (Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, Samut Sakhon)</p>
+<p>As most literature has focused on behavioral and environmental factors, the study will focus on identifying spatiotemporal factors influencing the occurrence of road accidents in BMR. At the minimum, the study deliverables include the following:</p>
+<ul>
+<li><p>Visualization of spatiotemporal dynamics of road traffic accidents in BMR</p></li>
+<li><p>Detailed spatial analysis of road traffic accidents in BMR</p></li>
+<li><p>Detailed spatiotemporal analysis of road traffic accidents in BMR</p></li>
+</ul>
+<p>The appropriate technique must be used for these deliverables and all the analysis and visualizations will be carried out using R.</p>
 </section>
-<section id="take-home-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="take-home-exercises">Take-Home Exercises</h2>
-<p>Take-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.</p>
-<p>For each of these, we are given a specific problem, objectives and a base data set. Each student will work on the problem independently, guided only by the previous exercises and lessons.</p>
-<ol type="1">
-<li><a href="Take-home/Take-home_Ex01/Take-home_Ex01.html">Geospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region</a></li>
-</ol>
+<section id="a.3-data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="a.3-data-sources">A.3 Data Sources</h2>
+<p>The study makes use of the following datasets which are publicly available online.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Dataset Short Name</th>
+<th>Description</th>
+<th>Datasource</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>THRA</td>
+<td>Thailand road accident data from 2019 to 2022</td>
+<td><a href="https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022">Kaggle</a></td>
+</tr>
+<tr class="even">
+<td>THOSM</td>
+<td>Thailand roads open street map in shapefile format</td>
+<td><a href="https://data.humdata.org/dataset/hotosm_tha_roads">HDX</a></td>
+</tr>
+<tr class="odd">
+<td>THSAB</td>
+<td>Thailand - Subnational Administrative Boudaries shapefile</td>
+<td><a href="https://data.humdata.org/dataset/cod-ab-tha?">HDX</a></td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="a.4-importing-and-launching-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="a.4-importing-and-launching-r-packages">A.4 Importing and Launching R Packages</h2>
+<p>For this study, five R packages will be used. A description of the packages and the code, using <code>p_load()</code> of the <strong>pacman</strong> package, to import them is given below.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Package Description</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Import Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>The loaded packages include:</p>
+<ul>
+<li><p><strong>sf -</strong> package for importing, managing and processing vector-based geospatial data</p></li>
+<li><p><strong>tidyverse -</strong> collection of packages for performing data importation, wrangling and visualization</p></li>
+<li><p><strong>tmap -</strong> package with functions for plotting cartographic quality maps</p></li>
+<li><p><strong>sPNetwork</strong> - provides functions for performing SPPA methods like KDE and K-function on a network. The package can also be used to build spatial matrices to conduct traditional spatial analyses with spatial weights based on reticular distances</p></li>
+<li><p><strong>spatstat</strong> - offers a wide range of functions for point pattern analysis (PPA)</p></li>
+<li><p><strong>raster</strong> - for reading, writing, manipulating and analysing models of gridded spatial data</p></li>
+</ul>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, spNetwork, tmap, tidyverse, spatstat, raster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="b.-data-loading-and-preparation" class="level1">
+<h1>B. Data Loading and Preparation</h1>
+<p>In this section, the appropriate R packages will be used to load the three datasets into R objects, and to inspect and transform them as needed.</p>
+<section id="b.1-thsab-thailand-subnational-administrative-boundary-shapefile" class="level2">
+<h2 class="anchored" data-anchor-id="b.1-thsab-thailand-subnational-administrative-boundary-shapefile">B.1 THSAB (Thailand Subnational Administrative Boundary, Shapefile)</h2>
+<p>WIP</p>
+</section>
+<section id="b.2-thosm-thailand-roads-open-streetmap-shapefile" class="level2">
+<h2 class="anchored" data-anchor-id="b.2-thosm-thailand-roads-open-streetmap-shapefile">B.2 THOSM (Thailand Roads Open StreetMap, Shapefile)</h2>
+<p>WIP</p>
+</section>
+<section id="b.3-thra-thailand-road-accident-data-aspatial-csv" class="level2">
+<h2 class="anchored" data-anchor-id="b.3-thra-thailand-road-accident-data-aspatial-csv">B.3 THRA (Thailand Road Accident Data, Aspatial, csv)</h2>
+<p>WIP</p>
+</section>
+<section id="b.4-joining-the-aspatial-and-geospatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="b.4-joining-the-aspatial-and-geospatial-data">B.4 Joining the Aspatial and Geospatial Data</h2>
+<p>WIP</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

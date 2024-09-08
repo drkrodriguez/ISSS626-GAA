@@ -1,0 +1,96 @@
+---
+title: "Geospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region"
+author: "Federico Jose Rodriguez"
+date: "Sep 8 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+(Summary here. WIP)
+
+# A. Getting Started
+
+## A.1 Background
+
+Road traffic accidents account for 1.19million deaths and up to 50 million non-fatal injuries according to a [report by the WHO](https://www.who.int/news-room/fact-sheets/detail/road-traffic-injuries) last year.
+
+The same report identifies major risk groups: low- and middle-income countries, (esp in Africa and Europe) the working population, and males. It also identifies some key risk factors which include human error, speeding, driving under the influence of alcohol, distracted driving, unsafe road infrastructure, unsafe vehicles, and law enforcement. Most of the factors identified are behavioral in nature but do not discount that other factors may also contribute to a higher risk of occurrence.
+
+Within Southeast Asia, Thailand has ranked the highest in terms of incidence of road traffic accidents with an average number of of 20,000 deaths a year or 56 a day. The country has also seen an increase in the number of accidents from 2014 to 2021. A large 19% of these accidents occurred in national highways, and the chances of encountering an accident-prone zone was found to be 66%.
+
+## A.2 Objectives
+
+This study aims to take a deeper look into the road accidents in Thailand, focusing on the [Bangkok Metropolitan Region (BMR)](https://en.wikipedia.org/wiki/Bangkok_Metropolitan_Region) which contains the capital Bangkok, and five neighboring provinces. (Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, Samut Sakhon)
+
+As most literature has focused on behavioral and environmental factors, the study will focus on identifying spatiotemporal factors influencing the occurrence of road accidents in BMR. At the minimum, the study deliverables include the following:
+
+-   Visualization of spatiotemporal dynamics of road traffic accidents in BMR
+
+-   Detailed spatial analysis of road traffic accidents in BMR
+
+-   Detailed spatiotemporal analysis of road traffic accidents in BMR
+
+The appropriate technique must be used for these deliverables and all the analysis and visualizations will be carried out using R.
+
+## A.3 Data Sources
+
+The study makes use of the following datasets which are publicly available online.
+
+| Dataset Short Name | Description                                               | Datasource                                                                              |
+|----------------|----------------------|----------------------------------|
+| THRA               | Thailand road accident data from 2019 to 2022             | [Kaggle](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) |
+| THOSM              | Thailand roads open street map in shapefile format        | [HDX](https://data.humdata.org/dataset/hotosm_tha_roads)                                |
+| THSAB              | Thailand - Subnational Administrative Boudaries shapefile | [HDX](https://data.humdata.org/dataset/cod-ab-tha?)                                     |
+|                    |                                                           |                                                                                         |
+
+## A.4 Importing and Launching R Packages
+
+For this study, five R packages will be used. A description of the packages and the code, using `p_load()` of the **pacman** package, to import them is given below.
+
+::: panel-tabset
+#### Package Description
+
+The loaded packages include:
+
+-   **sf -** package for importing, managing and processing vector-based geospatial data
+
+-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+
+-   **tmap -** package with functions for plotting cartographic quality maps
+
+-   **sPNetwork** - provides functions for performing SPPA methods like KDE and K-function on a network. The package can also be used to build spatial matrices to conduct traditional spatial analyses with spatial weights based on reticular distances
+
+-   **spatstat** - offers a wide range of functions for point pattern analysis (PPA)
+
+-   **raster** - for reading, writing, manipulating and analysing models of gridded spatial data
+
+#### Import Code
+
+```{r}
+pacman::p_load(sf, spNetwork, tmap, tidyverse, spatstat, raster)
+```
+:::
+
+# B. Data Loading and Preparation
+
+In this section, the appropriate R packages will be used to load the three datasets into R objects, and to inspect and transform them as needed.
+
+## B.1 THSAB (Thailand Subnational Administrative Boundary, Shapefile)
+
+WIP
+
+## B.2 THOSM (Thailand Roads Open StreetMap, Shapefile)
+
+WIP
+
+## B.3 THRA (Thailand Road Accident Data, Aspatial, csv)
+
+WIP
+
+## B.4 Joining the Aspatial and Geospatial Data
+
+WIP

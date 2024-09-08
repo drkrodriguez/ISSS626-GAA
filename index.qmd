@@ -31,8 +31,10 @@ In each session, we go through a hands-on exercise to revise the readings for th
 
 3.  Advanced Spatial Point Patterns Analysis (9 Sept '24)
 
-## Take Home Exercises
+## Take-Home Exercises
 
-Coming Soon
+Take-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.
 
-1.  Thailand Road Accident Case (WIP)
+For each of these, we are given a specific problem, objectives and a base data set. Each student will work on the problem independently, guided only by the previous exercises and lessons.
+
+1.  [Geospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region](Take-home/Take-home_Ex01/Take-home_Ex01.html)
