@@ -213,8 +213,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#b.-data-loading-and-preparation" id="toc-b.-data-loading-and-preparation" class="nav-link" data-scroll-target="#b.-data-loading-and-preparation">B. Data Loading and Preparation</a>
   <ul class="collapse">
   <li><a href="#b.1-thsab-thailand-subnational-administrative-boundary-shapefile" id="toc-b.1-thsab-thailand-subnational-administrative-boundary-shapefile" class="nav-link" data-scroll-target="#b.1-thsab-thailand-subnational-administrative-boundary-shapefile">B.1 THSAB (Thailand Subnational Administrative Boundary, Shapefile)</a></li>
-  <li><a href="#b.2-thosm-thailand-roads-open-streetmap-shapefile" id="toc-b.2-thosm-thailand-roads-open-streetmap-shapefile" class="nav-link" data-scroll-target="#b.2-thosm-thailand-roads-open-streetmap-shapefile">B.2 THOSM (Thailand Roads Open StreetMap, Shapefile)</a></li>
-  <li><a href="#b.3-thra-thailand-road-accident-data-aspatial-csv" id="toc-b.3-thra-thailand-road-accident-data-aspatial-csv" class="nav-link" data-scroll-target="#b.3-thra-thailand-road-accident-data-aspatial-csv">B.3 THRA (Thailand Road Accident Data, Aspatial, csv)</a></li>
+  <li><a href="#b.2-filtering-thsab-for-the-bangkok-metropolitan-region" id="toc-b.2-filtering-thsab-for-the-bangkok-metropolitan-region" class="nav-link" data-scroll-target="#b.2-filtering-thsab-for-the-bangkok-metropolitan-region">B.2 Filtering THSAB for the Bangkok Metropolitan Region</a></li>
+  <li><a href="#b.3-thosm-thailand-roads-open-streetmap-shapefile" id="toc-b.3-thosm-thailand-roads-open-streetmap-shapefile" class="nav-link" data-scroll-target="#b.3-thosm-thailand-roads-open-streetmap-shapefile">B.3 THOSM (Thailand Roads Open StreetMap, Shapefile)</a></li>
+  <li><a href="#b.4-thra-thailand-road-accident-data-aspatial-csv" id="toc-b.4-thra-thailand-road-accident-data-aspatial-csv" class="nav-link" data-scroll-target="#b.4-thra-thailand-road-accident-data-aspatial-csv">B.4 THRA (Thailand Road Accident Data, Aspatial, csv)</a></li>
   <li><a href="#b.4-joining-the-aspatial-and-geospatial-data" id="toc-b.4-joining-the-aspatial-and-geospatial-data" class="nav-link" data-scroll-target="#b.4-joining-the-aspatial-and-geospatial-data">B.4 Joining the Aspatial and Geospatial Data</a></li>
   </ul></li>
   </ul>
@@ -249,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 8, 2024</p>
+      <p class="date-modified">September 9, 2024</p>
     </div>
   </div>
     
@@ -339,6 +340,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+<p>As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="b.-data-loading-and-preparation" class="level1">
@@ -346,14 +351,238 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In this section, the appropriate R packages will be used to load the three datasets into R objects, and to inspect and transform them as needed.</p>
 <section id="b.1-thsab-thailand-subnational-administrative-boundary-shapefile" class="level2">
 <h2 class="anchored" data-anchor-id="b.1-thsab-thailand-subnational-administrative-boundary-shapefile">B.1 THSAB (Thailand Subnational Administrative Boundary, Shapefile)</h2>
+<p>We load the Thailand subnational administrative boundary shapefile into an R dataframe using <code>st_read()</code> from the sf package. The source provides the geospatial data in varying levels as indicated by their suffix: country (0), province (1), district (2), and sub-district. (3) For focusing on the BMR, which covers Bangkok and neighboring provinces, province is the most likely level of detail we will need so we will use the code chunk below to load the appropriate layer first.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thsab_prov <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">layer=</span><span class="st">"tha_admbnda_adm1_rtsd_20220121"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `tha_admbnda_adm1_rtsd_20220121' from data source 
+  `C:\drkrodriguez\ISSS626-GAA\Take-home\Take-home_Ex01\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 77 features and 16 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 97.34336 ymin: 5.613038 xmax: 105.637 ymax: 20.46507
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>We examine the loaded data to confirm the load has been done properly and to get some initial observations of the data.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Calling Object</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Checking crs information with st_crs()</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>thsab_prov</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 77 features and 16 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 97.34336 ymin: 5.613038 xmax: 105.637 ymax: 20.46507
+Geodetic CRS:  WGS 84
+First 10 features:
+   Shape_Leng Shape_Area                  ADM1_EN       ADM1_TH ADM1_PCODE
+1    2.417227 0.13133873                  Bangkok  กรุงเทพมหานคร       TH10
+2    1.695100 0.07926199             Samut Prakan    สมุทรปราการ       TH11
+3    1.251111 0.05323766               Nonthaburi         นนทบุรี       TH12
+4    1.884945 0.12698345             Pathum Thani        ปทุมธานี       TH13
+5    3.041716 0.21393797 Phra Nakhon Si Ayutthaya พระนครศรีอยุธยา       TH14
+6    1.739908 0.07920961                Ang Thong        อ่างทอง       TH15
+7    5.693342 0.54578838                 Lop Buri          ลพบุรี       TH16
+8    1.778326 0.06872655                Sing Buri         สิงห์บุรี       TH17
+9    2.896316 0.20907828                 Chai Nat         ชัยนาท       TH18
+10   4.766446 0.29208711                 Saraburi         สระบุรี       TH19
+   ADM1_REF ADM1ALT1EN ADM1ALT2EN ADM1ALT1TH ADM1ALT2TH  ADM0_EN   ADM0_TH
+1      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+2      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+3      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+4      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+5      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+6      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+7      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+8      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+9      &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+10     &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt; Thailand ประเทศไทย
+   ADM0_PCODE       date    validOn    validTo                       geometry
+1          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.6139 13...
+2          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.7306 13...
+3          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.3415 14...
+4          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.8916 14...
+5          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.5131 14...
+6          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.3332 14...
+7          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((101.3453 15...
+8          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.3691 15...
+9          TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((100.1199 15...
+10         TH 2019-02-18 2022-01-22 -001-11-30 MULTIPOLYGON (((101.3994 15...</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(thsab_prov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: WGS 84 
+  wkt:
+GEOGCRS["WGS 84",
+    DATUM["World Geodetic System 1984",
+        ELLIPSOID["WGS 84",6378137,298.257223563,
+            LENGTHUNIT["metre",1]]],
+    PRIMEM["Greenwich",0,
+        ANGLEUNIT["degree",0.0174532925199433]],
+    CS[ellipsoidal,2],
+        AXIS["latitude",north,
+            ORDER[1],
+            ANGLEUNIT["degree",0.0174532925199433]],
+        AXIS["longitude",east,
+            ORDER[2],
+            ANGLEUNIT["degree",0.0174532925199433]],
+    ID["EPSG",4326]]</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>The output confirms that we have a multipolygon sf object with 77 rows and 17 columns. There is a column named <code>ADM1_EN</code> which appears to contain the province names needed to define the BMR boundaries. It also shows that the dataset is using a coordinate reference system rather than a projected reference system.</p>
+<p>First, we reload the data to use a projected reference system and apply the correct reference system with EPSG code of 24048 using <code>st_transform()</code>. This transformation can be confirmed with <code>st_crs()</code> The <strong>tmap</strong> package is then used to visualize the object to see if it properly depicts the boundaries of Thailand and its provinces.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Load Object and Transform CRS information</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Checking crs information with st_crs()</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Plot of thsab_prov using tmap</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>thsab_prov <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">layer=</span><span class="st">"tha_admbnda_adm1_rtsd_20220121"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">24048</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `tha_admbnda_adm1_rtsd_20220121' from data source 
+  `C:\drkrodriguez\ISSS626-GAA\Take-home\Take-home_Ex01\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 77 features and 16 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 97.34336 ymin: 5.613038 xmax: 105.637 ymax: 20.46507
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(thsab_prov)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: EPSG:24048 
+  wkt:
+PROJCRS["Indian 1975 / UTM zone 48N",
+    BASEGEOGCRS["Indian 1975",
+        DATUM["Indian 1975",
+            ELLIPSOID["Everest 1830 (1937 Adjustment)",6377276.345,300.8017,
+                LENGTHUNIT["metre",1]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4240]],
+    CONVERSION["UTM zone 48N",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",0,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",105,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",0.9996,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",500000,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",0,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Engineering survey, topographic mapping."],
+        AREA["Thailand - onshore and offshore east of 102°E."],
+        BBOX[6.02,102,18.44,105.64]],
+    ID["EPSG",24048]]</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(thsab_prov) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"grey"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="b.2-filtering-thsab-for-the-bangkok-metropolitan-region" class="level2">
+<h2 class="anchored" data-anchor-id="b.2-filtering-thsab-for-the-bangkok-metropolitan-region">B.2 Filtering THSAB for the Bangkok Metropolitan Region</h2>
+<p>Before further analyzing the data, we will limit the scope to only consider the Bangkok Metropolitan Region or BMR. This would encompass Bangkok, Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, Samut Sakhon. While it is good to get insights outside of BMR, it is out of the study scope and it is best to focus on the objectives.</p>
+<p>The code chunk below checks if all the provinces in the BMR appear as is under the <code>ADM1_EN</code> column of <code>thsab_prov</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">filter</span>(thsab_prov, ADM1_EN <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Bangkok"</span>, <span class="st">"Nonthaburi"</span>,<span class="st">"Nakhon Pathom"</span>, <span class="st">"Pathum Thani"</span>, <span class="st">"Samut Prakan"</span>, <span class="st">"Samut Sakhon"</span>))<span class="sc">$</span>ADM1_EN</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Bangkok"       "Samut Prakan"  "Nonthaburi"    "Pathum Thani" 
+[5] "Nakhon Pathom" "Samut Sakhon" </code></pre>
+</div>
+</div>
+<p>With the previous code returning all 6 provinces, we have confirmation that the provinces are all present and spelled as is in the data source. We create a new object <code>bmr_boundary</code> to contain only the provinces in BMR.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Create BMR boundary object using filter()</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Plot of bmr_boundary using tmap</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>bmr_boundary <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">layer=</span><span class="st">"tha_admbnda_adm1_rtsd_20220121"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">24048</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ADM1_EN <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Bangkok"</span>, <span class="st">"Nonthaburi"</span>,<span class="st">"Nakhon Pathom"</span>, <span class="st">"Pathum Thani"</span>, <span class="st">"Samut Prakan"</span>, <span class="st">"Samut Sakhon"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `tha_admbnda_adm1_rtsd_20220121' from data source 
+  `C:\drkrodriguez\ISSS626-GAA\Take-home\Take-home_Ex01\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 77 features and 16 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 97.34336 ymin: 5.613038 xmax: 105.637 ymax: 20.46507
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary) <span class="sc">+</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"grey"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="b.3-thosm-thailand-roads-open-streetmap-shapefile" class="level2">
+<h2 class="anchored" data-anchor-id="b.3-thosm-thailand-roads-open-streetmap-shapefile">B.3 THOSM (Thailand Roads Open StreetMap, Shapefile)</h2>
 <p>WIP</p>
 </section>
-<section id="b.2-thosm-thailand-roads-open-streetmap-shapefile" class="level2">
-<h2 class="anchored" data-anchor-id="b.2-thosm-thailand-roads-open-streetmap-shapefile">B.2 THOSM (Thailand Roads Open StreetMap, Shapefile)</h2>
-<p>WIP</p>
-</section>
-<section id="b.3-thra-thailand-road-accident-data-aspatial-csv" class="level2">
-<h2 class="anchored" data-anchor-id="b.3-thra-thailand-road-accident-data-aspatial-csv">B.3 THRA (Thailand Road Accident Data, Aspatial, csv)</h2>
+<section id="b.4-thra-thailand-road-accident-data-aspatial-csv" class="level2">
+<h2 class="anchored" data-anchor-id="b.4-thra-thailand-road-accident-data-aspatial-csv">B.4 THRA (Thailand Road Accident Data, Aspatial, csv)</h2>
 <p>WIP</p>
 </section>
 <section id="b.4-joining-the-aspatial-and-geospatial-data" class="level2">

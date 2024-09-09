@@ -41,7 +41,7 @@ The appropriate technique must be used for these deliverables and all the analys
 The study makes use of the following datasets which are publicly available online.
 
 | Dataset Short Name | Description                                               | Datasource                                                                              |
-|----------------|----------------------|----------------------------------|
+|--------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | THRA               | Thailand road accident data from 2019 to 2022             | [Kaggle](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) |
 | THOSM              | Thailand roads open street map in shapefile format        | [HDX](https://data.humdata.org/dataset/hotosm_tha_roads)                                |
 | THSAB              | Thailand - Subnational Administrative Boudaries shapefile | [HDX](https://data.humdata.org/dataset/cod-ab-tha?)                                     |
@@ -75,19 +75,104 @@ pacman::p_load(sf, spNetwork, tmap, tidyverse, spatstat, raster)
 ```
 :::
 
+As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.
+
+```{r}
+set.seed(1234)
+```
+
 # B. Data Loading and Preparation
 
 In this section, the appropriate R packages will be used to load the three datasets into R objects, and to inspect and transform them as needed.
 
 ## B.1 THSAB (Thailand Subnational Administrative Boundary, Shapefile)
 
+We load the Thailand subnational administrative boundary shapefile into an R dataframe using `st_read()` from the sf package. The source provides the geospatial data in varying levels as indicated by their suffix: country (0), province (1), district (2), and sub-district. (3) For focusing on the BMR, which covers Bangkok and neighboring provinces, province is the most likely level of detail we will need so we will use the code chunk below to load the appropriate layer first.
+
+```{r}
+thsab_prov <- st_read(dsn="data/geospatial", 
+                   layer="tha_admbnda_adm1_rtsd_20220121")
+```
+
+We examine the loaded data to confirm the load has been done properly and to get some initial observations of the data.
+
+::: panel-tabset
+#### Calling Object
+
+```{r}
+thsab_prov
+```
+
+#### Checking crs information with st_crs()
+
+```{r}
+st_crs(thsab_prov)
+```
+:::
+
+The output confirms that we have a multipolygon sf object with 77 rows and 17 columns. There is a column named `ADM1_EN` which appears to contain the province names needed to define the BMR boundaries. It also shows that the dataset is using a coordinate reference system rather than a projected reference system.
+
+First, we reload the data to use a projected reference system and apply the correct reference system with EPSG code of 24048 using `st_transform()`. This transformation can be confirmed with `st_crs()` The **tmap** package is then used to visualize the object to see if it properly depicts the boundaries of Thailand and its provinces.
+
+::: panel-tabset
+#### Load Object and Transform CRS information
+
+```{r}
+thsab_prov <- st_read(dsn="data/geospatial",
+                          layer="tha_admbnda_adm1_rtsd_20220121") %>%
+  st_transform(crs = 24048)
+```
+
+#### Checking crs information with st_crs()
+
+```{r}
+st_crs(thsab_prov)
+```
+
+#### Plot of thsab_prov using tmap
+
+```{r}
+tm_shape(thsab_prov) +
+  tm_polygons("grey")
+```
+:::
+
+## B.2 Filtering THSAB for the Bangkok Metropolitan Region
+
+Before further analyzing the data, we will limit the scope to only consider the Bangkok Metropolitan Region or BMR. This would encompass Bangkok, Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan, Samut Sakhon. While it is good to get insights outside of BMR, it is out of the study scope and it is best to focus on the objectives.
+
+The code chunk below checks if all the provinces in the BMR appear as is under the `ADM1_EN` column of `thsab_prov`
+
+```{r}
+filter(thsab_prov, ADM1_EN %in% c("Bangkok", "Nonthaburi","Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon"))$ADM1_EN
+```
+
+With the previous code returning all 6 provinces, we have confirmation that the provinces are all present and spelled as is in the data source. We create a new object `bmr_boundary` to contain only the provinces in BMR.
+
+::: panel-tabset
+#### Create BMR boundary object using filter()
+
+```{r}
+bmr_boundary <- st_read(dsn="data/geospatial",
+                      layer="tha_admbnda_adm1_rtsd_20220121") %>%
+  st_transform(crs = 24048) %>%
+  filter(ADM1_EN %in% c("Bangkok", "Nonthaburi","Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon"))
+  
+```
+
+#### Plot of bmr_boundary using tmap
+
+```{r}
+tm_shape(bmr_boundary) +
+  tm_polygons("grey")
+```
+:::
+
+## B.3 THOSM (Thailand Roads Open StreetMap, Shapefile)
+
 WIP
 
-## B.2 THOSM (Thailand Roads Open StreetMap, Shapefile)
-
-WIP
-
-## B.3 THRA (Thailand Road Accident Data, Aspatial, csv)
+## B.4 THRA (Thailand Road Accident Data, Aspatial, csv)
 
 WIP
 
