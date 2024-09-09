@@ -27,9 +27,9 @@ In each session, we go through a hands-on exercise to revise the readings for th
 
 1.  [Introduction to Geospatial Analytics](In-class/In-class_Ex01/In-class_Ex01.html) (26 Aug '24)
 
-2.  [Spatial Point Pattern Analysis](In-class/In-class_Ex02/In-class_Ex02.html) (2 Sept '24)
+2.  [Spatial Point Pattern Analysis](In-class/In-class_Ex02/In-class_Ex02.html) - Data Load for Take-home Exercise 1 (2 Sept '24)
 
-3.  Advanced Spatial Point Patterns Analysis (9 Sept '24)
+3.  [Advanced Spatial Point Patterns Analysis](In-class/In-class_Ex03/In-class_Ex03.html) (9 Sept '24)
 
 ## Take-Home Exercises
 

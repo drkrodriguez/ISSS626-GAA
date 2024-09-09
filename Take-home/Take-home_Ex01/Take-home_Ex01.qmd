@@ -41,7 +41,7 @@ The appropriate technique must be used for these deliverables and all the analys
 The study makes use of the following datasets which are publicly available online.
 
 | Dataset Short Name | Description                                               | Datasource                                                                              |
-|--------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------|
+|------------------|----------------------|--------------------------------|
 | THRA               | Thailand road accident data from 2019 to 2022             | [Kaggle](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) |
 | THOSM              | Thailand roads open street map in shapefile format        | [HDX](https://data.humdata.org/dataset/hotosm_tha_roads)                                |
 | THSAB              | Thailand - Subnational Administrative Boudaries shapefile | [HDX](https://data.humdata.org/dataset/cod-ab-tha?)                                     |
@@ -168,9 +168,42 @@ tm_shape(bmr_boundary) +
 ```
 :::
 
+The plot confirms that the object. We now need to prepare the .
+
+```{r}
+bmr_full = st_union(bmr_boundary)
+```
+
+```{r}
+tm_shape(bmr_full) +
+  tm_polygons("grey")
+```
+
 ## B.3 THOSM (Thailand Roads Open StreetMap, Shapefile)
 
-WIP
+The second geospatial object is the street map shapefile. We will use the object `network` to contain the final road network for the study.
+
+```{r}
+network <- st_read(dsn="data/geospatial",
+                      layer="hotosm_tha_roads_lines_shp")
+```
+
+The above code confirms that the dataset is in multilinestring sf format and contains 2.8M records. It also shows that there is no CRS applied to the dataset.
+
+Based on these, the following steps need to be done: apply the right CRS/EPSG code of 24048, and, filter the network to only include BMR. We are opting to filter the network dataset before transforming into a ppp object to limit the amount of resources required as we do not keep the full dataset in memory.
+
+```{r}
+network <- st_read(dsn="data/geospatial",
+                      layer="hotosm_tha_roads_lines_shp") %>%
+  st_set_crs(24048)
+
+```
+
+```{r}
+glimpse(network)
+```
+
+XXX
 
 ## B.4 THRA (Thailand Road Accident Data, Aspatial, csv)
 
