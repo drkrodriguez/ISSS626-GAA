@@ -49,7 +49,7 @@ The study makes use of the following datasets which are publicly available onlin
 
 ## A.4 Importing and Launching R Packages
 
-For this study, five R packages will be used. A description of the packages and the code, using `p_load()` of the **pacman** package, to import them is given below.
+For this study, four R packages will be used. A description of the packages and the code, using `p_load()` of the **pacman** package, to import them is given below.
 
 ::: panel-tabset
 #### Package Description
@@ -64,14 +64,10 @@ The loaded packages include:
 
 -   **sPNetwork** - provides functions for performing SPPA methods like KDE and K-function on a network. The package can also be used to build spatial matrices to conduct traditional spatial analyses with spatial weights based on reticular distances
 
--   **spatstat** - offers a wide range of functions for point pattern analysis (PPA)
-
--   **raster** - for reading, writing, manipulating and analysing models of gridded spatial data
-
 #### Import Code
 
 ```{r}
-pacman::p_load(sf, spNetwork, tmap, tidyverse, spatstat, raster)
+pacman::p_load(sf, spNetwork, tmap, tidyverse)
 ```
 :::
 
@@ -85,7 +81,7 @@ set.seed(1234)
 
 In this section, the appropriate R packages will be used to load the three datasets into R objects, and to inspect and transform them as needed.
 
-## B.1 THSAB (Thailand Subnational Administrative Boundary, Shapefile)
+## B.1 Thailand Subnational Administrative Boundary, Shapefile
 
 We load the Thailand subnational administrative boundary shapefile into an R dataframe using `st_read()` from the sf package. The source provides the geospatial data in varying levels as indicated by their suffix: country (0), province (1), district (2), and sub-district. (3) For focusing on the BMR, which covers Bangkok and neighboring provinces, province is the most likely level of detail we will need so we will use the code chunk below to load the appropriate layer first.
 
@@ -112,7 +108,7 @@ st_crs(thsab_prov)
 
 The output confirms that we have a multipolygon sf object with 77 rows and 17 columns. There is a column named `ADM1_EN` which appears to contain the province names needed to define the BMR boundaries. It also shows that the dataset is using a coordinate reference system rather than a projected reference system.
 
-First, we reload the data to use a projected reference system and apply the correct reference system with EPSG code of 24048 using `st_transform()`. This transformation can be confirmed with `st_crs()` The **tmap** package is then used to visualize the object to see if it properly depicts the boundaries of Thailand and its provinces.
+First, we reload the data to use a projected reference system and apply the correct reference system with EPSG code of 32647 using `st_transform()`. This transformation can be confirmed with `st_crs()` The **tmap** package is then used to visualize the object to see if it properly depicts the boundaries of Thailand and its provinces.
 
 ::: panel-tabset
 #### Load Object and Transform CRS information
@@ -120,7 +116,7 @@ First, we reload the data to use a projected reference system and apply the corr
 ```{r}
 thsab_prov <- st_read(dsn="data/geospatial",
                           layer="tha_admbnda_adm1_rtsd_20220121") %>%
-  st_transform(crs = 24048)
+  st_transform(crs = 32647)
 ```
 
 #### Checking crs information with st_crs()
@@ -147,7 +143,7 @@ The code chunk below checks if all the provinces in the BMR appear as is under t
 filter(thsab_prov, ADM1_EN %in% c("Bangkok", "Nonthaburi","Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon"))$ADM1_EN
 ```
 
-With the previous code returning all 6 provinces, we have confirmation that the provinces are all present and spelled as is in the data source. We create a new object `bmr_boundary` to contain only the provinces in BMR.
+With the previous code returning all 6 provinces, we have confirmation that the provinces are all present and spelled as is in the data source. We create a new object `bmr_boundary` to contain only the provinces in BMR. We also take this opportunity to only keep the relevant columns in the dataset using the **select()** function of dplyr package.
 
 ::: panel-tabset
 #### Create BMR boundary object using filter()
@@ -155,8 +151,8 @@ With the previous code returning all 6 provinces, we have confirmation that the 
 ```{r}
 bmr_boundary <- st_read(dsn="data/geospatial",
                       layer="tha_admbnda_adm1_rtsd_20220121") %>%
-  st_transform(crs = 24048) %>%
-  filter(ADM1_EN %in% c("Bangkok", "Nonthaburi","Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon"))
+  st_transform(crs = 32647) %>%
+  filter(ADM1_EN %in% c("Bangkok", "Nonthaburi","Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) %>% dplyr::select(Shape_Leng, Shape_Area, ADM1_EN, geometry)
   
 ```
 
@@ -168,7 +164,7 @@ tm_shape(bmr_boundary) +
 ```
 :::
 
-The plot confirms that the object. We now need to prepare the .
+The code below creates a second object which is just a union of all the provinces. (i.e., borders between provinces are lost) This is done using the `st_union()` function.
 
 ```{r}
 bmr_full = st_union(bmr_boundary)
@@ -179,36 +175,205 @@ tm_shape(bmr_full) +
   tm_polygons("grey")
 ```
 
-## B.3 THOSM (Thailand Roads Open StreetMap, Shapefile)
+```{r}
+#| echo: false
+rm(thsab_prov)
+```
+
+The code below keeps the final boundary objects into files to make loading more convenient for later analyses.
+
+```{r}
+#| eval: false 
+write_rds(bmr_boundary, "data/rds/bmr_boundary.rds")
+write_rds(bmr_full, "data/rds/bmr_full.rds")
+```
+
+The code below then reloads the same objects into R:
+
+```{r}
+#| eval: false
+bmr_boundary = read_rds("data/rds/bmr_boundary.rds")
+bmr_full = read_rds("data/rds/bmr_full.rds")
+```
+
+## B.3 Road Accident Data, Aspatial, csv-file
+
+The road accident data is contained in a csv file. We use the code block in the first tab below to load it into the `thra` object with some necessary transformations that we identified upon inspecting the raw file. The second tab gives an explanation of the different nested functions used in the code
+
+Code to import and transform road accident data
+
+```{r}
+bmracc <- read_csv("data/aspatial/thai_road_accident_2019_2022.csv")  %>%
+  filter(!is.na(longitude) & longitude != "",
+         !is.na(latitude) & latitude != "") %>%
+  st_as_sf(coords = c(
+    "longitude", "latitude"),
+    crs=4326) %>%
+  st_transform(crs = 32647) %>%
+  mutate(Year = year(incident_datetime)) %>%
+  mutate(MonthNum = month(incident_datetime)) %>%
+  mutate(Month = month(incident_datetime, label = TRUE, abbr = TRUE)) %>%
+  mutate(DayOfWeek = wday(incident_datetime, label = TRUE, abbr = TRUE))
+
+bmracc = st_intersection(bmr_full, bmracc)
+```
+
+We use the code chunks below to check the data and visualize the data on the BMR boundary map.
+
+```{r}
+bmracc
+```
+
+```{r}
+tm_shape(bmr_boundary) +
+  tm_polygons(col = "grey") +
+  tm_shape(bmracc) +
+  tm_dots(col = "red", size = 0.01, alpha = 0.5)
+```
+
+The code chunk below writes the resulting accident dataset into an rds file for convenient loading.
+
+```{r}
+#| eval: false
+write_rds(bmracc, "data/rds/bmracc.rds")
+```
+
+tm\_
+
+## B.4 THOSM (Thailand Roads Open StreetMap, Shapefile)
 
 The second geospatial object is the street map shapefile. We will use the object `network` to contain the final road network for the study.
 
 ```{r}
+#| eval: false
 network <- st_read(dsn="data/geospatial",
                       layer="hotosm_tha_roads_lines_shp")
 ```
 
-The above code confirms that the dataset is in multilinestring sf format and contains 2.8M records. It also shows that there is no CRS applied to the dataset.
+Running the above code confirms that the dataset is in multilinestring sf format and that it contains 2.8M records across 15 variables. It also shows that there is no CRS applied to the dataset.
 
-Based on these, the following steps need to be done: apply the right CRS/EPSG code of 24048, and, filter the network to only include BMR. We are opting to filter the network dataset before transforming into a ppp object to limit the amount of resources required as we do not keep the full dataset in memory.
+Based on these, the following steps need to be done: apply the right CRS/EPSG code of 32647 or the same as `bmr_full`, and, filter the network to only include BMR.
+
+The code below does the first step of applying a reference system and updating the EPSG code to 32647 using `st_set_crs()` and `st_crs()` from the sf package.
 
 ```{r}
+#| eval: false
 network <- st_read(dsn="data/geospatial",
                       layer="hotosm_tha_roads_lines_shp") %>%
-  st_set_crs(24048)
+  st_make_valid() %>% st_set_crs(4326) %>% st_transform(crs = st_crs(bmr_full))
 
+```
+
+The code below then finds the network within BMR by using `st_intersection()` to find the overlap between the full road network and the BMR boundary.
+
+```{r}
+#| eval: false
+bmr_network <- st_intersection(network, bmr_full)
 ```
 
 ```{r}
-glimpse(network)
+#| echo: false
+bmr_network = read_rds("data/rds/bmr_network.rds")
 ```
 
-XXX
+Calling the object name allows us to inspect the contents.
 
-## B.4 THRA (Thailand Road Accident Data, Aspatial, csv)
+```{r}
+bmr_network
+```
 
-WIP
+The size of the object has now been reduced to 585K features from the original 2.8M. This still appears a very large number if we want to visualize the data, so we need to inspect if there are any opportunities to reduce the dataset by excluding any irrelevant records.
 
-## B.4 Joining the Aspatial and Geospatial Data
+The data includes a column named highway which gives information on the the type or classification of the road.
 
-WIP
+```{r}
+ggplot(bmr_network, aes(x = reorder(highway, table(highway)[highway]))) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Number of Roads by Highway type") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), hjust=-0.3) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "Number of Records", y = "Highway Type")
+```
+
+The resulting chart shows that roads with highway type of **residential** and **service** make up 522K of the 585K roads in the dataset. We refer to the OpenStreetMap wiki page to see the definition of the [different types of highways](https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification) in the Thailand map and see that these two highway types are access roads for residences or specific buildings. For our objective, we should be able to limit to roads where accidents (are expected to frequently) happen, and only to roads that should be accessible by vehicles. Going through the definition of the highway types, we see that the following 6 types could be out of scope for our study:
+
+-   residential - road within a residential area that gives public access to one or multiple residences
+
+-   service - minor road that gives access to buildings or places outside a residential area (e.g., to a religious site, an attraction, part of an estate)
+
+-   footway - pathways designed for pedestrian access
+
+-   track - road whose only function is to provide access to surrounding land, and is most of the time unpaved
+
+-   path - multi-purpose path intended for non-motor vehicles
+
+-   steps
+
+We can then use the following code chunk which uses the `filter()` function to remove these classifications from the current `network` object. We call the object name in the succeeding code chunk to check the new dataset.
+
+```{r}
+bmr_network <- bmr_network %>% 
+  filter(!(highway %in% c("residential", "service", "footway", "track", "path", "steps")))
+```
+
+```{r}
+bmr_network
+```
+
+The new road network object is now reduced to 34K records or roads which is a 94% reduction in the number of records. We will use some visual inspection to see if this reduction in records will affect our analysis. The two code chunks below plot the road network within the boundaries, while the second plots the three objects together. We use the tmap function to create these maps.
+
+::: panel-tabset
+#### BMR filtered road network only
+
+```{r}
+
+tm_shape(bmr_full) +
+  tm_polygons(col = "lightgrey") +
+  tm_shape(bmr_network) +
+  tm_lines(col = "black", alpha = 0.5)
+
+```
+
+#### BMR filtered road network with road accident dataset
+
+```{r}
+tm_shape(bmr_full) +
+  tm_polygons(col = "lightgrey") +
+  tm_shape(bmr_network) +
+  tm_lines(col = "darkblue") +
+  tm_shape(bmracc) +
+  tm_dots(col = "red", alpha = 0.2)
+```
+:::
+
+From these two maps, we see that:
+
+1.   while we have filtered 90% of the original records, the resulting map still appears dense, especially in some central areas; and,
+
+2.  the road accident locations appear to fall along the network
+
+Based on these, we will go ahead with this version of the network for our analysis.
+
+The following code writes the resulting network into an rds file for more convenient loading in the future.
+
+```{r}
+#| eval: false
+write_rds(bmr_network, "data/rds/bmr_network.rds")
+```
+
+## B.5 Pre-analysis transformations
+
+In this section, we perform some additional transformations to perform the required analyses. 
+
+XX jitter xx
+
+xx creating seasonal mapping or other time based tagging xx
