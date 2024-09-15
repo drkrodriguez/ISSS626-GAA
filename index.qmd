@@ -21,6 +21,8 @@ Hands-on exercises are assigned before each lesson to give us hands-on experienc
 
 5.  [Network Constrained Spatial Point Pattern Analysis](Hands-on/Hands-on_Ex05/Hands-on_Ex05.html) (for Session 3, 9 Sept 2024)
 
+6.  [Spatial Weights and Applications](Hands-on/Hands-on_Ex06/Hands-on_Ex06.html) (for Session 4, 16 Sept 2024)
+
 ## In-Class Exercises
 
 In each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.

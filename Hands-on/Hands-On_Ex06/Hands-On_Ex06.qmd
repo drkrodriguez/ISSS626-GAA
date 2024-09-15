@@ -1,0 +1,220 @@
+---
+title: "Spatial Weights and Applications"
+author: "Federico Jose Rodriguez"
+date: "Sep 15 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this hands-on exercise, we learn how to compute spatial weights and spatially lagged in R using the **spdep** package.
+
+This exercise is based on Chapter 8 of Dr Kam's online book which can be accessed [here](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam").
+
+# Getting Started
+
+## Data Sources
+
+Data for this exercise are based on the Hunan county coming from two files:
+
+-   Hunan county boundary layer in ESRI shapefile format
+
+-   Hunan local development indicators for 2012 stored in a csv file
+
+## Installing and launching R packages
+
+This exercise will make use of five R packages: **sf**, **tidyverse,** **tmap, and spdep**.
+
+-   **sf -** for importing, managing and processing vector-based geospatial data
+
+-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+
+-   **tmap -** for plotting cartographic quality maps
+
+-   **spdep** - functions to create spatial weights
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse)
+```
+
+# Data Import and Preparation
+
+## Data Loading
+
+The code chunk below uses `st_read()` of the **sf** package to load the Hunan shapefile into an R object.
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+The following code chunk imports the second data source, a csv file, into an R object using `read_csv()` of the **readr** package.
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+We can examine the contents of the two objects by calling them.
+
+::: panel-tabset
+#### hunan sf dataframe
+
+```{r}
+hunan
+```
+
+#### hunan2012 dataframe
+
+```{r}
+hunan2012
+```
+:::
+
+## Performing relational join
+
+The code chunk below will be used to import columns from `hunan2012` into `hunan` using `left_join()` of the **dplyr** package.
+
+```{r}
+hunan <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15)
+```
+
+# Visualising Regional Development Indicator
+
+The code chunk below uses **tmap** package to create two side by side maps of the basemap and a choropleth map based on the `GDPPC` attribute.
+
+```{r}
+basemap <- tm_shape(hunan) +
+  tm_polygons() +
+  tm_text("NAME_3", size=0.5)
+
+gdppc <- qtm(hunan, "GDPPC")
+tmap_arrange(basemap, gdppc, asp=1, ncol=2)
+```
+
+# Computing Contiguity Spatial Weights
+
+The `poly2nb()` of the **spdep** package computes contiguity weight matrices for a study area. This builds a neighbour list based on regions with contiguous boundaries. The function includes a `queen` argument which defaults to TRUE. This argument dictates whether the Queen criteria will be used in building a list of first order neighbours.
+
+## Computing (QUEEN) contiguity based neighbours
+
+The code chunk below computes for a Queen contiguity weight matrix and displays a summary.
+
+```{r}
+wm_q <- poly2nb(hunan, queen=TRUE)
+summary(wm_q)
+```
+
+The output shows that:
+
+-   There are 88 units in the dataset.
+
+-   The most connected unit has 11 neighbours (and only one unit has 11 neighbours)
+
+-   There are two units with only one neighbour.
+
+The resulting polygon object wm_q lists all neighboring polygons for each polygon. For example, the following code will show the neighbors of the first polygon:
+
+```{r}
+wm_q[[1]]
+```
+
+This shows that there are 5 neighbors for the first polygon. The numbers denote the id of those neighbors as they are stored in `hunan`.
+
+We can retrieve the names of those polygons or units using the code chunk below. The columns `County` and `NAME_3` contain the same value so either may be used to return the names
+
+```{r}
+hunan$County[1]
+hunan$NAME_3[c(2,3,4,57,85)]
+```
+
+We can retrieve the GDPPC of these countries using the code below (for polygon 1 and then for its five neighbours)
+
+```{r}
+hunan$GDPPC[1]
+hunan$GDPPC[wm_q[[1]]]
+```
+
+The complete weight matrix can be displayed by using `str()`, i.e., `str(wm_q)`
+
+## Computing (ROOK) contiguity based neighbours
+
+The code chunk below computes the Rook contiguity weight matrix by setting the `queen` argument to FALSE
+
+```{r}
+wm_r <- poly2nb(hunan, queen=FALSE)
+summary(wm_r)
+```
+
+The report shows a few differences compared to the earlier QUEEN contiguity matrix. The most connected area has 10 instead of 11 neighbors, and there are differences in the details from the number of nonzero links to the average number of links.
+
+## Visualizing contiguity weights
+
+In this section, we introduce connectivity graphs which displays lines between neighboring points. As we are working with a polygon object at the moment, we would need to convert or define points to represent them first before attempting to build a connectivity graph. The most common method to do this is by choosing the centroid as the point for the polygon
+
+### Getting longitude and latitude of polygon centroids
+
+The process is slightly complicated as we cannot immediately simply run `st_centroid()` on the object.
+
+First, we need to get the coordinates of the polygons in separate dataframe by using a mapping function. The code chunk below create a dataframe for the centroids along the longitude by using `st_centroid()` on the geometry longitude using double bracket notation.
+
+```{r}
+longitude <- map_dbl(hunan$geometry, ~st_centroid(.x)[[1]])
+```
+
+For the latitudes, we use a similar code with the only difference being the index referenced by the double bracket notation.
+
+```{r}
+latitude <- map_dbl(hunan$geometry, ~st_centroid(.x)[[2]])
+```
+
+We can then use `cbind()` to combine the two objects into a single object for the centroid locations.
+
+```{r}
+coords <- cbind(longitude, latitude)
+```
+
+We can confirm that the points are formatted correctly by checking the first few records with `head()`
+
+```{r}
+head(coords)
+```
+
+### Plotting Queen contiguity based neighbours map
+
+The code below creates the connectivity graph based on the matrix in `wm_q`
+
+```{r}
+plot(hunan$geometry, border="lightgrey")
+plot(wm_q, coords, pch = 19, cex = 0.6, add = TRUE, col= "red")
+```
+
+### Plotting Rook contiguity based neighbours map
+
+The code below creates the connectivity graph based on the matrix in `wm_r`
+
+```{r}
+plot(hunan$geometry, border="lightgrey")
+plot(wm_r, coords, pch = 19, cex = 0.6, add = TRUE, col = "red")
+```
+
+### Plotting Queen and Rook contiguity based neighbours map
+
+The code below creates the connectivity graph for both queen and rook based contiguity and show theem side by side
+
+```{r}
+par(mfrow=c(1,2))
+plot(hunan$geometry, border="lightgrey", main="Queen Contiguity")
+plot(wm_q, coords, pch = 19, cex = 0.6, add = TRUE, col= "red")
+plot(hunan$geometry, border="lightgrey", main="Rook Contiguity")
+plot(wm_r, coords, pch = 19, cex = 0.6, add = TRUE, col = "red")
+```
+
+# Computing distance-based neighbours
+
+In this section, we will use `dnearneigh()` of the **spdep** package to derive the distance-based weight matrices. This function identifies neighbours by Euclidean distance based on a lower (`d1`) and upper (`d2`) bound based on the `bounds` argument.

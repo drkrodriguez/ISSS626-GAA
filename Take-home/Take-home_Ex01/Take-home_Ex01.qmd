@@ -64,10 +64,12 @@ The loaded packages include:
 
 -   **sPNetwork** - provides functions for performing SPPA methods like KDE and K-function on a network. The package can also be used to build spatial matrices to conduct traditional spatial analyses with spatial weights based on reticular distances
 
+-   **spatstat** - package for plotting, EDA and simulation of spatial data
+
 #### Import Code
 
 ```{r}
-pacman::p_load(sf, spNetwork, tmap, tidyverse)
+pacman::p_load(sf, spNetwork, tmap, tidyverse, spatstat)
 ```
 :::
 
@@ -204,24 +206,31 @@ Code to import and transform road accident data
 
 ```{r}
 bmracc <- read_csv("data/aspatial/thai_road_accident_2019_2022.csv")  %>%
-  filter(!is.na(longitude) & longitude != "",
+  filter(!is.na(longitude) & longitude != "", 
          !is.na(latitude) & latitude != "") %>%
-  st_as_sf(coords = c(
-    "longitude", "latitude"),
-    crs=4326) %>%
-  st_transform(crs = 32647) %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs=4326) %>%
+  st_transform(crs = 32647)
+
+bmracc <- filter(bmracc, geometry %in% st_intersection(bmr_full, bmracc)) %>%
   mutate(Year = year(incident_datetime)) %>%
   mutate(MonthNum = month(incident_datetime)) %>%
   mutate(Month = month(incident_datetime, label = TRUE, abbr = TRUE)) %>%
   mutate(DayOfWeek = wday(incident_datetime, label = TRUE, abbr = TRUE))
 
-bmracc = st_intersection(bmr_full, bmracc)
+
+```
+
+Calling the new object shows that it has 12,989 rows across 20 fields.
+
+```{r}
+bmracc
 ```
 
 We use the code chunks below to check the data and visualize the data on the BMR boundary map.
 
 ```{r}
-bmracc
+#| echo: false
+bmracc <- read_rds("data/rds/bmracc.rds")
 ```
 
 ```{r}
@@ -238,9 +247,7 @@ The code chunk below writes the resulting accident dataset into an rds file for 
 write_rds(bmracc, "data/rds/bmracc.rds")
 ```
 
-tm\_
-
-## B.4 THOSM (Thailand Roads Open StreetMap, Shapefile)
+## B.4 Thailand Roads Open StreetMap, Shapefile
 
 The second geospatial object is the street map shapefile. We will use the object `network` to contain the final road network for the study.
 
@@ -271,14 +278,10 @@ The code below then finds the network within BMR by using `st_intersection()` to
 bmr_network <- st_intersection(network, bmr_full)
 ```
 
-```{r}
-#| echo: false
-bmr_network = read_rds("data/rds/bmr_network.rds")
-```
-
 Calling the object name allows us to inspect the contents.
 
 ```{r}
+#| eval: false
 bmr_network
 ```
 
@@ -287,6 +290,7 @@ The size of the object has now been reduced to 585K features from the original 2
 The data includes a column named highway which gives information on the the type or classification of the road.
 
 ```{r}
+#| eval: false
 ggplot(bmr_network, aes(x = reorder(highway, table(highway)[highway]))) +
   geom_bar() +
   coord_flip() +
@@ -321,6 +325,12 @@ The resulting chart shows that roads with highway type of **residential** and **
 We can then use the following code chunk which uses the `filter()` function to remove these classifications from the current `network` object. We call the object name in the succeeding code chunk to check the new dataset.
 
 ```{r}
+#| echo: false
+bmr_network = read_rds("data/rds/bmr_network.rds")
+```
+
+```{r}
+#| eval: false
 bmr_network <- bmr_network %>% 
   filter(!(highway %in% c("residential", "service", "footway", "track", "path", "steps")))
 ```
@@ -339,7 +349,7 @@ The new road network object is now reduced to 34K records or roads which is a 94
 tm_shape(bmr_full) +
   tm_polygons(col = "lightgrey") +
   tm_shape(bmr_network) +
-  tm_lines(col = "black", alpha = 0.5)
+  tm_lines(col = "black")
 
 ```
 
@@ -349,7 +359,7 @@ tm_shape(bmr_full) +
 tm_shape(bmr_full) +
   tm_polygons(col = "lightgrey") +
   tm_shape(bmr_network) +
-  tm_lines(col = "darkblue") +
+  tm_lines(col = "black") +
   tm_shape(bmracc) +
   tm_dots(col = "red", alpha = 0.2)
 ```
@@ -357,7 +367,7 @@ tm_shape(bmr_full) +
 
 From these two maps, we see that:
 
-1.   while we have filtered 90% of the original records, the resulting map still appears dense, especially in some central areas; and,
+1.  while we have filtered 90% of the original records, the resulting map still appears dense, especially in some central areas; and,
 
 2.  the road accident locations appear to fall along the network
 
@@ -370,10 +380,28 @@ The following code writes the resulting network into an rds file for more conven
 write_rds(bmr_network, "data/rds/bmr_network.rds")
 ```
 
-## B.5 Pre-analysis transformations
+## B.5 Resolving duplicate points
 
-In this section, we perform some additional transformations to perform the required analyses. 
+In this section, we perform some additional transformations to perform the required analyses.
 
-XX jitter xx
+First, we check the event or accident dataset to see if there are any **duplicated data points** or locations as the methods require that the points are unique. The code below checks if any duplicate points exist. Note that we specify the column in the argument as we are double-checking duplicate locations rather than completely duplicate records.
 
-xx creating seasonal mapping or other time based tagging xx
+```{r}
+any(duplicated(bmracc$geometry))
+```
+
+As the code returned TRUE, it confirms the presence of duplicate points, we use `st_jitter()` from the **sf** package to introduce some jitter to each point and ensure that points do not lie on the same location. Without any additional arguments, the function uses a default factor 0.002 of the bounding box diagonal as the bounds for the amount of jitter introduced. In the code below, we define an amount of 0.01 instead.
+
+```{r}
+bmracc <- st_jitter(bmracc, 0.01)
+```
+
+Rerunning the check using `duplicated()` shows that there are no duplicate points anymore.
+
+```{r}
+any(duplicated(bmracc$geometry))
+```
+
+# C. Exploratory Data Analysis
+
+The second thing we want to perform is to generate lixels and sample points (based on those lixels) along the network. These points will be the basis for computing the KDE. 
