@@ -218,3 +218,62 @@ plot(wm_r, coords, pch = 19, cex = 0.6, add = TRUE, col = "red")
 # Computing distance-based neighbours
 
 In this section, we will use `dnearneigh()` of the **spdep** package to derive the distance-based weight matrices. This function identifies neighbours by Euclidean distance based on a lower (`d1`) and upper (`d2`) bound based on the `bounds` argument.
+
+## Determining the cut-off distance
+
+The first step is to determine the upper limit for the distance bands by using the following steps:
+
+1.  Using `knearneigh()` of **spdep** package to produce a matrix of the (indices) of the k-nearest neighbors (knn) of each unit
+
+2.  Using `knn2nb()` to convert the resulting knn object into a neighbors list of class nb with a list of integer vectors containing the neighbor region number ids
+
+3.  Using `nbdists()` to return the length of neighbor relationship edges. Note that this function returns in the same units if the source is projected. Otherwise, it uses km
+
+4.  Using `unlist()` to remove the list structure of the returned object
+
+```{r}
+#coords <- coordinates(hunan)
+k1 <- knn2nb(knearneigh(coords))
+k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
+summary(k1dists)
+```
+
+The summary shows that the largest first nearest neighbor distance is 61.79km, so this is a good upper threshold that ensures that all units will have at least one neighbor
+
+## Computing fixed distance weight matrix
+
+We use `dnearneigh()` in the code chunk below to compute the distance weight matrix
+
+```{r}
+wm_d62 <- dnearneigh(coords, 0, 62, longlat = TRUE)
+wm_d62
+```
+
+We can use str() to display the contents of the `wm_d62` weight matrix
+
+```{r}
+str(wm_d62)
+```
+
+Alternatively, we can also display the matrix in another form using `table()` and `card()` of **spdep**.
+
+```{r}
+table(hunan$County, card(wm_d62))
+```
+
+```{r}
+n_comp <- n.comp.nb(wm_d62)
+n_comp$nc
+
+table(n_comp$comp.id)
+```
+
+### Plotting the fixed distance weight matrix
+
+The code chunk below plots the distance weight matrix
+
+```{r}
+plot(hunan$geometry, border="lightgrey")
+plot(wm_d62, coords, add=TRUE)
+plot(k1, coords, add=TRUE, col="red", length=0.08)
+```
