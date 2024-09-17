@@ -202,9 +202,11 @@ bmr_full = read_rds("data/rds/bmr_full.rds")
 
 The road accident data is contained in a csv file. We use the code block in the first tab below to load it into the `thra` object with some necessary transformations that we identified upon inspecting the raw file. The second tab gives an explanation of the different nested functions used in the code
 
-Code to import and transform road accident data
+::: panel-tabset
+#### Code to import and transform road accident data
 
 ```{r}
+#| eval: false
 bmracc <- read_csv("data/aspatial/thai_road_accident_2019_2022.csv")  %>%
   filter(!is.na(longitude) & longitude != "", 
          !is.na(latitude) & latitude != "") %>%
@@ -220,9 +222,25 @@ bmracc <- filter(bmracc, geometry %in% st_intersection(bmr_full, bmracc)) %>%
 
 ```
 
+#### Explanation of the code lines / functions used
+
+-   `read_csv()` used to import a csv file into an R object
+
+-   `filter(!is.na(longitude) & longitude != "", !is.na(latitude) & latitude != "")` used to exclude any records where the longitude or latitude information is missing
+
+-   `st_as_sf(coords = c("longitude", "latitude"), crs=4326)` used to convert the dataframe into an sf object using a reference system (WGS84) based on the coordinates
+
+-   `st_transform(crs = 32647)` used to apply the correct EPSG code to the sf object
+
+-   `filter(bmracc, geometry %in% st_intersection(bmr_full, bmracc))` used to leave only records which fall within the BMR boundaries
+
+-   `mutate(...)` these lines are used to add additional columns to quickly reference the year, month and day of the week that each accident occured as these dimensions allow for some temporal analyses
+:::
+
 Calling the new object shows that it has 12,989 rows across 20 fields.
 
 ```{r}
+#| eval: false
 bmracc
 ```
 
@@ -271,27 +289,28 @@ network <- st_read(dsn="data/geospatial",
 
 ```
 
-The code below then finds the network within BMR by using `st_intersection()` to find the overlap between the full road network and the BMR boundary.
+The code below then finds the network within BMR by using `st_intersection()` to find the overlap between the full road network and the BMR boundary. We also include `write_rds()` in the chunk to store this object into an rds file for easy future loading.
 
 ```{r}
 #| eval: false
-bmr_network <- st_intersection(network, bmr_full)
+network <- st_intersection(network, bmr_full)
+write_rds(network, "data/rds/network.rds")
 ```
 
 Calling the object name allows us to inspect the contents.
 
 ```{r}
 #| eval: false
-bmr_network
+network
 ```
 
 The size of the object has now been reduced to 585K features from the original 2.8M. This still appears a very large number if we want to visualize the data, so we need to inspect if there are any opportunities to reduce the dataset by excluding any irrelevant records.
 
 The data includes a column named highway which gives information on the the type or classification of the road.
 
-```{r}
+```{r, fig.width=15, fig.height=8}
 #| eval: false
-ggplot(bmr_network, aes(x = reorder(highway, table(highway)[highway]))) +
+ggplot(network, aes(x = reorder(highway, table(highway)[highway]))) +
   geom_bar() +
   coord_flip() +
   ggtitle("Number of Roads by Highway type") +
@@ -305,7 +324,7 @@ ggplot(bmr_network, aes(x = reorder(highway, table(highway)[highway]))) +
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank()
   ) +
-  labs(x = "Number of Records", y = "Highway Type")
+  labs(x = "Highway Type", y = "Number of Roads")
 ```
 
 The resulting chart shows that roads with highway type of **residential** and **service** make up 522K of the 585K roads in the dataset. We refer to the OpenStreetMap wiki page to see the definition of the [different types of highways](https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification) in the Thailand map and see that these two highway types are access roads for residences or specific buildings. For our objective, we should be able to limit to roads where accidents (are expected to frequently) happen, and only to roads that should be accessible by vehicles. Going through the definition of the highway types, we see that the following 6 types could be out of scope for our study:
@@ -336,6 +355,19 @@ bmr_network <- bmr_network %>%
 ```
 
 ```{r}
+#| eval: false
+bmr_network
+```
+
+While this looks good, it looks like the object is being identified as a GEOMETRY rather than a LINESTRING object. We can use the code below to correct it.
+
+```{r}
+#| eval: false
+bmr_network <- st_cast(bmr_network, "LINESTRING")
+```
+
+```{r}
+#| eval: false
 bmr_network
 ```
 
@@ -402,6 +434,249 @@ Rerunning the check using `duplicated()` shows that there are no duplicate point
 any(duplicated(bmracc$geometry))
 ```
 
-# C. Exploratory Data Analysis
+# C. NonSpatial Data Analysis
 
-The second thing we want to perform is to generate lixels and sample points (based on those lixels) along the network. These points will be the basis for computing the KDE. 
+Before we go into performing spatial or spatio-temporal analysis, it would be good to explore and examine the data further. This can reveal some insights and also clarify what variables we can use for drilling down on the required analysis.
+
+## C.1 Categories of accidents
+
+We first would like to understand the different labels we can use from the BMR road accident dataset `bmracc` The following columns appear to be able to give some insight about the nature of the accident:
+
+-   vehicle_type
+
+-   presumed_cause
+
+-   accident_type
+
+-   number_of_vehicles_involved
+
+-   number_of_fatalities
+
+-   weather_condition
+
+We will try to be brief in analysing these variables as the main intent is to understand which ones will add the most value to the spatial analysis needed to address the main study objectives.
+
+### C.1.1 Vehicle Type
+
+This variable is intended to give the type of vehicle involved in the accident. We use the code block below to understand the categories under this variable using a simple bar chart created through `ggplot()`.
+
+```{r, fig.width=15, fig.height=8}
+ggplot(bmracc, aes(x = reorder(vehicle_type, table(vehicle_type)[vehicle_type]))) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Number of Accidents by Vehicle type") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), hjust=-0.3) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "", y = "")
+```
+
+The output shows that out of 12,989 accidents, 35% are with private or passenger cars, 27% are with pickup trucks and 13% are with motorcycles. These three make up 75% of all the recorded accidents while the remaining 11 types make up the balance 25%
+
+### C.1.2 Presumed Cause
+
+This variable is intended to give the presumed cause of the accident. We again use the code block below to understand the categories under this variable using a simple bar chart created through `ggplot()`.
+
+```{r , fig.width=15, fig.height=8}
+ggplot(bmracc, aes(x = reorder(presumed_cause, table(presumed_cause)[presumed_cause]))) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Number of Accidents by Presumed Cause") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), hjust=-0.3) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "", y = "")
+
+```
+
+The chart shows that 10,146 or 75% of the accidents are presumed to be caused by speeding. The next largest named presumed cause only accounts for 5% of the overall data.
+
+### C.1.3 Accident Type
+
+This variable is intended to give the type or nature of the accident. We again use the code block below to understand the categories under this variable using a simple bar chart created through `ggplot()`.
+
+```{r , fig.width=15, fig.height=8}
+ggplot(bmracc, aes(x = reorder(accident_type, table(accident_type)[accident_type]))) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Number of Accidents by Type") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), hjust=-0.3) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "", y = "")
+
+```
+
+The chart shows that "rear-end collisions" and "rollover/fallen on straight road" are the leading causes recorded and account for 83% of the accidents.
+
+### C.1.4 Number of Fatalities
+
+This variable is intended to give the number of fatalities resulting from the accident. We again use the code block below to understand the categories under this variable using a simple histogram created through `ggplot()`.
+
+```{r}
+ggplot(bmracc, aes(x = number_of_fatalities)) +
+  geom_histogram(binwidth = 1, color = "black", fill = "darkgrey") +
+  scale_x_continuous(breaks = seq(min(bmracc$number_of_fatalities), max(bmracc$number_of_fatalities), by = 1)) +
+  labs(title = "Accidents by Number of Fatalities", x = "Number of Fatalities", y = "Number of Accidents") +
+  theme_minimal() +
+  theme(panel.grid = element_blank()) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5)
+```
+
+The plot shows that 94% of the recorded accidents are non-fatal. Only 719 were fatal. Although this is a small number, it might be worth looking at the location of such fatal accidents later. We can use the code below to introduce a new column `fatal` into the data for more convenient filtering later.
+
+```{r}
+bmracc$fatal <- bmracc$number_of_fatalities > 0
+```
+
+### C.1.5 Weather Condition
+
+This variable is intended to indicate the weather condition when the accident was recorded. We first use the code block below to understand the categories under this variable using a simple bar chart created through `ggplot()`.
+
+```{r , fig.width=15, fig.height=8}
+ggplot(bmracc, aes(x = reorder(weather_condition, table(weather_condition)[weather_condition]))) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Number of Accidents by Weather Condition") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), hjust=-0.3) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "", y = "")
+
+```
+
+The chart shows that 90% of the accidents occurred during "clear" weather. Online sources suggest that Bangkok experieces a long rainy season and has [153 rainy days per year](https://weatherandclimate.com/thailand/bangkok), so 10% for the occurrence of accidents appears low. The sources also say that the wettest month is September.
+
+We can use the code chunk below to plot the number of accidents that were not recorded on clear weather (i.e., rainy) by month.
+
+```{r , fig.width=15, fig.height=8}
+
+ggplot(filter(bmracc, !weather_condition == "clear"), aes(x = reorder(Month, table(Month)[Month]))) +
+  geom_bar() +
+  coord_flip() +
+  ggtitle("Number of Accidents by Month during Non-clear Weather") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), hjust=-0.3) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.text.x = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "", y = "")
+```
+
+The plot does align with the expectation that September is the wettest month. The very low number of accidents during rainy weather is still questionable though so we will watch out for this if we will use this variable later.
+
+# D. Spatiotemporal Visualizations of Road Accidents in BMR
+
+In this section, we visualize the locations of accidents using different dimensions, especially based on time. For our objectives, we are concerned about the locations of accidents along the roads, so we will explore both the point locations as well as network-constrained visualizations.
+
+## D.1 Preparation of Data for Network Constrained Analysis
+
+Before we are able to perform network-constrained NKDE, we first need to define sample points along the road network, and to do that, we can use the midpoint of the lixels of the network.
+
+### D.1.1 Preparing the lixels
+
+To lixelize a network, the minimum and (maximum) length of lixels need to be defined. A logical distance needs to be chosen for a given study. In our case, we might no have enough information to understand what road segment length is relevant to group accidents into. However, we can start with understanding the road lengths in the network.
+
+We can use the code block below to show the distribution of the road length values using `summary()` to give the quartiles, and `quantile()` to give a wider range of view.
+
+```{r}
+summary(st_length(bmr_network))
+
+quantile(st_length(bmr_network), probs = seq(.1, .9, by = .1))
+```
+
+The output shows that there is a very wide range of values. There is also a surprisingly large number of roads (\>40%) that are less than 100m– which seem to be too short for typical roads. We can choose a range of 100-500m for lixel length, and this would keep at least 40% of the roads intact, while the balance will either be merged or split.
+
+We implement this using `lixelize_lines()` in the code chunk below.
+
+```{r}
+lixels <- lixelize_lines(bmr_network$geometry, 
+                         500, 
+                         mindist = 100)
+```
+
+### D.1.2 Generating sample points
+
+The next step is to define sample points along the network which will be the points where the KDE function will be computed on.
+
+We can create sample points on the lixel centers using `lines_center()` in the code below.
+
+```{r}
+samples <- lines_center(lixels) 
+```
+
+## D.2 Total and Annual Level Analysis
+
+Let's start by looking at the highest levels. We can compute for the nkde for all accidents in the dataset (2019-2022) using the code chunk below.
+
+```{r}
+densities <- nkde(bmr_network, 
+                  events = bmracc,
+                  w = rep(1, nrow(bmracc)),
+                  samples = samples,
+                  kernel_name = "quartic",
+                  bw = 300, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(10,10), 
+                  max_depth = 8,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+We import the densities into the lixel and sample object using the code below. We use a multiple of 1000 to convert the figures from accidents per square meter to accidents per square kilometer
+
+```{r}
+samples$density_all <- densities*1000000
+lixels$density_all <- densities*1000000
+```
+
+We use the code below to produce an interactive map with just the calculated densities.
+
+```{r}
+tmap_mode("view")
+tm_shape(lixels)+
+  tm_lines(col="density_all")
+tmap_mode("plot")
+```
