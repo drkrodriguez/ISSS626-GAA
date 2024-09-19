@@ -425,13 +425,13 @@ any(duplicated(bmracc$geometry))
 As the code returned TRUE, it confirms the presence of duplicate points, we use `st_jitter()` from the **sf** package to introduce some jitter to each point and ensure that points do not lie on the same location. Without any additional arguments, the function uses a default factor 0.002 of the bounding box diagonal as the bounds for the amount of jitter introduced. In the code below, we define an amount of 0.01 instead.
 
 ```{r}
-bmracc <- st_jitter(bmracc, 0.01)
+bmracc_jitt <- st_jitter(bmracc, 0.01)
 ```
 
 Rerunning the check using `duplicated()` shows that there are no duplicate points anymore.
 
 ```{r}
-any(duplicated(bmracc$geometry))
+any(duplicated(bmracc_jitt$geometry))
 ```
 
 # C. NonSpatial Data Analysis
@@ -455,6 +455,8 @@ We first would like to understand the different labels we can use from the BMR r
 -   weather_condition
 
 We will try to be brief in analysing these variables as the main intent is to understand which ones will add the most value to the spatial analysis needed to address the main study objectives.
+
+Note that while we use `bmracc` rather than the modified `bmracc_jitt` in the codes below, the result will be the same as we do not concern ourselves with the geometry innformation yet.
 
 ### C.1.1 Vehicle Type
 
@@ -603,15 +605,146 @@ ggplot(filter(bmracc, !weather_condition == "clear"), aes(x = reorder(Month, tab
 
 The plot does align with the expectation that September is the wettest month. The very low number of accidents during rainy weather is still questionable though so we will watch out for this if we will use this variable later.
 
-# D. Spatiotemporal Visualizations of Road Accidents in BMR
+# D. Non-Network-Constrained Visualization
 
-In this section, we visualize the locations of accidents using different dimensions, especially based on time. For our objectives, we are concerned about the locations of accidents along the roads, so we will explore both the point locations as well as network-constrained visualizations.
+While we know that road accidents will only happen along the network / roads, we can still use regular spatial point pattern analysis to get some insights. We will limit this to the highest level as we just want to have some high level insights and want to spend more time working with the network constrained analysis.
 
-## D.1 Preparation of Data for Network Constrained Analysis
+We will also limit this to visualizing the KDE as we know that testing for CSR without considering the constraint of the network is inappropriate for our case.
+
+## D.1. Converting Objects into spatstat's formats
+
+The events need to be converted into spatstat's ppp object using `as.ppp()`
+
+```{r}
+bmracc_ppp <- as.ppp(st_geometry(bmracc_jitt))
+```
+
+We then prepare an owin object to define the boundaries using the `as.owin()` function.
+
+```{r}
+bmr_owin <- as.owin(bmr_full)
+```
+
+## D.2 KDE for all Accidents
+
+We first combine the accidents (all years, all types) into the owin using the following code chunk
+
+```{r}
+bmracc_for_kde = bmracc_ppp[bmr_owin]
+bmracc_for_kde <- rescale.ppp(bmracc_for_kde, 1000, "km")
+```
+
+We can then compute for the kde using the `density()` function. We use the four common methods for automatic bandwidth selection and examine them in a grid using the code chunk below.
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(bmracc_for_kde, sigma=bw.diggle,
+                      edge=TRUE,kernel="gaussian"), main = "KDE using Diggle Method")
+plot(density(bmracc_for_kde, sigma=bw.scott(X = bmracc_for_kde),
+                      edge=TRUE,kernel="gaussian"), main = "KDE using Scott's Rule")
+plot(density(bmracc_for_kde, sigma=bw.CvL(X = bmracc_for_kde),
+                      edge=TRUE,kernel="gaussian"), main = "KDE using Cronie & Van Lieshout Criterion")
+plot(density(bmracc_for_kde, sigma=bw.ppl(X = bmracc_for_kde),
+                      edge=TRUE,kernel="gaussian"), main = "KDE using Likelihood Cross Validation")
+```
+
+Among the four methods, it looks like Scott's rule (using `sigma=bw.scott()`) is identifying hot spots unlike the others. There is a hotspot in the southwest and southeast of Bangkok. There also appears to be a high density strip (or maybe a major highway) stretching up northwards.
+
+We will use this bandwidth selection method for our succeeding analysis.
+
+### D.3 KDE for accidents across years
+
+We then want to see if the hotspots move across the years. To do this, we effectively need to compute for the kde across years and see if there are any visible signs of shifts in the hotspots.
+
+First, let us try to understand the distribution of accidents by year. This will help us understand if the numberical values of the density will move because of change in the absolute number of accidents.
+
+We use `ggplot()` in the code chunk below to achieve this.
+
+```{r}
+ggplot(bmracc, aes(x = reorder(Year, table(Year)[Year]))) +
+  geom_bar() +
+  ggtitle("Number of Accidents by Year") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), vjust = +2) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 12),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "", y = "")
+```
+
+The chart shows that there were significantly more accidents in 2022 compared to the previous years. The other years are within 10% of each other. We should expect that 2022 KDE may have higher numerical values compared to the other years.
+
+We can then use the following code to generate four different kde's, one for each year.
+
+```{r}
+par(mfrow=c(2,2))
+for (i in c(2019, 2020, 2021, 2022)) {
+  bmracc_ppp <- as.ppp(st_geometry(filter(bmracc_jitt, Year == i)))
+  bmracc_for_kde = bmracc_ppp[bmr_owin]
+  bmracc_for_kde <- rescale.ppp(bmracc_for_kde, 1000, "km")
+  plot(density(bmracc_for_kde, sigma=bw.scott(X = bmracc_for_kde),
+                      edge=TRUE,kernel="gaussian"), main = paste("KDE for year",i))
+}
+```
+
+We see that there appears to be a shift between 2020 and 2021. Before 2020, there appeared to be two separate promininet hotspots for accidents– in the central and southeastern portion of the region. However, after 2020, it seems that the accidents are more frequent in the southeastern part, and in a much wider area.
+
+## D.3 KDE across Months
+
+We can apply a similar approach of analysing by month using the code chunk below. For now, we are aggregating accidents by month across all years, so the insights will apply to the whole period and not any particular year.
+
+```{r}
+par(mfrow=c(3,4))
+for (i in 1:12) {
+  bmracc_ppp <- as.ppp(st_geometry(filter(bmracc_jitt, MonthNum == i)))
+  bmracc_for_kde = bmracc_ppp[bmr_owin]
+  bmracc_for_kde <- rescale.ppp(bmracc_for_kde, 1000, "km")
+  plot(density(bmracc_for_kde, sigma=bw.scott(X = bmracc_for_kde),
+                      edge=TRUE,kernel="gaussian"), main = paste("KDE for month",i))
+}
+```
+
+The output reveals no drastic shift in hotspots (using kde) across months. There are months where the intensities and relative intensities differ, but it appears like the hotspots remain in the same areas.
+
+## D.4 KDE for Clear vs "Rainy" Days
+
+The final analysis we want to perform before moving to network-constrained analysis is on clear vs non-clear days. This is indicated in the field called `weather_condition` in the accident dataset.
+
+To produce the kde visualization, we can use the code chunk below.
+
+```{r}
+par(mfrow=c(1,2))
+
+bmracc_ppp <- as.ppp(st_geometry(filter(bmracc_jitt, weather_condition == "clear")))
+bmracc_for_kde = bmracc_ppp[bmr_owin]
+bmracc_for_kde <- rescale.ppp(bmracc_for_kde, 1000, "km")
+plot(density(bmracc_for_kde, sigma=bw.scott(X = bmracc_for_kde),
+             edge=TRUE,kernel="gaussian"), main = "KDE for Clear Days")
+
+bmracc_ppp <- as.ppp(st_geometry(filter(bmracc_jitt, !(weather_condition == "clear"))))
+bmracc_for_kde = bmracc_ppp[bmr_owin]
+bmracc_for_kde <- rescale.ppp(bmracc_for_kde, 1000, "km")
+plot(density(bmracc_for_kde, sigma=bw.scott(X = bmracc_for_kde),
+             edge=TRUE,kernel="gaussian"), main = "KDE for Rainy Days")
+```
+
+The output are very similar too some of the charts generated earlier. The hotspot in the center of BMR appears to dissipate during rainy days. (relative to the one in the southeast portion of the region.
+
+# E. Network Constrained Visualizations and Analyses
+
+In this section, we visualize the locations of accidents using different dimensions, especially based on time, and recognizing the constraint of the network for our particular problem. As such, we will be performing network-constrained methods from this point.
+
+## E.1 Preparation of Data for Network Constrained Analysis
 
 Before we are able to perform network-constrained NKDE, we first need to define sample points along the road network, and to do that, we can use the midpoint of the lixels of the network.
 
-### D.1.1 Preparing the lixels
+### E.1.1 Preparing the lixels
 
 To lixelize a network, the minimum and (maximum) length of lixels need to be defined. A logical distance needs to be chosen for a given study. In our case, we might no have enough information to understand what road segment length is relevant to group accidents into. However, we can start with understanding the road lengths in the network.
 
@@ -623,17 +756,17 @@ summary(st_length(bmr_network))
 quantile(st_length(bmr_network), probs = seq(.1, .9, by = .1))
 ```
 
-The output shows that there is a very wide range of values. There is also a surprisingly large number of roads (\>40%) that are less than 100m– which seem to be too short for typical roads. We can choose a range of 100-500m for lixel length, and this would keep at least 40% of the roads intact, while the balance will either be merged or split.
+The output shows that there is a very wide range of values. There is also a surprisingly large number of roads (\>40%) that are less than 100m– which seem to be too short for typical roads. We can first choose a min distance of 200m which would allow for at least 40% of roads to not be split. As for the maximum length, let us first set it to 600m so only a little over 20% of the roads will be split into smaller segments.
 
 We implement this using `lixelize_lines()` in the code chunk below.
 
 ```{r}
 lixels <- lixelize_lines(bmr_network$geometry, 
-                         500, 
-                         mindist = 100)
+                         600, 
+                         mindist = 200)
 ```
 
-### D.1.2 Generating sample points
+### E.1.2 Generating sample points
 
 The next step is to define sample points along the network which will be the points where the KDE function will be computed on.
 
@@ -643,14 +776,14 @@ We can create sample points on the lixel centers using `lines_center()` in the c
 samples <- lines_center(lixels) 
 ```
 
-## D.2 Total and Annual Level Analysis
+## E.2 All Years, All Accidents, Initial Analysis
 
-Let's start by looking at the highest levels. We can compute for the nkde for all accidents in the dataset (2019-2022) using the code chunk below.
+Let's start by looking at the highest levels. We can compute for the nkde for all accidents in the dataset (2019-2022) using the code chunk below. This uses the accidents with the jitter applied.This code uses a bandwidth of 300m, anduses "quartic" for the kernel function, and uses simple calculation method for the KDE
 
 ```{r}
 densities <- nkde(bmr_network, 
-                  events = bmracc,
-                  w = rep(1, nrow(bmracc)),
+                  events = bmracc_jitt,
+                  w = rep(1, nrow(bmracc_jitt)),
                   samples = samples,
                   kernel_name = "quartic",
                   bw = 300, 
@@ -680,3 +813,164 @@ tm_shape(lixels)+
   tm_lines(col="density_all")
 tmap_mode("plot")
 ```
+
+The resulting map surprisingly does not show a lot of high density road segments, which is not aligned to the earlier map with the locations of the accidents. We can check if the jitter has caused displacement of the locations and hidden high density road segments by rerunning the below code chunk which uses the accident locations without jitter applied.
+
+```{r}
+densities <- nkde(bmr_network, 
+                  events = bmracc,
+                  w = rep(1, nrow(bmracc)),
+                  samples = samples,
+                  kernel_name = "quartic",
+                  bw = 300, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(10,10), 
+                  max_depth = 8,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+To see if using the original event points will address our concern, we repeat the code chunk below to recreate the interactive map.
+
+```{r}
+samples$density_all <- densities*1000000
+lixels$density_all <- densities*1000000
+
+tmap_mode("view")
+tm_shape(lixels)+
+  tm_lines(col="density_all")
+tmap_mode("plot")
+```
+
+It looks like the use of the original accident data does little to reveal dense locations. If we examine the interactive map and zoom in, we see one possible reason for the problem. Major roads are being split into multiple semi-parallel roads. These might denote different directions on the same highway, service roads, etc. These might cause accidents on the same "parent" road to be split across their parts.
+
+We try to solve this problem by recreating our network while merging such roads into one.
+
+## E.3 Transformation step - merging of parallel roads
+
+One way to merge the roads, is to first use `st_buffer()` to create a width dimension on the roads. We would prefer to use the actual width of the roads, plus the islands here, but there is no way to do this accurately and this would vary from road to road. (e.g., some roads could have one lane, while others could have four or more lanes) For our case, we will use a width of 2 x 15m, which is based on a \~3m lane width estimate, which means we are buffering up to the width of five lanes or five cars on each side.
+
+We use the code chunk below to produce a buffered network.
+
+```{r}
+bmr_network_buffered <- st_buffer(bmr_network, dist = 15)
+bmr_network_dissolved <- st_union(bmr_network_buffered)
+```
+
+The next step is to convert or cast this into a linestring object, but before that we would want to make sure that the geometries are simple enough so the casting is executed properly. To do this, we fist use `st_simplify()` which simplifies objects by reducing vertices.
+
+```{r}
+bmr_network_simplified <- st_simplify(bmr_network_dissolved, dTolerance = 1)
+```
+
+With the network simplified, we can then use `st_cast()` to convert the geometries back into linestrings. Note that we use two calls since we cannot cast polygons directly into linestrings.
+
+```{r}
+bmr_network_v2 <- st_cast(bmr_network_simplified, "MULTILINESTRING")
+bmr_network_v2 <- st_cast(bmr_network_v2, "LINESTRING")
+```
+
+Note that the resulting object was a list rather than a dataframe, we can use st_as_sf() to ensure that it is in an sf dataframe format.
+
+```{r}
+bmr_network_v2 <- st_as_sf(bmr_network_v2)
+```
+
+We can examine the original and new network side by side using `tmap_arrange()` in the code below to see that the new network has worked sufficiently.
+
+```{r}
+orig_network <- tm_shape(bmr_full) +
+  tm_polygons(col = "lightgrey") +
+  tm_shape(bmr_network) +
+  tm_lines(col = "black") +
+  tm_layout(title = "Original Road Network")
+
+new_network <- tm_shape(bmr_full) +
+  tm_polygons(col = "lightgrey") +
+  tm_shape(bmr_network_v2) +
+  tm_lines(col = "black")+
+  tm_layout(title = "Simplified Road Network")
+
+
+tmap_arrange(orig_network, new_network, asp=1, ncol=2)
+```
+
+The transformation seems to have worked, and we see by counting the objects using length() st_geometry() in the code below, that the number of roads has been reduced dramatically from 34K to 4.2K-- even with the very similar high level map.
+
+```{r}
+length(st_geometry(bmr_network))
+length(st_geometry(bmr_network_v2))
+```
+
+Let us examine the road lengths in the updated network using `summary()` and `quantile()` in the code chunk below.
+
+```{r}
+summary(st_length(bmr_network_v2))
+
+quantile(st_length(bmr_network_v2), probs = seq(.1, .9, by = .1))
+```
+
+The simplified network now has longer road segments with the median being close to 2km in length.
+
+We can then repeat the preparation of data from the creation of the lixels to the creation of the sample points. we will use exactly a similar code using `lixelize_lines()` as in the earlier sections. Given the distribution of the lengths, we decide to use longer lixel lengths with this new network. We choose 1km and 2km for the parameters.
+
+```{r}
+lixels_v2 <- lixelize_lines(st_geometry(bmr_network_v2), 
+                         2000, 
+                         mindist = 1000)
+samples_v2 <- lines_center(lixels_v2) 
+```
+
+Before we move, let us remove the intermediate objects from memory using `rm()`
+
+```{r}
+rm(bmr_network_buffered)
+rm(bmr_network_dissolved)
+rm(bmr_network_simplified)
+```
+
+## E.4 All Years, All Accidents, Initial Analysis
+
+We now rerun the highest level KDE with the updated network to see if we are getting more insightful output.
+
+We rerun `nkde()` to compute the network constrained KDE on the new network and using the new sample points.
+
+```{r}
+densities <- nkde(bmr_network_v2, 
+                  events = bmracc,
+                  w = rep(1, nrow(bmracc)),
+                  samples = samples_v2,
+                  kernel_name = "quartic",
+                  bw = 500, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(10,10), 
+                  max_depth = 2,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+We again transfer these densities into the lixels and sample dataframes using the code chunk below
+
+```{r}
+samples_v2$density_all <- densities*1000000
+lixels_v2$density_all <- densities*1000000
+```
+
+Next, we can create an interactive map to show the computed KDEs visually using **tmap** package in the code chunk below.
+
+```{r}
+tmap_mode("view")
+tm_shape(lixels_v2)+
+  tm_lines(col="density_all")
+tmap_mode("plot")
+```
+
+WIP
