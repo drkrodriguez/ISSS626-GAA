@@ -103,6 +103,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -256,7 +285,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#e.2-all-years-all-accidents-initial-analysis" id="toc-e.2-all-years-all-accidents-initial-analysis" class="nav-link" data-scroll-target="#e.2-all-years-all-accidents-initial-analysis">E.2 All Years, All Accidents, Initial Analysis</a></li>
   <li><a href="#e.3-transformation-step---merging-of-parallel-roads" id="toc-e.3-transformation-step---merging-of-parallel-roads" class="nav-link" data-scroll-target="#e.3-transformation-step---merging-of-parallel-roads">E.3 Transformation step - merging of parallel roads</a></li>
-  <li><a href="#e.4-all-years-all-accidents-initial-analysis" id="toc-e.4-all-years-all-accidents-initial-analysis" class="nav-link" data-scroll-target="#e.4-all-years-all-accidents-initial-analysis">E.4 All Years, All Accidents, Initial Analysis</a></li>
+  <li><a href="#e.4-distribution-of-all-accidents-initial-analysis" id="toc-e.4-distribution-of-all-accidents-initial-analysis" class="nav-link" data-scroll-target="#e.4-distribution-of-all-accidents-initial-analysis">E.4 Distribution of All Accidents, Initial Analysis</a></li>
+  <li><a href="#e.5-distribution-of-accidents-by-year" id="toc-e.5-distribution-of-accidents-by-year" class="nav-link" data-scroll-target="#e.5-distribution-of-accidents-by-year">E.5 Distribution of Accidents by Year</a></li>
+  <li><a href="#e.6-test-for-csr---2022-accidents" id="toc-e.6-test-for-csr---2022-accidents" class="nav-link" data-scroll-target="#e.6-test-for-csr---2022-accidents">E.6 Test for CSR - 2022 Accidents</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -290,7 +321,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 20, 2024</p>
+      <p class="date-modified">September 21, 2024</p>
     </div>
   </div>
     
@@ -301,7 +332,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>(Summary here. WIP)</p>
+<p>In this exercise, we apply spatial point pattern analysis to analyse the distribution of road traffic accidents in the Bangkok Metropolitan Region. We demonstrate how kernel density estimation can be used to visualize hotspots in a network constrained and non-network constrained context. We use different approaches to display charts side by side, especially to compare hotspots across different time dimensions or different conditions. Finally, we demonstrate how K- and G-functionss can be used to support any claims on the randomness, clustering or dispersion of a spatial point distribution.</p>
 <section id="a.-getting-started" class="level1">
 <h1>A. Getting Started</h1>
 <section id="a.1-background" class="level2">
@@ -1251,8 +1282,14 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 <p>We use the code below to produce a map with just the calculated densities.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lixels)<span class="sc">+</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary)<span class="sc">+</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(lixels)<span class="sc">+</span></span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>, <span class="at">palette =</span> <span class="st">"-inferno"</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">title.col =</span> <span class="st">"Per sq km"</span>) <span class="sc">+</span></span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"BMR Road Accident Density - 2019-2022"</span>,</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1284,8 +1321,14 @@ Geodetic CRS:  WGS 84</code></pre>
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>samples<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span>
 <span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>lixels<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span>
 <span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lixels)<span class="sc">+</span></span>
-<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary)<span class="sc">+</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(lixels)<span class="sc">+</span></span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>, <span class="at">palette =</span> <span class="st">"-inferno"</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">title.col =</span> <span class="st">"Per sq km"</span>) <span class="sc">+</span></span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"BMR Road Accident Density - 2019-2022"</span>,</span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1394,8 +1437,8 @@ found</code></pre>
 </div>
 </div>
 </section>
-<section id="e.4-all-years-all-accidents-initial-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="e.4-all-years-all-accidents-initial-analysis">E.4 All Years, All Accidents, Initial Analysis</h2>
+<section id="e.4-distribution-of-all-accidents-initial-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="e.4-distribution-of-all-accidents-initial-analysis">E.4 Distribution of All Accidents, Initial Analysis</h2>
 <p>We now rerun the highest level KDE with the updated network to see if we are getting more insightful output.</p>
 <p>We rerun <code>nkde()</code> to compute the network constrained KDE on the new network and using the new sample points.</p>
 <div class="cell">
@@ -1422,8 +1465,14 @@ found</code></pre>
 </div>
 <p>Next, we can create a static map to show the computed KDEs visually using <strong>tmap</strong> package in the code chunk below.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lixels_v2)<span class="sc">+</span></span>
-<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary)<span class="sc">+</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(lixels_v2)<span class="sc">+</span></span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>, <span class="at">palette =</span> <span class="st">"-inferno"</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">title.col =</span> <span class="st">"Per sq km"</span>) <span class="sc">+</span></span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"BMR Road Accident Density - 2019-2022"</span>,</span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1432,7 +1481,145 @@ found</code></pre>
 </div>
 </div>
 </div>
-<p>WIP</p>
+<p>While the network is simplified, it looks like we still get a very homoegenous, yellow chart. This might be due to the bottom-most bin including zeros. We can inspect the number of zeros and the range of the nonzero kde’s using <code>summary()</code> in the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Distribution of all Densities"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Distribution of all Densities"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(lixels_v2<span class="sc">$</span>density_all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   0.000   0.000   1.623   0.000 214.461 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Distribution of non-zero Densities"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Distribution of non-zero Densities"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">filter</span>(lixels_v2, density_all <span class="sc">&gt;</span> <span class="dv">0</span>)<span class="sc">$</span>density_all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+  0.00004   2.83624   4.71730  11.10733  11.22094 214.46127 </code></pre>
+</div>
+</div>
+<p>It looks like non-zero vlues are sparse. Less than 25% of the lixles have non-zero values. We can either use a custom palette or add a layer to grey out the zero denisty lixels. We use the latter in the code chunk below. We also add some additional elements like the provinces, and modify the formatting, in order to make the chart more information-rich and readable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary)<span class="sc">+</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"ADM1_EN"</span>, <span class="at">palette =</span> <span class="st">"Blues"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>, <span class="at">title =</span> <span class="st">"Province"</span>)<span class="sc">+</span></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(lixels_v2)<span class="sc">+</span></span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>, <span class="at">palette =</span> <span class="st">"-inferno"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">title.col =</span> <span class="st">"Per sq km"</span>) <span class="sc">+</span></span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(<span class="fu">filter</span>(lixels_v2, density_all <span class="sc">==</span> <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"grey"</span>, <span class="at">lwd =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"BMR Road Accident Density - 2019-2022"</span>,</span>
+<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb102-10"><a href="#cb102-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-82-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot now shows clear road segments where there is higher density. It reveals the most dense segments lie within Bangkok. Pathum Thani and Samut Sakhon also show some high density segments. Meanwhile, Nakohn Pathom appears to have the least accident dense road segments.</p>
+</section>
+<section id="e.5-distribution-of-accidents-by-year" class="level2">
+<h2 class="anchored" data-anchor-id="e.5-distribution-of-accidents-by-year">E.5 Distribution of Accidents by Year</h2>
+<p>We then look into the distribution of accidents across years to see if there is a change or shift that has occured. To do this, we need to generate the nkde for each year using the code below. The code writes a new column for the lixels and the samples dataframes for each year’s KDE values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2019</span><span class="sc">:</span><span class="dv">2022</span>) {</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>   densities <span class="ot">&lt;-</span> <span class="fu">nkde</span>(bmr_network_v2, </span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">events =</span> <span class="fu">filter</span>(bmracc, Year <span class="sc">==</span> i),</span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">w =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(<span class="fu">filter</span>(bmracc, Year <span class="sc">==</span> i))),</span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">samples =</span> samples_v2,</span>
+<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel_name =</span> <span class="st">"quartic"</span>,</span>
+<span id="cb103-7"><a href="#cb103-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw =</span> <span class="dv">500</span>, </span>
+<span id="cb103-8"><a href="#cb103-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">div=</span> <span class="st">"bw"</span>, </span>
+<span id="cb103-9"><a href="#cb103-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"simple"</span>, </span>
+<span id="cb103-10"><a href="#cb103-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">digits =</span> <span class="dv">1</span>, </span>
+<span id="cb103-11"><a href="#cb103-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tol =</span> <span class="dv">1</span>,</span>
+<span id="cb103-12"><a href="#cb103-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">grid_shape =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">10</span>), </span>
+<span id="cb103-13"><a href="#cb103-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">max_depth =</span> <span class="dv">2</span>,</span>
+<span id="cb103-14"><a href="#cb103-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">agg =</span> <span class="dv">5</span>, </span>
+<span id="cb103-15"><a href="#cb103-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sparse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb103-16"><a href="#cb103-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb103-17"><a href="#cb103-17" aria-hidden="true" tabindex="-1"></a>  lixels_v2[[<span class="fu">paste</span>(<span class="st">"density_"</span>,<span class="fu">as.character</span>(i),<span class="at">sep=</span><span class="st">""</span>)]] <span class="ot">&lt;-</span> densities <span class="sc">*</span> <span class="dv">100000</span></span>
+<span id="cb103-18"><a href="#cb103-18" aria-hidden="true" tabindex="-1"></a>  samples_v2[[<span class="fu">paste</span>(<span class="st">"density_"</span>,<span class="fu">as.character</span>(i),<span class="at">sep=</span><span class="st">""</span>)]] <span class="ot">&lt;-</span> densities <span class="sc">*</span> <span class="dv">100000</span></span>
+<span id="cb103-19"><a href="#cb103-19" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then use the code block below to generate the map of the four different years using tmap package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>columns_to_map <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"density_2019"</span>, <span class="st">"density_2020"</span>, <span class="st">"density_2021"</span>, <span class="st">"density_2022"</span>)</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>yearly <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (col <span class="cf">in</span> columns_to_map)</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>  yearly[[col]] <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bmr_boundary)<span class="sc">+</span></span>
+<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightblue"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(lixels_v2)<span class="sc">+</span></span>
+<span id="cb104-8"><a href="#cb104-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span>col, <span class="at">palette =</span> <span class="st">"-inferno"</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">title.col =</span> <span class="st">"Per sq km"</span>) <span class="sc">+</span></span>
+<span id="cb104-9"><a href="#cb104-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(lixels_v2[lixels_v2[[col]] <span class="sc">==</span> <span class="dv">0</span>, ]) <span class="sc">+</span></span>
+<span id="cb104-10"><a href="#cb104-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"grey"</span>, <span class="at">lwd =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb104-11"><a href="#cb104-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Year -"</span>,<span class="fu">substr</span>(col,<span class="dv">9</span>,<span class="dv">12</span>)),</span>
+<span id="cb104-12"><a href="#cb104-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb104-13"><a href="#cb104-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb104-14"><a href="#cb104-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span>
+<span id="cb104-15"><a href="#cb104-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(yearly[[<span class="dv">1</span>]], yearly[[<span class="dv">2</span>]], yearly[[<span class="dv">3</span>]], yearly[[<span class="dv">4</span>]], <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-89-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The output shows no significant change in the location of the hotspots across years. Before we look at another dimension, let us try to test for complete spatial randomness on the most recent year.</p>
+</section>
+<section id="e.6-test-for-csr---2022-accidents" class="level2">
+<h2 class="anchored" data-anchor-id="e.6-test-for-csr---2022-accidents">E.6 Test for CSR - 2022 Accidents</h2>
+<p>It clearly looks like accidents are not randomly or homogeneously distributed in the network. We can verify this using tests for CSR (Complete Spatial Randomness) using the K- or G-functions.</p>
+<p>For our CSR test, the test hypotheses will be:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - Road accidents in 2022 are randomly distributed along the BMR road network</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - Road accidents in 2022 are <strong>not</strong> randomly distributed along the BMR road network</p></li>
+</ul>
+<p>The code chunk below runs these two functions for testing CSR using <code>kfunctions()</code> from the <strong>spNetwork</strong> package. We specify a range of 0m (<code>start</code>) and 2km (<code>end</code>) to evaluate the function. We also specify 50 Monte Carlo simulations (<code>nsim</code> + 1) to draw the envelope. A confidence interval (1 - <code>conf_int</code>) of 95%, and intervals of 200m for the steps and the donut width. We also use an agg argument to allow consolidation of events. (as the function cannot work with duplicate points)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>kfun_bmracc <span class="ot">&lt;-</span> <span class="fu">kfunctions</span>(bmr_network_v2, </span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>                             <span class="fu">filter</span>(bmracc_jitt, Year <span class="sc">==</span> <span class="dv">2022</span>),</span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">start =</span> <span class="dv">0</span>, </span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">end =</span> <span class="dv">2000</span>, </span>
+<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">step =</span> <span class="dv">200</span>, </span>
+<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">width =</span> <span class="dv">200</span>, </span>
+<span id="cb106-7"><a href="#cb106-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">nsim =</span> <span class="dv">49</span>, </span>
+<span id="cb106-8"><a href="#cb106-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">resolution =</span> <span class="dv">50</span>,</span>
+<span id="cb106-9"><a href="#cb106-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb106-10"><a href="#cb106-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">conf_int =</span> <span class="fl">0.05</span>,</span>
+<span id="cb106-11"><a href="#cb106-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">agg =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can output the K-function by calling on the <code>plotk</code> field, and the G-function by calling on the <code>plotg</code> field of the resulting object</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>kfun_bmracc<span class="sc">$</span>plotg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-93-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>kfun_bmracc<span class="sc">$</span>plotk</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-93-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The envelop depicts a 95% confidence level CSR interval for each function. Both functions do not support th hypothesis of CSR except for very short intervals. (where the blue lines fall within the envelope) The K-function supports the view on clustering from a distance of around 300m-1.9km, while the G-function supports this from around 250-650m. The G-function supports a view on regular distribution beyond 750m. While these differ in the details, both tests do not support CSR for the distribution of accidents in 2022.</p>
 
 
 </section>

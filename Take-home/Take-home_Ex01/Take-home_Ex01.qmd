@@ -10,7 +10,7 @@ execute:
   freeze: true
 ---
 
-(Summary here. WIP)
+In this exercise, we apply spatial point pattern analysis to analyse the distribution of road traffic accidents in the Bangkok Metropolitan Region. We demonstrate how kernel density estimation can be used to visualize hotspots in a network constrained and non-network constrained context. We use different approaches to display charts side by side, especially to compare hotspots across different time dimensions or different conditions. Finally, we demonstrate how K- and G-functionss can be used to support any claims on the randomness, clustering or dispersion of a spatial point distribution.
 
 # A. Getting Started
 
@@ -41,7 +41,7 @@ The appropriate technique must be used for these deliverables and all the analys
 The study makes use of the following datasets which are publicly available online.
 
 | Dataset Short Name | Description                                               | Datasource                                                                              |
-|------------------|----------------------|--------------------------------|
+|--------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | THRA               | Thailand road accident data from 2019 to 2022             | [Kaggle](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) |
 | THOSM              | Thailand roads open street map in shapefile format        | [HDX](https://data.humdata.org/dataset/hotosm_tha_roads)                                |
 | THSAB              | Thailand - Subnational Administrative Boudaries shapefile | [HDX](https://data.humdata.org/dataset/cod-ab-tha?)                                     |
@@ -820,8 +820,14 @@ lixels$density_all <- densities*1000000
 We use the code below to produce a map with just the calculated densities.
 
 ```{r}
-tm_shape(lixels)+
-  tm_lines(col="density_all")
+tm_shape(bmr_boundary)+
+  tm_polygons(col = "lightblue", border.col = "black", lwd = 0.5)+
+  tm_shape(lixels)+
+  tm_lines(col="density_all", palette = "-inferno", lwd = 1, title.col = "Per sq km") +
+  tm_layout(title = "BMR Road Accident Density - 2019-2022",
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
 ```
 
 The resulting map surprisingly does not show a lot of high density road segments, which is not aligned to the earlier map with the locations of the accidents. We can check if the jitter has caused displacement of the locations and hidden high density road segments by rerunning the below code chunk which uses the accident locations without jitter applied.
@@ -861,8 +867,14 @@ To see if using the original event points will address our concern, we repeat th
 samples$density_all <- densities*1000000
 lixels$density_all <- densities*1000000
 
-tm_shape(lixels)+
-  tm_lines(col="density_all")
+tm_shape(bmr_boundary)+
+  tm_polygons(col = "lightblue", border.col = "black", lwd = 0.5)+
+  tm_shape(lixels)+
+  tm_lines(col="density_all", palette = "-inferno", lwd = 1, title.col = "Per sq km") +
+  tm_layout(title = "BMR Road Accident Density - 2019-2022",
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
 ```
 
 It looks like the use of the original accident data does little to reveal dense locations. If we examine the interactive map and zoom in, we see one possible reason for the problem. Major roads are being split into multiple semi-parallel roads. These might denote different directions on the same highway, service roads, etc. These might cause accidents on the same "parent" road to be split across their parts.
@@ -967,7 +979,7 @@ rm(bmr_network_dissolved)
 rm(bmr_network_simplified)
 ```
 
-## E.4 All Years, All Accidents, Initial Analysis
+## E.4 Distribution of All Accidents, Initial Analysis
 
 We now rerun the highest level KDE with the updated network to see if we are getting more insightful output.
 
@@ -1013,8 +1025,165 @@ lixels_v2$density_all <- densities*1000000
 Next, we can create a static map to show the computed KDEs visually using **tmap** package in the code chunk below.
 
 ```{r}
-tm_shape(lixels_v2)+
-  tm_lines(col="density_all")
+tm_shape(bmr_boundary)+
+  tm_polygons(col = "lightblue", border.col = "black", lwd = 0.5)+
+  tm_shape(lixels_v2)+
+  tm_lines(col="density_all", palette = "-inferno", lwd = 1, title.col = "Per sq km") +
+  tm_layout(title = "BMR Road Accident Density - 2019-2022",
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
 ```
 
-WIP
+While the network is simplified, it looks like we still get a very homoegenous, yellow chart. This might be due to the bottom-most bin including zeros. We can inspect the number of zeros and the range of the nonzero kde's using `summary()` in the code chunk below.
+
+```{r}
+print("Distribution of all Densities")
+summary(lixels_v2$density_all)
+print("Distribution of non-zero Densities")
+summary(filter(lixels_v2, density_all > 0)$density_all)
+```
+
+It looks like non-zero vlues are sparse. Less than 25% of the lixles have non-zero values. We can either use a custom palette or add a layer to grey out the zero denisty lixels. We use the latter in the code chunk below. We also add some additional elements like the provinces, and modify the formatting, in order to make the chart more information-rich and readable.
+
+```{r}
+tm_shape(bmr_boundary)+
+  tm_polygons(col = "ADM1_EN", palette = "Blues", border.col = "black", lwd = 0.5, title = "Province")+
+  tm_shape(lixels_v2)+
+  tm_lines(col="density_all", palette = "-inferno", lwd = 2, title.col = "Per sq km") +
+  tm_shape(filter(lixels_v2, density_all == 0)) +
+  tm_lines(col="grey", lwd = 2) +
+  tm_layout(title = "BMR Road Accident Density - 2019-2022",
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
+```
+
+The plot now shows clear road segments where there is higher density. It reveals the most dense segments lie within Bangkok. Pathum Thani and Samut Sakhon also show some high density segments. Meanwhile, Nakohn Pathom appears to have the least accident dense road segments.
+
+## E.5 Distribution of Accidents by Year
+
+We then look into the distribution of accidents across years to see if there is a change or shift that has occured. To do this, we need to generate the nkde for each year using the code below. The code writes a new column for the lixels and the samples dataframes for each year's KDE values.
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(lixels_v2, "data/rds/lixels_v2.rds")
+write_rds(samples_v2, "data/rds/samples_v2.rds")
+```
+
+```{r}
+#| echo: false
+lixels_v2 <- read_rds("data/rds/lixels_v2.rds")
+samples_v2 <- read_rds("data/rds/samples_v2.rds")
+```
+
+```{r}
+#| eval: false
+for (i in 2019:2022) {
+   densities <- nkde(bmr_network_v2, 
+                  events = filter(bmracc, Year == i),
+                  w = rep(1, nrow(filter(bmracc, Year == i))),
+                  samples = samples_v2,
+                  kernel_name = "quartic",
+                  bw = 500, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(10,10), 
+                  max_depth = 2,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+  lixels_v2[[paste("density_",as.character(i),sep="")]] <- densities * 100000
+  samples_v2[[paste("density_",as.character(i),sep="")]] <- densities * 100000
+  }
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(lixels_v2, "data/rds/lixels_with_years.rds")
+write_rds(samples_v2, "data/rds/samples_with_years.rds")
+```
+
+```{r}
+#| echo: false
+lixels_v2 <- read_rds("data/rds/lixels_with_years.rds")
+samples_v2 <- read_rds("data/rds/samples_with_years.rds")
+```
+
+We can then use the code block below to generate the map of the four different years using tmap package.
+
+```{r}
+columns_to_map <- c("density_2019", "density_2020", "density_2021", "density_2022")
+yearly = list()
+for (col in columns_to_map)
+{
+  yearly[[col]] <- tm_shape(bmr_boundary)+
+  tm_polygons(col = "lightblue", border.col = "black", lwd = 0.5)+
+  tm_shape(lixels_v2)+
+  tm_lines(col=col, palette = "-inferno", lwd = 1, title.col = "Per sq km") +
+  tm_shape(lixels_v2[lixels_v2[[col]] == 0, ]) +
+  tm_lines(col="grey", lwd = 2) +
+  tm_layout(title = paste("Year -",substr(col,9,12)),
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
+}
+```
+
+```{r}
+tmap_arrange(yearly[[1]], yearly[[2]], yearly[[3]], yearly[[4]], ncol = 2)
+```
+
+The output shows no significant change in the location of the hotspots across years. Before we look at another dimension, let us try to test for complete spatial randomness on the most recent year.
+
+## E.6 Test for CSR - 2022 Accidents
+
+It clearly looks like accidents are not randomly or homogeneously distributed in the network. We can verify this using tests for CSR (Complete Spatial Randomness) using the K- or G-functions.
+
+For our CSR test, the test hypotheses will be:
+
+-   $H_0$ - Road accidents in 2022 are randomly distributed along the BMR road network
+
+-   $H_1$ - Road accidents in 2022 are **not** randomly distributed along the BMR road network
+
+The code chunk below runs these two functions for testing CSR using `kfunctions()` from the **spNetwork** package. We specify a range of 0m (`start`) and 2km (`end`) to evaluate the function. We also specify 50 Monte Carlo simulations (`nsim` + 1) to draw the envelope. A confidence interval (1 - `conf_int`) of 95%, and intervals of 200m for the steps and the donut width. We also use an agg argument to allow consolidation of events. (as the function cannot work with duplicate points)
+
+```{r}
+#| eval: false
+kfun_bmracc <- kfunctions(bmr_network_v2, 
+                             filter(bmracc_jitt, Year == 2022),
+                             start = 0, 
+                             end = 2000, 
+                             step = 200, 
+                             width = 200, 
+                             nsim = 49, 
+                             resolution = 50,
+                             verbose = FALSE, 
+                             conf_int = 0.05,
+                             agg = 100)
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(kfun_bmracc, "data/rds/kfun_bmracc_2022.rds")
+```
+
+```{r}
+#| echo: false
+kfun_bmracc <- read_rds("data/rds/kfun_bmracc_2022.rds")
+```
+
+We can output the K-function by calling on the `plotk` field, and the G-function by calling on the `plotg` field of the resulting object
+
+```{r}
+kfun_bmracc$plotg
+kfun_bmracc$plotk
+```
+
+The envelop depicts a 95% confidence level CSR interval for each function. Both functions do not support th hypothesis of CSR except for very short intervals. (where the blue lines fall within the envelope) The K-function supports the view on clustering from a distance of around 300m-1.9km, while the G-function supports this from around 250-650m. The G-function supports a view on regular distribution beyond 750m. While these differ in the details, both tests do not support CSR for the distribution of accidents in 2022.
