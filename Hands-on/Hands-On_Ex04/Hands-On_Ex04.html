@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.56">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Federico Jose Rodriguez">
+<meta name="dcterms.date" content="2024-09-01">
+
+<title>Second Order Spatial Point Pattern Analysis Methods – Geospatial Analytics w/ Derek</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Geospatial Analytics w/ Derek</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex01/Hands-on_Ex01.html">
+ <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex02/Hands-on_Ex02.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex03/Hands-on_Ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex04/Hands-on_Ex04.html">
+ <span class="dropdown-text">Hands-on Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex05/Hands-on_Ex05.html">
+ <span class="dropdown-text">Hands-on Exercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex06/Hands-on_Ex06.html">
+ <span class="dropdown-text">Hands-on Exercise 6</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-Class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../In-class/In-class_Ex01/In-class_Ex01.html">
+ <span class="dropdown-text">In-Class Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class/In-class_Ex02/In-class_Ex02.html">
+ <span class="dropdown-text">In-Class Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class/In-class_Ex03/In-class_Ex03.html">
+ <span class="dropdown-text">In-Class Exercise 3</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Take-home/Take-home_Ex01/Take-home_Ex01.html">
+ <span class="dropdown-text">Take Home Exercise 1</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
+  <li><a href="#installing-and-launching-r-packages" id="toc-installing-and-launching-r-packages" class="nav-link" data-scroll-target="#installing-and-launching-r-packages">Installing and launching R packages</a></li>
+  </ul></li>
+  <li><a href="#spatial-data-wrangling" id="toc-spatial-data-wrangling" class="nav-link" data-scroll-target="#spatial-data-wrangling">Spatial Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#importing-the-spatial-data" id="toc-importing-the-spatial-data" class="nav-link" data-scroll-target="#importing-the-spatial-data">Importing the spatial data</a></li>
+  <li><a href="#checking-and-converting-projection-systems" id="toc-checking-and-converting-projection-systems" class="nav-link" data-scroll-target="#checking-and-converting-projection-systems">Checking and converting projection systems</a></li>
+  <li><a href="#mapping-the-geospatial-datasets" id="toc-mapping-the-geospatial-datasets" class="nav-link" data-scroll-target="#mapping-the-geospatial-datasets">Mapping the geospatial datasets</a></li>
+  </ul></li>
+  <li><a href="#geospatial-data-wrangling" id="toc-geospatial-data-wrangling" class="nav-link" data-scroll-target="#geospatial-data-wrangling">Geospatial Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#converting-sf-dataframe-sp-spatial-class" id="toc-converting-sf-dataframe-sp-spatial-class" class="nav-link" data-scroll-target="#converting-sf-dataframe-sp-spatial-class">Converting sf dataframe sp spatial class</a></li>
+  <li><a href="#converting-the-spatial-class-to-generic-sp-format" id="toc-converting-the-spatial-class-to-generic-sp-format" class="nav-link" data-scroll-target="#converting-the-spatial-class-to-generic-sp-format">Converting the spatial class to generic sp format</a></li>
+  <li><a href="#converting-generic-sp-format-into-spatstats-ppp-format" id="toc-converting-generic-sp-format-into-spatstats-ppp-format" class="nav-link" data-scroll-target="#converting-generic-sp-format-into-spatstats-ppp-format">Converting generic sp format into spatstat’s ppp format</a></li>
+  <li><a href="#handling-duplicated-points" id="toc-handling-duplicated-points" class="nav-link" data-scroll-target="#handling-duplicated-points">Handling duplicated points</a></li>
+  <li><a href="#creating-owin-object" id="toc-creating-owin-object" class="nav-link" data-scroll-target="#creating-owin-object">Creating owin object</a></li>
+  <li><a href="#combining-point-events-object-and-owin-object" id="toc-combining-point-events-object-and-owin-object" class="nav-link" data-scroll-target="#combining-point-events-object-and-owin-object">Combining point events object and owin object</a></li>
+  <li><a href="#extracting-study-areas" id="toc-extracting-study-areas" class="nav-link" data-scroll-target="#extracting-study-areas">Extracting study areas</a></li>
+  <li><a href="#converting-target-areas-into-owin-objects" id="toc-converting-target-areas-into-owin-objects" class="nav-link" data-scroll-target="#converting-target-areas-into-owin-objects">Converting target areas into owin objects</a></li>
+  <li><a href="#combining-childcare-points-and-the-study-area" id="toc-combining-childcare-points-and-the-study-area" class="nav-link" data-scroll-target="#combining-childcare-points-and-the-study-area">Combining childcare points and the study area</a></li>
+  </ul></li>
+  <li><a href="#second-order-spatial-point-patterns-analysis" id="toc-second-order-spatial-point-patterns-analysis" class="nav-link" data-scroll-target="#second-order-spatial-point-patterns-analysis">Second-order Spatial Point Patterns Analysis</a>
+  <ul class="collapse">
+  <li><a href="#analysing-spatial-point-process-using-g-function" id="toc-analysing-spatial-point-process-using-g-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-g-function">Analysing spatial point process using G function</a>
+  <ul class="collapse">
+  <li><a href="#g-function-estimation-for-choa-chu-kang-planning-area" id="toc-g-function-estimation-for-choa-chu-kang-planning-area" class="nav-link" data-scroll-target="#g-function-estimation-for-choa-chu-kang-planning-area">G-Function Estimation for Choa Chu Kang Planning Area</a></li>
+  <li><a href="#g-function-estimation-for-tampines-planning-area" id="toc-g-function-estimation-for-tampines-planning-area" class="nav-link" data-scroll-target="#g-function-estimation-for-tampines-planning-area">G Function Estimation for Tampines Planning Area</a></li>
+  </ul></li>
+  <li><a href="#analysing-spatial-point-process-using-f-function" id="toc-analysing-spatial-point-process-using-f-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-f-function">Analysing Spatial Point Process using F-Function</a>
+  <ul class="collapse">
+  <li><a href="#f-function-estimation-for-choa-chu-kang-planning-area" id="toc-f-function-estimation-for-choa-chu-kang-planning-area" class="nav-link" data-scroll-target="#f-function-estimation-for-choa-chu-kang-planning-area">F-Function Estimation for Choa Chu Kang Planning Area</a></li>
+  <li><a href="#f-function-estimation-for-tampines-planning-area" id="toc-f-function-estimation-for-tampines-planning-area" class="nav-link" data-scroll-target="#f-function-estimation-for-tampines-planning-area">F-Function Estimation for Tampines Planning Area</a></li>
+  </ul></li>
+  <li><a href="#analysing-spatial-point-process-using-k-function" id="toc-analysing-spatial-point-process-using-k-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-k-function">Analysing Spatial Point Process using K-Function</a>
+  <ul class="collapse">
+  <li><a href="#k-function-estimation-for-choa-chu-kang-planning-area" id="toc-k-function-estimation-for-choa-chu-kang-planning-area" class="nav-link" data-scroll-target="#k-function-estimation-for-choa-chu-kang-planning-area">K-Function Estimation for Choa Chu Kang Planning Area</a></li>
+  <li><a href="#k-function-estimation-for-tampines-planning-area" id="toc-k-function-estimation-for-tampines-planning-area" class="nav-link" data-scroll-target="#k-function-estimation-for-tampines-planning-area">K-Function Estimation for Tampines Planning Area</a></li>
+  </ul></li>
+  <li><a href="#analysing-spatial-point-process-using-l-function" id="toc-analysing-spatial-point-process-using-l-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-l-function">Analysing Spatial Point Process using L-Function</a>
+  <ul class="collapse">
+  <li><a href="#l-function-estimation-for-choa-chu-kang-planning-area" id="toc-l-function-estimation-for-choa-chu-kang-planning-area" class="nav-link" data-scroll-target="#l-function-estimation-for-choa-chu-kang-planning-area">L-Function Estimation for Choa Chu Kang Planning Area</a></li>
+  <li><a href="#l-function-estimation-for-tampines-planning-area" id="toc-l-function-estimation-for-tampines-planning-area" class="nav-link" data-scroll-target="#l-function-estimation-for-tampines-planning-area">L-Function Estimation for Tampines Planning Area</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Second Order Spatial Point Pattern Analysis Methods</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Federico Jose Rodriguez </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 1, 2024</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 5, 2024</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>In this hands-on exercise, we continue learning about Spatial Point pattern analysis with the help of <strong>spatstat</strong> package. We continue looking at the dataset using the location of childcare centres in Singapore.</p>
+<p>This exercise is based on Chapter 5 of Dr Kam’s online book which can be accessed <a href="https://r4gdsa.netlify.app/" title="R for Geospatial Data Science and Analytics by Dr Kam">here</a>.</p>
+<section id="getting-started" class="level1">
+<h1>Getting Started</h1>
+<section id="data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="data-sources">Data Sources</h2>
+<p>Data for this exercise are from public sources and are the same as the previous hands-on exercise. This includes:</p>
+<ul>
+<li><p>Location and attribute information of childcare centres in Singapore from data.gov.sg</p></li>
+<li><p>Master Plan 2014 Subzone Boundary from <a href="https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view">data.gov.sg</a></p></li>
+<li><p>National boundary of Singapore provided in SLA and ESRI shapefile format</p></li>
+</ul>
+</section>
+<section id="installing-and-launching-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="installing-and-launching-r-packages">Installing and launching R packages</h2>
+<p>This exercise will make use of five R packages: <strong>sf</strong>, <strong>tidyverse, spatstat, raster</strong> and <strong>tmap</strong>.</p>
+<ul>
+<li><p><strong>sf -</strong> for importing, managing and processing vector-based geospatial data</p></li>
+<li><p><strong>tidyverse -</strong> collection of packages for performing data importation, wrangling and visualization</p></li>
+<li><p><strong>tmap -</strong> for plotting cartographic quality maps</p></li>
+<li><p><strong>spatstat</strong> - offers a wide range of functions for point pattern analysis (PPA)</p></li>
+<li><p><strong>raster</strong> - for reading, writing, manipulating and analysing models of gridded spatial data</p></li>
+</ul>
+<p>The code chunk below uses <code>p_load()</code> of <strong>pacman</strong> package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, raster, spatstat, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="spatial-data-wrangling" class="level1">
+<h1>Spatial Data Wrangling</h1>
+<section id="importing-the-spatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="importing-the-spatial-data">Importing the spatial data</h2>
+<p>The code chunk below uses <code>st_read()</code> from the <strong>sf</strong> package to import the geospatial datasets.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>childcare_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/geospatial/child-care-services-geojson.geojson"</span>) <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `child-care-services-geojson' from data source 
+  `C:\drkrodriguez\ISSS626-GAA\Hands-on\Hands-On_Ex04\data\geospatial\child-care-services-geojson.geojson' 
+  using driver `GeoJSON'
+Simple feature collection with 1545 features and 2 fields
+Geometry type: POINT
+Dimension:     XYZ
+Bounding box:  xmin: 103.6824 ymin: 1.248403 xmax: 103.9897 ymax: 1.462134
+z_range:       zmin: 0 zmax: 0
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sg_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, <span class="at">layer=</span><span class="st">"CostalOutline"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `CostalOutline' from data source 
+  `C:\drkrodriguez\ISSS626-GAA\Hands-on\Hands-On_Ex04\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 60 features and 4 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 2663.926 ymin: 16357.98 xmax: 56047.79 ymax: 50244.03
+Projected CRS: SVY21</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mpsz_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">layer =</span> <span class="st">"MP14_SUBZONE_WEB_PL"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `MP14_SUBZONE_WEB_PL' from data source 
+  `C:\drkrodriguez\ISSS626-GAA\Hands-on\Hands-On_Ex04\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 323 features and 15 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33
+Projected CRS: SVY21</code></pre>
+</div>
+</div>
+</section>
+<section id="checking-and-converting-projection-systems" class="level2">
+<h2 class="anchored" data-anchor-id="checking-and-converting-projection-systems">Checking and converting projection systems</h2>
+<p>We can use <code>st_crs()</code> to check what coordinate systems are used in each of the three sf dataframes.</p>
+<p><code>childcare_sf</code> is in SVY21 using EPSG code 3414 after our load and transform operation above. However, <code>sg_sf</code> and <code>mpsz_sf</code> reveals that they are not using the correct EPSG code.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: EPSG:3414 
+  wkt:
+PROJCRS["SVY21 / Singapore TM",
+    BASEGEOGCRS["SVY21",
+        DATUM["SVY21",
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["degree",0.0174532925199433]],
+        ID["EPSG",4757]],
+    CONVERSION["Singapore Transverse Mercator",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",1.36666666666667,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",103.833333333333,
+            ANGLEUNIT["degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",1,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",28001.642,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",38744.572,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["northing (N)",north,
+            ORDER[1],
+            LENGTHUNIT["metre",1]],
+        AXIS["easting (E)",east,
+            ORDER[2],
+            LENGTHUNIT["metre",1]],
+    USAGE[
+        SCOPE["Cadastre, engineering survey, topographic mapping."],
+        AREA["Singapore - onshore and offshore."],
+        BBOX[1.13,103.59,1.47,104.07]],
+    ID["EPSG",3414]]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(sg_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: SVY21 
+  wkt:
+PROJCRS["SVY21",
+    BASEGEOGCRS["SVY21[WGS84]",
+        DATUM["World Geodetic System 1984",
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]],
+            ID["EPSG",6326]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["Degree",0.0174532925199433]]],
+    CONVERSION["unnamed",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",1.36666666666667,
+            ANGLEUNIT["Degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",103.833333333333,
+            ANGLEUNIT["Degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",1,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",28001.642,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",38744.572,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1,
+                ID["EPSG",9001]]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1,
+                ID["EPSG",9001]]]]</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">st_crs</span>(mpsz_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coordinate Reference System:
+  User input: SVY21 
+  wkt:
+PROJCRS["SVY21",
+    BASEGEOGCRS["SVY21[WGS84]",
+        DATUM["World Geodetic System 1984",
+            ELLIPSOID["WGS 84",6378137,298.257223563,
+                LENGTHUNIT["metre",1]],
+            ID["EPSG",6326]],
+        PRIMEM["Greenwich",0,
+            ANGLEUNIT["Degree",0.0174532925199433]]],
+    CONVERSION["unnamed",
+        METHOD["Transverse Mercator",
+            ID["EPSG",9807]],
+        PARAMETER["Latitude of natural origin",1.36666666666667,
+            ANGLEUNIT["Degree",0.0174532925199433],
+            ID["EPSG",8801]],
+        PARAMETER["Longitude of natural origin",103.833333333333,
+            ANGLEUNIT["Degree",0.0174532925199433],
+            ID["EPSG",8802]],
+        PARAMETER["Scale factor at natural origin",1,
+            SCALEUNIT["unity",1],
+            ID["EPSG",8805]],
+        PARAMETER["False easting",28001.642,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8806]],
+        PARAMETER["False northing",38744.572,
+            LENGTHUNIT["metre",1],
+            ID["EPSG",8807]]],
+    CS[Cartesian,2],
+        AXIS["(E)",east,
+            ORDER[1],
+            LENGTHUNIT["metre",1,
+                ID["EPSG",9001]]],
+        AXIS["(N)",north,
+            ORDER[2],
+            LENGTHUNIT["metre",1,
+                ID["EPSG",9001]]]]</code></pre>
+</div>
+</div>
+<p>We use the code chunk below to update the EPSG code for the last two objects</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sg_sf <span class="ot">=</span> <span class="fu">st_set_crs</span>(sg_sf, <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: st_crs&lt;- : replacing crs does not reproject data; use st_transform for
+that</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>mpsz_sf <span class="ot">=</span> <span class="fu">st_set_crs</span>(mpsz_sf, <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: st_crs&lt;- : replacing crs does not reproject data; use st_transform for
+that</code></pre>
+</div>
+</div>
+</section>
+<section id="mapping-the-geospatial-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="mapping-the-geospatial-datasets">Mapping the geospatial datasets</h2>
+<p>It is always good practice to plot or display imported data to check that they have been loaded and transformed properly. The code chunk below creates a map using tmap with all three objects where they appear to be mapped properly.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(sg_sf)<span class="sc">+</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_fill</span>(<span class="st">"lightblue"</span>) <span class="sc">+</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_borders</span>(<span class="at">lwd =</span> <span class="fl">0.1</span>,  <span class="at">alpha =</span> <span class="dv">1</span>)<span class="sc">+</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_shape</span>(mpsz_sf) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_fill</span>(<span class="st">"grey"</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_borders</span>(<span class="at">lwd =</span> <span class="fl">0.1</span>,  <span class="at">alpha =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_shape</span>(childcare_sf) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"darkgreen"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="geospatial-data-wrangling" class="level1">
+<h1>Geospatial Data Wrangling</h1>
+<section id="converting-sf-dataframe-sp-spatial-class" class="level2">
+<h2 class="anchored" data-anchor-id="converting-sf-dataframe-sp-spatial-class">Converting sf dataframe sp spatial class</h2>
+<p>The code chunk below converts the three dataframes using <code>as_Spatial()</code> from the <strong>sf</strong> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>childcare <span class="ot">&lt;-</span> <span class="fu">as_Spatial</span>(childcare_sf)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">&lt;-</span> <span class="fu">as_Spatial</span>(mpsz_sf)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>sg <span class="ot">&lt;-</span> <span class="fu">as_Spatial</span>(sg_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can check the contents of the new dataframes by calling them. This confirms that they are in the spatial* class format.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>childcare</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatialPointsDataFrame 
+features    : 1545 
+extent      : 11203.01, 45404.24, 25667.6, 49300.88  (xmin, xmax, ymin, ymax)
+crs         : +proj=tmerc +lat_0=1.36666666666667 +lon_0=103.833333333333 +k=1 +x_0=28001.642 +y_0=38744.572 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+variables   : 2
+names       :    Name,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           Description 
+min values  :   kml_1, &lt;center&gt;&lt;table&gt;&lt;tr&gt;&lt;th colspan='2' align='center'&gt;&lt;em&gt;Attributes&lt;/em&gt;&lt;/th&gt;&lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSBLOCKHOUSENUMBER&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;ADDRESSBUILDINGNAME&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSPOSTALCODE&lt;/th&gt; &lt;td&gt;018989&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;ADDRESSSTREETNAME&lt;/th&gt; &lt;td&gt;1, MARINA BOULEVARD, #B1 - 01, ONE MARINA BOULEVARD, SINGAPORE 018989&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSTYPE&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;DESCRIPTION&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;HYPERLINK&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;LANDXADDRESSPOINT&lt;/th&gt; &lt;td&gt;0&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;LANDYADDRESSPOINT&lt;/th&gt; &lt;td&gt;0&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;NAME&lt;/th&gt; &lt;td&gt;THE LITTLE SKOOL-HOUSE INTERNATIONAL PTE. LTD.&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;PHOTOURL&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;ADDRESSFLOORNUMBER&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;INC_CRC&lt;/th&gt; &lt;td&gt;08F73931F4A691F4&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;FMEL_UPD_D&lt;/th&gt; &lt;td&gt;20200826094036&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSUNITNUMBER&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;/table&gt;&lt;/center&gt; 
+max values  : kml_999,                  &lt;center&gt;&lt;table&gt;&lt;tr&gt;&lt;th colspan='2' align='center'&gt;&lt;em&gt;Attributes&lt;/em&gt;&lt;/th&gt;&lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSBLOCKHOUSENUMBER&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;ADDRESSBUILDINGNAME&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSPOSTALCODE&lt;/th&gt; &lt;td&gt;829646&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;ADDRESSSTREETNAME&lt;/th&gt; &lt;td&gt;200, PONGGOL SEVENTEENTH AVENUE, SINGAPORE 829646&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSTYPE&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;DESCRIPTION&lt;/th&gt; &lt;td&gt;Child Care Services&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;HYPERLINK&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;LANDXADDRESSPOINT&lt;/th&gt; &lt;td&gt;0&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;LANDYADDRESSPOINT&lt;/th&gt; &lt;td&gt;0&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;NAME&lt;/th&gt; &lt;td&gt;RAFFLES KIDZ @ PUNGGOL PTE LTD&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;PHOTOURL&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;ADDRESSFLOORNUMBER&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;INC_CRC&lt;/th&gt; &lt;td&gt;379D017BF244B0FA&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor=""&gt; &lt;th&gt;FMEL_UPD_D&lt;/th&gt; &lt;td&gt;20200826094036&lt;/td&gt; &lt;/tr&gt;&lt;tr bgcolor="#E3E3F3"&gt; &lt;th&gt;ADDRESSUNITNUMBER&lt;/th&gt; &lt;td&gt;&lt;/td&gt; &lt;/tr&gt;&lt;/table&gt;&lt;/center&gt; </code></pre>
+</div>
+</div>
+</section>
+<section id="converting-the-spatial-class-to-generic-sp-format" class="level2">
+<h2 class="anchored" data-anchor-id="converting-the-spatial-class-to-generic-sp-format">Converting the spatial class to generic sp format</h2>
+<p><strong>spatstat</strong> requires that the data is in <strong><em>ppp</em></strong> object form. There is no direct way to do this from spatial* class. We need to convert spatial* class to a spatial object first.</p>
+<p>The code chunk below transform two of the spatial* objects into generic sp objects.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>childcare_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(childcare, <span class="st">"SpatialPoints"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>sg_sp <span class="ot">&lt;-</span> <span class="fu">as</span>(sg, <span class="st">"SpatialPolygons"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Calling <code>childcare_sp</code> and <code>sg_sp</code> lets us check their properties.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>childcare_sp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatialPoints 
+features    : 1545 
+extent      : 11203.01, 45404.24, 25667.6, 49300.88  (xmin, xmax, ymin, ymax)
+crs         : +proj=tmerc +lat_0=1.36666666666667 +lon_0=103.833333333333 +k=1 +x_0=28001.642 +y_0=38744.572 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>sg_sp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class       : SpatialPolygons 
+features    : 60 
+extent      : 2663.926, 56047.79, 16357.98, 50244.03  (xmin, xmax, ymin, ymax)
+crs         : +proj=tmerc +lat_0=1.36666666666667 +lon_0=103.833333333333 +k=1 +x_0=28001.642 +y_0=38744.572 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs </code></pre>
+</div>
+</div>
+</section>
+<section id="converting-generic-sp-format-into-spatstats-ppp-format" class="level2">
+<h2 class="anchored" data-anchor-id="converting-generic-sp-format-into-spatstats-ppp-format">Converting generic sp format into spatstat’s ppp format</h2>
+<p>We will then use <code>as.ppp()</code> from <strong>spatstat</strong> package to convert the (spatial) data into spatstat’s ppp object format.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>childcare_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(childcare_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in as.ppp.sf(childcare_sf): only first attribute column is used for
+marks</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>childcare_ppp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Marked planar point pattern: 1545 points
+marks are of storage type  'character'
+window: rectangle = [11203.01, 45404.24] x [25667.6, 49300.88] units</code></pre>
+</div>
+</div>
+<p>We see the difference of this format when we use <code>plot()</code> (from R Graphics) to produce a quick map of the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(childcare_ppp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in default.charmap(ntypes, chars): Too many types to display every type
+as a different character</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Only 10 out of 1545 symbols are shown in the symbol map</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can see summary information on the new ppp object using the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(childcare_ppp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Marked planar point pattern:  1545 points
+Average intensity 1.91145e-06 points per square unit
+
+Coordinates are given to 11 decimal places
+
+marks are of type 'character'
+Summary:
+   Length     Class      Mode 
+     1545 character character 
+
+Window: rectangle = [11203.01, 45404.24] x [25667.6, 49300.88] units
+                    (34200 x 23630 units)
+Window area = 808287000 square units</code></pre>
+</div>
+</div>
+</section>
+<section id="handling-duplicated-points" class="level2">
+<h2 class="anchored" data-anchor-id="handling-duplicated-points">Handling duplicated points</h2>
+<p>We can check duplication in a ppp object using the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">any</span>(<span class="fu">duplicated</span>(childcare_ppp))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p>To count the number of coincident points, we can use the <code>multiplicity()</code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">multiplicity</span>(childcare_ppp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  [38] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  [75] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [112] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [149] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [186] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [223] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [260] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [297] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [334] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [371] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [408] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [445] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [482] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [519] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [556] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [593] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [630] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [667] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [704] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [741] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [778] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [815] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [852] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [889] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [926] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ [963] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1000] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1037] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1074] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1111] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1148] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1185] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1222] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1259] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1296] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1333] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1370] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1407] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1444] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1481] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[1518] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</code></pre>
+</div>
+</div>
+<p>We can wrap this in <code>sum()</code> to count the number of locations with more than one event.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">multiplicity</span>(childcare_ppp) <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0</code></pre>
+</div>
+</div>
+<p>The outputs show that there are no duplication in <code>childcare_ppp</code></p>
+</section>
+<section id="creating-owin-object" class="level2">
+<h2 class="anchored" data-anchor-id="creating-owin-object">Creating owin object</h2>
+<p>When analysing spatial point patterns, it is best to confine the analysis within a geographical area. In <strong>spatstat</strong>, the object that represents the bounded region is called an <strong>owin</strong>.</p>
+<p>The code chunk below creates an <strong>owin</strong> based on the <code>sg</code> SpatialPolygon object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>sg_owin <span class="ot">&lt;-</span> <span class="fu">as.owin</span>(sg_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The owin object can be displayed graphically using <code>plot()</code> and summarized using <code>summary()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sg_owin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sg_owin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Window: polygonal boundary
+50 separate polygons (1 hole)
+                 vertices         area relative.area
+polygon 1 (hole)       30     -7081.18     -9.76e-06
+polygon 2              55     82537.90      1.14e-04
+polygon 3              90    415092.00      5.72e-04
+polygon 4              49     16698.60      2.30e-05
+polygon 5              38     24249.20      3.34e-05
+polygon 6             976  23344700.00      3.22e-02
+polygon 7             721   1927950.00      2.66e-03
+polygon 8            1992   9992170.00      1.38e-02
+polygon 9             330   1118960.00      1.54e-03
+polygon 10            175    925904.00      1.28e-03
+polygon 11            115    928394.00      1.28e-03
+polygon 12             24      6352.39      8.76e-06
+polygon 13            190    202489.00      2.79e-04
+polygon 14             37     10170.50      1.40e-05
+polygon 15             25     16622.70      2.29e-05
+polygon 16             10      2145.07      2.96e-06
+polygon 17             66     16184.10      2.23e-05
+polygon 18           5195 636837000.00      8.78e-01
+polygon 19             76    312332.00      4.31e-04
+polygon 20            627  31891300.00      4.40e-02
+polygon 21             20     32842.00      4.53e-05
+polygon 22             42     55831.70      7.70e-05
+polygon 23             67   1313540.00      1.81e-03
+polygon 24            734   4690930.00      6.47e-03
+polygon 25             16      3194.60      4.40e-06
+polygon 26             15      4872.96      6.72e-06
+polygon 27             15      4464.20      6.15e-06
+polygon 28             14      5466.74      7.54e-06
+polygon 29             37      5261.94      7.25e-06
+polygon 30            111    662927.00      9.14e-04
+polygon 31             69     56313.40      7.76e-05
+polygon 32            143    145139.00      2.00e-04
+polygon 33            397   2488210.00      3.43e-03
+polygon 34             90    115991.00      1.60e-04
+polygon 35             98     62682.90      8.64e-05
+polygon 36            165    338736.00      4.67e-04
+polygon 37            130     94046.50      1.30e-04
+polygon 38             93    430642.00      5.94e-04
+polygon 39             16      2010.46      2.77e-06
+polygon 40            415   3253840.00      4.49e-03
+polygon 41             30     10838.20      1.49e-05
+polygon 42             53     34400.30      4.74e-05
+polygon 43             26      8347.58      1.15e-05
+polygon 44             74     58223.40      8.03e-05
+polygon 45            327   2169210.00      2.99e-03
+polygon 46            177    467446.00      6.44e-04
+polygon 47             46    699702.00      9.65e-04
+polygon 48              6     16841.00      2.32e-05
+polygon 49             13     70087.30      9.66e-05
+polygon 50              4      9459.63      1.30e-05
+enclosing rectangle: [2663.93, 56047.79] x [16357.98, 50244.03] units
+                     (53380 x 33890 units)
+Window area = 725376000 square units
+Fraction of frame area: 0.401</code></pre>
+</div>
+</div>
+</section>
+<section id="combining-point-events-object-and-owin-object" class="level2">
+<h2 class="anchored" data-anchor-id="combining-point-events-object-and-owin-object">Combining point events object and owin object</h2>
+<p>In this last step, we extract childcare events (locations) that are within Singapore, as depicted by the owin, using the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>childcareSG_ppp <span class="ot">=</span> childcare_ppp[sg_owin]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The output is a combination of the point feature and the polygon feature into a single ppp object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(childcareSG_ppp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Marked planar point pattern:  1545 points
+Average intensity 2.129929e-06 points per square unit
+
+Coordinates are given to 11 decimal places
+
+marks are of type 'character'
+Summary:
+   Length     Class      Mode 
+     1545 character character 
+
+Window: polygonal boundary
+50 separate polygons (1 hole)
+                 vertices         area relative.area
+polygon 1 (hole)       30     -7081.18     -9.76e-06
+polygon 2              55     82537.90      1.14e-04
+polygon 3              90    415092.00      5.72e-04
+polygon 4              49     16698.60      2.30e-05
+polygon 5              38     24249.20      3.34e-05
+polygon 6             976  23344700.00      3.22e-02
+polygon 7             721   1927950.00      2.66e-03
+polygon 8            1992   9992170.00      1.38e-02
+polygon 9             330   1118960.00      1.54e-03
+polygon 10            175    925904.00      1.28e-03
+polygon 11            115    928394.00      1.28e-03
+polygon 12             24      6352.39      8.76e-06
+polygon 13            190    202489.00      2.79e-04
+polygon 14             37     10170.50      1.40e-05
+polygon 15             25     16622.70      2.29e-05
+polygon 16             10      2145.07      2.96e-06
+polygon 17             66     16184.10      2.23e-05
+polygon 18           5195 636837000.00      8.78e-01
+polygon 19             76    312332.00      4.31e-04
+polygon 20            627  31891300.00      4.40e-02
+polygon 21             20     32842.00      4.53e-05
+polygon 22             42     55831.70      7.70e-05
+polygon 23             67   1313540.00      1.81e-03
+polygon 24            734   4690930.00      6.47e-03
+polygon 25             16      3194.60      4.40e-06
+polygon 26             15      4872.96      6.72e-06
+polygon 27             15      4464.20      6.15e-06
+polygon 28             14      5466.74      7.54e-06
+polygon 29             37      5261.94      7.25e-06
+polygon 30            111    662927.00      9.14e-04
+polygon 31             69     56313.40      7.76e-05
+polygon 32            143    145139.00      2.00e-04
+polygon 33            397   2488210.00      3.43e-03
+polygon 34             90    115991.00      1.60e-04
+polygon 35             98     62682.90      8.64e-05
+polygon 36            165    338736.00      4.67e-04
+polygon 37            130     94046.50      1.30e-04
+polygon 38             93    430642.00      5.94e-04
+polygon 39             16      2010.46      2.77e-06
+polygon 40            415   3253840.00      4.49e-03
+polygon 41             30     10838.20      1.49e-05
+polygon 42             53     34400.30      4.74e-05
+polygon 43             26      8347.58      1.15e-05
+polygon 44             74     58223.40      8.03e-05
+polygon 45            327   2169210.00      2.99e-03
+polygon 46            177    467446.00      6.44e-04
+polygon 47             46    699702.00      9.65e-04
+polygon 48              6     16841.00      2.32e-05
+polygon 49             13     70087.30      9.66e-05
+polygon 50              4      9459.63      1.30e-05
+enclosing rectangle: [2663.93, 56047.79] x [16357.98, 50244.03] units
+                     (53380 x 33890 units)
+Window area = 725376000 square units
+Fraction of frame area: 0.401</code></pre>
+</div>
+</div>
+<p>Running <code>plot()</code> on this shows both the owin and the preschool locations in a single map.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(childcareSG_ppp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in default.charmap(ntypes, chars): Too many types to display every type
+as a different character</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Only 10 out of 1545 symbols are shown in the symbol map</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="extracting-study-areas" class="level2">
+<h2 class="anchored" data-anchor-id="extracting-study-areas">Extracting study areas</h2>
+<p>The code chunk below extracts the target planning areas from <code>mpsz_sf</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>pg <span class="ot">&lt;-</span> mpsz_sf <span class="sc">%&gt;%</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PLN_AREA_N <span class="sc">==</span> <span class="st">"PUNGGOL"</span>)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>tm <span class="ot">&lt;-</span> mpsz_sf <span class="sc">%&gt;%</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PLN_AREA_N <span class="sc">==</span> <span class="st">"TAMPINES"</span>)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>ck <span class="ot">&lt;-</span> mpsz_sf <span class="sc">%&gt;%</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PLN_AREA_N <span class="sc">==</span> <span class="st">"CHOA CHU KANG"</span>)</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>jw <span class="ot">&lt;-</span> mpsz_sf <span class="sc">%&gt;%</span></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PLN_AREA_N <span class="sc">==</span> <span class="st">"JURONG WEST"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The code chunks below plot the different target planning areas using <code>tmap_arrange()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>punggol <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(pg) <span class="sc">+</span> </span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Punggol"</span>)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>cck <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(ck) <span class="sc">+</span> </span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Chua Chu Kang"</span>)</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>tampines <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(tm) <span class="sc">+</span> </span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Tampines"</span>)</span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>jwest <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(jw) <span class="sc">+</span> </span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span> <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Jurong West"</span>)</span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(punggol, tampines, cck, jwest, <span class="at">asp=</span><span class="dv">2</span>, <span class="at">ncol=</span><span class="dv">2</span>, <span class="at">nrow =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="converting-target-areas-into-owin-objects" class="level2">
+<h2 class="anchored" data-anchor-id="converting-target-areas-into-owin-objects">Converting target areas into owin objects</h2>
+<p>The code chunk below converts the four objeects into owin which is a requirement for analysing with <strong>spatstat</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>pg_owin <span class="ot">=</span> <span class="fu">as.owin</span>(pg)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>tm_owin <span class="ot">=</span> <span class="fu">as.owin</span>(tm)</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>ck_owin <span class="ot">=</span> <span class="fu">as.owin</span>(ck)</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>jw_owin <span class="ot">=</span> <span class="fu">as.owin</span>(jw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="combining-childcare-points-and-the-study-area" class="level2">
+<h2 class="anchored" data-anchor-id="combining-childcare-points-and-the-study-area">Combining childcare points and the study area</h2>
+<p>The code chunk below extracts the childcare points/events that are within each of the target areas</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>childcare_pg_ppp <span class="ot">=</span> childcare_ppp[pg_owin]</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>childcare_tm_ppp <span class="ot">=</span> childcare_ppp[tm_owin]</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>childcare_ck_ppp <span class="ot">=</span> childcare_ppp[ck_owin]</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>childcare_jw_ppp <span class="ot">=</span> childcare_ppp[jw_owin]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We use <code>rescale.ppp()</code> in the next code chunk to transform the unit of measure from meter to kilometer</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>childcare_pg_ppp.km <span class="ot">=</span> <span class="fu">rescale.ppp</span>(childcare_pg_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>childcare_tm_ppp.km <span class="ot">=</span> <span class="fu">rescale.ppp</span>(childcare_tm_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>childcare_ck_ppp.km <span class="ot">=</span> <span class="fu">rescale.ppp</span>(childcare_ck_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>childcare_jw_ppp.km <span class="ot">=</span> <span class="fu">rescale.ppp</span>(childcare_jw_ppp, <span class="dv">1000</span>, <span class="st">"km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The code chunk below is used to plot the four target areas and the locations of their childcare centres</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(childcare_pg_ppp.km, <span class="at">main=</span><span class="st">"Punggol"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in default.charmap(ntypes, chars): Too many types to display every type
+as a different character</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Only 10 out of 61 symbols are shown in the symbol map</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(childcare_tm_ppp.km, <span class="at">main=</span><span class="st">"Tampines"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in default.charmap(ntypes, chars): Too many types to display every type
+as a different character</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Only 10 out of 89 symbols are shown in the symbol map</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(childcare_ck_ppp.km, <span class="at">main=</span><span class="st">"Choa Chu Kang"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in default.charmap(ntypes, chars): Too many types to display every type
+as a different character</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Only 10 out of 61 symbols are shown in the symbol map</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(childcare_jw_ppp.km, <span class="at">main=</span><span class="st">"Jurong West"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in default.charmap(ntypes, chars): Too many types to display every type
+as a different character</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Only 10 out of 88 symbols are shown in the symbol map</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="second-order-spatial-point-patterns-analysis" class="level1">
+<h1>Second-order Spatial Point Patterns Analysis</h1>
+<section id="analysing-spatial-point-process-using-g-function" class="level2">
+<h2 class="anchored" data-anchor-id="analysing-spatial-point-process-using-g-function">Analysing spatial point process using G function</h2>
+<p>The G function measures the distribution of distances from an arbitrary event to the nearest event. We will compute the G function using <code>Gest()</code> of the <strong>spatstat</strong> package. We will also perform monte carlo simulation using the <code>envelope()</code> function of the same package.</p>
+<section id="g-function-estimation-for-choa-chu-kang-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="g-function-estimation-for-choa-chu-kang-planning-area">G-Function Estimation for Choa Chu Kang Planning Area</h3>
+<section id="computing-the-g-function-estimation" class="level4">
+<h4 class="anchored" data-anchor-id="computing-the-g-function-estimation">Computing the G function estimation</h4>
+<p>The code chunk below computes the G-function for the planning area using <code>Gest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>G_CK <span class="ot">=</span> <span class="fu">Gest</span>(childcare_ck_ppp, <span class="at">correction =</span> <span class="st">"border"</span>)</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(G_CK, <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="performing-complete-spatial-randomness-csr-test" class="level4">
+<h4 class="anchored" data-anchor-id="performing-complete-spatial-randomness-csr-test">Performing Complete Spatial Randomness (CSR) test</h4>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Choa Chu Kang are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Choa Chu Kang are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the G-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>G_CK.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_ck_ppp, Gest, <span class="at">nsim =</span> <span class="dv">999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 999 simulations of CSR  ...
+1, 2, 3, ......10.........20.........30.........40.........50.........60..
+.......70.........80.........90.........100.........110.........120.........130
+.........140.........150.........160.........170.........180.........190........
+.200.........210.........220.........230.........240.........250.........260......
+...270.........280.........290.........300.........310.........320.........330....
+.....340.........350.........360.........370.........380.........390.........400..
+.......410.........420.........430.........440.........450.........460.........470
+.........480.........490.........500.........510.........520.........530........
+.540.........550.........560.........570.........580.........590.........600......
+...610.........620.........630.........640.........650.........660.........670....
+.....680.........690.........700.........710.........720.........730.........740..
+.......750.........760.........770.........780.........790.........800.........810
+.........820.........830.........840.........850.........860.........870........
+.880.........890.........900.........910.........920.........930.........940......
+...950.........960.........970.........980.........990........
+999.
+
+Done.</code></pre>
+</div>
+</div>
+<p>We then plot the results using the code chunk below</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(G_CK.csr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="g-function-estimation-for-tampines-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="g-function-estimation-for-tampines-planning-area">G Function Estimation for Tampines Planning Area</h3>
+<section id="computing-the-g-function-estimation-1" class="level4">
+<h4 class="anchored" data-anchor-id="computing-the-g-function-estimation-1">Computing the G function estimation</h4>
+<p>The code chunk below computes the G-function for the planning area using <code>Gest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>G_tm <span class="ot">=</span> <span class="fu">Gest</span>(childcare_tm_ppp, <span class="at">correction =</span> <span class="st">"best"</span>)</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(G_tm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="performing-complete-spatial-randomness-csr-test-1" class="level4">
+<h4 class="anchored" data-anchor-id="performing-complete-spatial-randomness-csr-test-1">Performing Complete Spatial Randomness (CSR) test</h4>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Tampines are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Tampines are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the G-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>G_tm.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_tm_ppp, Gest, <span class="at">correction =</span> <span class="st">"all"</span>, <span class="at">nsim =</span> <span class="dv">999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 999 simulations of CSR  ...
+1, 2, 3, ......10.........20.........30.........40.........50.........60..
+.......70.........80.........90.........100.........110.........120.........130
+.........140.........150.........160.........170.........180.........190........
+.200.........210.........220.........230.........240.........250.........260......
+...270.........280.........290.........300.........310.........320.........330....
+.....340.........350.........360.........370.........380.........390.........400..
+.......410.........420.........430.........440.........450.........460.........470
+.........480.........490.........500.........510.........520.........530........
+.540.........550.........560.........570.........580.........590.........600......
+...610.........620.........630.........640.........650.........660.........670....
+.....680.........690.........700.........710.........720.........730.........740..
+.......750.........760.........770.........780.........790.........800.........810
+.........820.........830.........840.........850.........860.........870........
+.880.........890.........900.........910.........920.........930.........940......
+...950.........960.........970.........980.........990........
+999.
+
+Done.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(G_tm.csr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="analysing-spatial-point-process-using-f-function" class="level2">
+<h2 class="anchored" data-anchor-id="analysing-spatial-point-process-using-f-function">Analysing Spatial Point Process using F-Function</h2>
+<p>The F-Function estimates the empty space function F(r) or its hazard rate h(r) from a point pattern in a window of arbitrary shape. In this section, we will compute the F-function using <code>Fest()</code> of the spatstat package. We will again use monte carlo simulation using <code>envelope()</code></p>
+<section id="f-function-estimation-for-choa-chu-kang-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="f-function-estimation-for-choa-chu-kang-planning-area">F-Function Estimation for Choa Chu Kang Planning Area</h3>
+<section id="computing-the-f-function-estimation" class="level4">
+<h4 class="anchored" data-anchor-id="computing-the-f-function-estimation">Computing the F-function estimation</h4>
+<p>The code chunk below computes the F-function for the planning area using <code>Fest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>F_CK <span class="ot">=</span> <span class="fu">Fest</span>(childcare_ck_ppp)</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_CK)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="performing-complete-spatial-randomness-csr-test-2" class="level4">
+<h4 class="anchored" data-anchor-id="performing-complete-spatial-randomness-csr-test-2">Performing Complete Spatial Randomness (CSR) test</h4>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Choa Chu Kang are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Choa Chu Kang are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the F-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>F_CK.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_ck_ppp, Fest, <span class="at">nsim =</span> <span class="dv">999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 999 simulations of CSR  ...
+1, 2, 3, ......10.........20.........30.........40.........50.........60..
+.......70.........80.........90.........100.........110.........120.........130
+.........140.........150.........160.........170.........180.........190........
+.200.........210.........220.........230.........240.........250.........260......
+...270.........280.........290.........300.........310.........320.........330....
+.....340.........350.........360.........370.........380.........390.........400..
+.......410.........420.........430.........440.........450.........460.........470
+.........480.........490.........500.........510.........520.........530........
+.540.........550.........560.........570.........580.........590.........600......
+...610.........620.........630.........640.........650.........660.........670....
+.....680.........690.........700.........710.........720.........730.........740..
+.......750.........760.........770.........780.........790.........800.........810
+.........820.........830.........840.........850.........860.........870........
+.880.........890.........900.........910.........920.........930.........940......
+...950.........960.........970.........980.........990........
+999.
+
+Done.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_CK.csr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="f-function-estimation-for-tampines-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="f-function-estimation-for-tampines-planning-area">F-Function Estimation for Tampines Planning Area</h3>
+<section id="computing-the-f-function-estimation-1" class="level4">
+<h4 class="anchored" data-anchor-id="computing-the-f-function-estimation-1">Computing the F-function estimation</h4>
+<p>The code chunk below computes the F-function for the planning area using <code>Fest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>F_tm <span class="ot">=</span> <span class="fu">Fest</span>(childcare_tm_ppp, <span class="at">correction =</span> <span class="st">"best"</span>)</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_tm)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="performing-complete-spatial-randomness-csr-test-3" class="level4">
+<h4 class="anchored" data-anchor-id="performing-complete-spatial-randomness-csr-test-3">Performing Complete Spatial Randomness (CSR) test</h4>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Tampines are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Tampines are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the F-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>F_tm.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_tm_ppp, Fest, <span class="at">correction =</span> <span class="st">"all"</span>, <span class="at">nsim =</span> <span class="dv">999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 999 simulations of CSR  ...
+1, 2, 3, ......10.........20.........30.........40.........50.........60..
+.......70.........80.........90.........100.........110.........120.........130
+.........140.........150.........160.........170.........180.........190........
+.200.........210.........220.........230.........240.........250.........260......
+...270.........280.........290.........300.........310.........320.........330....
+.....340.........350.........360.........370.........380.........390.........400..
+.......410.........420.........430.........440.........450.........460.........470
+.........480.........490.........500.........510.........520.........530........
+.540.........550.........560.........570.........580.........590.........600......
+...610.........620.........630.........640.........650.........660.........670....
+.....680.........690.........700.........710.........720.........730.........740..
+.......750.........760.........770.........780.........790.........800.........810
+.........820.........830.........840.........850.........860.........870........
+.880.........890.........900.........910.........920.........930.........940......
+...950.........960.........970.........980.........990........
+999.
+
+Done.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(F_tm.csr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="analysing-spatial-point-process-using-k-function" class="level2">
+<h2 class="anchored" data-anchor-id="analysing-spatial-point-process-using-k-function">Analysing Spatial Point Process using K-Function</h2>
+<p>The K-function measures the number of events found up to a given distance of any particular event. In this section, we will use <code>Kest()</code> of the <strong>spatstat</strong> package to estimate the K-function. We will again perform monte carlo simulations using <code>envelope()</code></p>
+<section id="k-function-estimation-for-choa-chu-kang-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="k-function-estimation-for-choa-chu-kang-planning-area">K-Function Estimation for Choa Chu Kang Planning Area</h3>
+<p>The code chunk below computes the K-function for the planning area using <code>Kest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>K_ck <span class="ot">=</span> <span class="fu">Kest</span>(childcare_ck_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(K_ck, . <span class="sc">-</span>r <span class="sc">~</span> r, <span class="at">ylab=</span> <span class="st">"K(d)-r"</span>, <span class="at">xlab =</span> <span class="st">"d(m)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-45-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Choa Chu Kang are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Choa Chu Kang are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the K-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>K_ck.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_ck_ppp, Kest, <span class="at">nsim =</span> <span class="dv">99</span>, <span class="at">rank =</span> <span class="dv">1</span>, <span class="at">glocal=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 99 simulations of CSR  ...
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 
+99.
+
+Done.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(K_ck.csr, . <span class="sc">-</span> r <span class="sc">~</span> r, <span class="at">xlab=</span><span class="st">"d"</span>, <span class="at">ylab=</span><span class="st">"K(d)-r"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-47-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="k-function-estimation-for-tampines-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="k-function-estimation-for-tampines-planning-area">K-Function Estimation for Tampines Planning Area</h3>
+<p>The code chunk below computes the K-function for the planning area using <code>Kest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>K_tm <span class="ot">=</span> <span class="fu">Kest</span>(childcare_tm_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(K_tm, . <span class="sc">-</span>r <span class="sc">~</span> r, </span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab=</span> <span class="st">"K(d)-r"</span>, <span class="at">xlab =</span> <span class="st">"d(m)"</span>, </span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Tampines are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Tampines are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the K-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>K_tm.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_tm_ppp, Kest, <span class="at">nsim =</span> <span class="dv">99</span>, <span class="at">rank =</span> <span class="dv">1</span>, <span class="at">glocal=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 99 simulations of CSR  ...
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 
+99.
+
+Done.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(K_tm.csr, . <span class="sc">-</span> r <span class="sc">~</span> r, </span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">"d"</span>, <span class="at">ylab=</span><span class="st">"K(d)-r"</span>, <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="analysing-spatial-point-process-using-l-function" class="level2">
+<h2 class="anchored" data-anchor-id="analysing-spatial-point-process-using-l-function">Analysing Spatial Point Process using L-Function</h2>
+<p>In this section, we will use <code>Lest()</code> of the <strong>spatstat</strong> package to estimate the L-function. We will again perform monte carlo simulations using <code>envelope()</code></p>
+<section id="l-function-estimation-for-choa-chu-kang-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="l-function-estimation-for-choa-chu-kang-planning-area">L-Function Estimation for Choa Chu Kang Planning Area</h3>
+<p>The code chunk below computes the L-function for the planning area using <code>Lest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>L_ck <span class="ot">=</span> <span class="fu">Lest</span>(childcare_ck_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_ck, . <span class="sc">-</span>r <span class="sc">~</span> r, </span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab=</span> <span class="st">"L(d)-r"</span>, <span class="at">xlab =</span> <span class="st">"d(m)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Choa Chu Kang are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Choa Chu Kang are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the L-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>L_ck.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_ck_ppp, Lest, <span class="at">nsim =</span> <span class="dv">99</span>, <span class="at">rank =</span> <span class="dv">1</span>, <span class="at">glocal=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 99 simulations of CSR  ...
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 
+99.
+
+Done.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_ck.csr, . <span class="sc">-</span> r <span class="sc">~</span> r, <span class="at">xlab=</span><span class="st">"d"</span>, <span class="at">ylab=</span><span class="st">"L(d)-r"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-53-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="l-function-estimation-for-tampines-planning-area" class="level3">
+<h3 class="anchored" data-anchor-id="l-function-estimation-for-tampines-planning-area">L-Function Estimation for Tampines Planning Area</h3>
+<p>The code chunk below computes the L-function for the planning area using <code>Lest()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>L_tm <span class="ot">=</span> <span class="fu">Lest</span>(childcare_tm_ppp, <span class="at">correction =</span> <span class="st">"Ripley"</span>)</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_tm, . <span class="sc">-</span>r <span class="sc">~</span> r, </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab=</span> <span class="st">"L(d)-r"</span>, <span class="at">xlab =</span> <span class="st">"d(m)"</span>, </span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1000</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-54-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To confirm the observed spatial pattern, we conduct hypothesis testing. The test hypotheses for these are:</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> - The locations of childcare service centres in Tampines are randomly distributed</p></li>
+<li><p><span class="math inline">\(H_1\)</span> - The locations of childcare service centres in Tampines are <strong>not</strong> randomly distributed</p></li>
+</ul>
+<p>For our testing, we will use a p-value smaller than α = 0.001 to reject the null hypothesis.</p>
+<p>The code chunk below produces monte carlo simulation for the L-function values using <code>envelope()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>L_tm.csr <span class="ot">&lt;-</span> <span class="fu">envelope</span>(childcare_tm_ppp, Lest, <span class="at">nsim =</span> <span class="dv">99</span>, <span class="at">rank =</span> <span class="dv">1</span>, <span class="at">glocal=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generating 99 simulations of CSR  ...
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 
+99.
+
+Done.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(L_tm.csr, . <span class="sc">-</span> r <span class="sc">~</span> r, </span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">"d"</span>, <span class="at">ylab=</span><span class="st">"L(d)-r"</span>, <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">500</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-On_Ex04_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

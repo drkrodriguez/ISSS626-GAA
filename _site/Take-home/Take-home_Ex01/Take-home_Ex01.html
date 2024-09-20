@@ -226,7 +226,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#b.4-thailand-roads-open-streetmap-shapefile" id="toc-b.4-thailand-roads-open-streetmap-shapefile" class="nav-link" data-scroll-target="#b.4-thailand-roads-open-streetmap-shapefile">B.4 Thailand Roads Open StreetMap, Shapefile</a></li>
   <li><a href="#b.5-resolving-duplicate-points" id="toc-b.5-resolving-duplicate-points" class="nav-link" data-scroll-target="#b.5-resolving-duplicate-points">B.5 Resolving duplicate points</a></li>
   </ul></li>
-  <li><a href="#c.-exploratory-data-analysis" id="toc-c.-exploratory-data-analysis" class="nav-link" data-scroll-target="#c.-exploratory-data-analysis">C. Exploratory Data Analysis</a></li>
+  <li><a href="#c.-nonspatial-data-analysis" id="toc-c.-nonspatial-data-analysis" class="nav-link" data-scroll-target="#c.-nonspatial-data-analysis">C. NonSpatial Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#c.1-categories-of-accidents" id="toc-c.1-categories-of-accidents" class="nav-link" data-scroll-target="#c.1-categories-of-accidents">C.1 Categories of accidents</a>
+  <ul class="collapse">
+  <li><a href="#c.1.1-vehicle-type" id="toc-c.1.1-vehicle-type" class="nav-link" data-scroll-target="#c.1.1-vehicle-type">C.1.1 Vehicle Type</a></li>
+  <li><a href="#c.1.2-presumed-cause" id="toc-c.1.2-presumed-cause" class="nav-link" data-scroll-target="#c.1.2-presumed-cause">C.1.2 Presumed Cause</a></li>
+  <li><a href="#c.1.3-accident-type" id="toc-c.1.3-accident-type" class="nav-link" data-scroll-target="#c.1.3-accident-type">C.1.3 Accident Type</a></li>
+  <li><a href="#c.1.4-number-of-fatalities" id="toc-c.1.4-number-of-fatalities" class="nav-link" data-scroll-target="#c.1.4-number-of-fatalities">C.1.4 Number of Fatalities</a></li>
+  <li><a href="#c.1.5-weather-condition" id="toc-c.1.5-weather-condition" class="nav-link" data-scroll-target="#c.1.5-weather-condition">C.1.5 Weather Condition</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#d.-non-network-constrained-visualization" id="toc-d.-non-network-constrained-visualization" class="nav-link" data-scroll-target="#d.-non-network-constrained-visualization">D. Non-Network-Constrained Visualization</a>
+  <ul class="collapse">
+  <li><a href="#d.1.-converting-objects-into-spatstats-formats" id="toc-d.1.-converting-objects-into-spatstats-formats" class="nav-link" data-scroll-target="#d.1.-converting-objects-into-spatstats-formats">D.1. Converting Objects into spatstat’s formats</a></li>
+  <li><a href="#d.2-kde-for-all-accidents" id="toc-d.2-kde-for-all-accidents" class="nav-link" data-scroll-target="#d.2-kde-for-all-accidents">D.2 KDE for all Accidents</a>
+  <ul class="collapse">
+  <li><a href="#d.3-kde-for-accidents-across-years" id="toc-d.3-kde-for-accidents-across-years" class="nav-link" data-scroll-target="#d.3-kde-for-accidents-across-years">D.3 KDE for accidents across years</a></li>
+  </ul></li>
+  <li><a href="#d.3-kde-across-months" id="toc-d.3-kde-across-months" class="nav-link" data-scroll-target="#d.3-kde-across-months">D.3 KDE across Months</a></li>
+  <li><a href="#d.4-kde-for-clear-vs-rainy-days" id="toc-d.4-kde-for-clear-vs-rainy-days" class="nav-link" data-scroll-target="#d.4-kde-for-clear-vs-rainy-days">D.4 KDE for Clear vs “Rainy” Days</a></li>
+  </ul></li>
+  <li><a href="#e.-network-constrained-visualizations-and-analyses" id="toc-e.-network-constrained-visualizations-and-analyses" class="nav-link" data-scroll-target="#e.-network-constrained-visualizations-and-analyses">E. Network Constrained Visualizations and Analyses</a>
+  <ul class="collapse">
+  <li><a href="#e.1-preparation-of-data-for-network-constrained-analysis" id="toc-e.1-preparation-of-data-for-network-constrained-analysis" class="nav-link" data-scroll-target="#e.1-preparation-of-data-for-network-constrained-analysis">E.1 Preparation of Data for Network Constrained Analysis</a>
+  <ul class="collapse">
+  <li><a href="#e.1.1-preparing-the-lixels" id="toc-e.1.1-preparing-the-lixels" class="nav-link" data-scroll-target="#e.1.1-preparing-the-lixels">E.1.1 Preparing the lixels</a></li>
+  <li><a href="#e.1.2-generating-sample-points" id="toc-e.1.2-generating-sample-points" class="nav-link" data-scroll-target="#e.1.2-generating-sample-points">E.1.2 Generating sample points</a></li>
+  </ul></li>
+  <li><a href="#e.2-all-years-all-accidents-initial-analysis" id="toc-e.2-all-years-all-accidents-initial-analysis" class="nav-link" data-scroll-target="#e.2-all-years-all-accidents-initial-analysis">E.2 All Years, All Accidents, Initial Analysis</a></li>
+  <li><a href="#e.3-transformation-step---merging-of-parallel-roads" id="toc-e.3-transformation-step---merging-of-parallel-roads" class="nav-link" data-scroll-target="#e.3-transformation-step---merging-of-parallel-roads">E.3 Transformation step - merging of parallel roads</a></li>
+  <li><a href="#e.4-all-years-all-accidents-initial-analysis" id="toc-e.4-all-years-all-accidents-initial-analysis" class="nav-link" data-scroll-target="#e.4-all-years-all-accidents-initial-analysis">E.4 All Years, All Accidents, Initial Analysis</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -259,7 +290,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 15, 2024</p>
+      <p class="date-modified">September 20, 2024</p>
     </div>
   </div>
     
@@ -621,67 +652,46 @@ Geodetic CRS:  WGS 84</code></pre>
 <section id="b.3-road-accident-data-aspatial-csv-file" class="level2">
 <h2 class="anchored" data-anchor-id="b.3-road-accident-data-aspatial-csv-file">B.3 Road Accident Data, Aspatial, csv-file</h2>
 <p>The road accident data is contained in a csv file. We use the code block in the first tab below to load it into the <code>thra</code> object with some necessary transformations that we identified upon inspecting the raw file. The second tab gives an explanation of the different nested functions used in the code</p>
-<p>Code to import and transform road accident data</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Code to import and transform road accident data</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Explanation of the code lines / functions used</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>bmracc <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/thai_road_accident_2019_2022.csv"</span>)  <span class="sc">%&gt;%</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(longitude) <span class="sc">&amp;</span> longitude <span class="sc">!=</span> <span class="st">""</span>, </span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">is.na</span>(latitude) <span class="sc">&amp;</span> latitude <span class="sc">!=</span> <span class="st">""</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>), <span class="at">crs=</span><span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">32647</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 81735 Columns: 18
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (10): province_th, province_en, agency, route, vehicle_type, presumed_c...
-dbl   (6): acc_code, number_of_vehicles_involved, number_of_fatalities, numb...
-dttm  (2): incident_datetime, report_datetime
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">32647</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>bmracc <span class="ot">&lt;-</span> <span class="fu">filter</span>(bmracc, geometry <span class="sc">%in%</span> <span class="fu">st_intersection</span>(bmr_full, bmracc)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(incident_datetime)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">MonthNum =</span> <span class="fu">month</span>(incident_datetime)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(incident_datetime, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DayOfWeek =</span> <span class="fu">wday</span>(incident_datetime, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>bmracc <span class="ot">&lt;-</span> <span class="fu">filter</span>(bmracc, geometry <span class="sc">%in%</span> <span class="fu">st_intersection</span>(bmr_full, bmracc)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(incident_datetime)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">MonthNum =</span> <span class="fu">month</span>(incident_datetime)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> <span class="fu">month</span>(incident_datetime, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DayOfWeek =</span> <span class="fu">wday</span>(incident_datetime, <span class="at">label =</span> <span class="cn">TRUE</span>, <span class="at">abbr =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<ul>
+<li><p><code>read_csv()</code> used to import a csv file into an R object</p></li>
+<li><p><code>filter(!is.na(longitude) &amp; longitude != "", !is.na(latitude) &amp; latitude != "")</code> used to exclude any records where the longitude or latitude information is missing</p></li>
+<li><p><code>st_as_sf(coords = c("longitude", "latitude"), crs=4326)</code> used to convert the dataframe into an sf object using a reference system (WGS84) based on the coordinates</p></li>
+<li><p><code>st_transform(crs = 32647)</code> used to apply the correct EPSG code to the sf object</p></li>
+<li><p><code>filter(bmracc, geometry %in% st_intersection(bmr_full, bmracc))</code> used to leave only records which fall within the BMR boundaries</p></li>
+<li><p><code>mutate(...)</code> these lines are used to add additional columns to quickly reference the year, month and day of the week that each accident occured as these dimensions allow for some temporal analyses</p></li>
+</ul>
+</div>
+</div>
 </div>
 <p>Calling the new object shows that it has 12,989 rows across 20 fields.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>bmracc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Simple feature collection with 12989 features and 20 fields
-Geometry type: POINT
-Dimension:     XY
-Bounding box:  xmin: 591277.5 ymin: 1486846 xmax: 710166.1 ymax: 1576520
-Projected CRS: WGS 84 / UTM zone 47N
-# A tibble: 12,989 × 21
-   acc_code incident_datetime   report_datetime     province_th  province_en  
- *    &lt;dbl&gt; &lt;dttm&gt;              &lt;dttm&gt;              &lt;chr&gt;        &lt;chr&gt;        
- 1   571882 2019-01-01 02:25:00 2019-01-02 17:32:00 นครปฐม       Nakhon Pathom
- 2   600001 2019-01-01 03:00:00 2019-01-05 10:33:00 นนทบุรี        Nonthaburi   
- 3   605043 2019-01-01 03:00:00 2019-03-29 08:22:00 สมุทรปราการ   Samut Prakan 
- 4   629691 2019-01-01 03:05:00 2019-01-01 03:05:00 กรุงเทพมหานคร Bangkok      
- 5   571887 2019-01-01 04:30:00 2019-01-02 17:32:00 นครปฐม       Nakhon Pathom
- 6   599234 2019-01-01 04:45:00 2019-01-02 08:28:00 สมุทรปราการ   Samut Prakan 
- 7   599990 2019-01-01 05:30:00 2019-01-05 10:35:00 สมุทรสาคร     Samut Sakhon 
- 8   612045 2019-01-01 05:30:00 2019-10-09 13:50:00 นนทบุรี        Nonthaburi   
- 9   629689 2019-01-01 05:42:00 2019-01-01 05:42:00 กรุงเทพมหานคร Bangkok      
-10   607046 2019-01-01 06:30:00 2019-05-15 13:24:00 ปทุมธานี       Pathum Thani 
-# ℹ 12,979 more rows
-# ℹ 16 more variables: agency &lt;chr&gt;, route &lt;chr&gt;, vehicle_type &lt;chr&gt;,
-#   presumed_cause &lt;chr&gt;, accident_type &lt;chr&gt;,
-#   number_of_vehicles_involved &lt;dbl&gt;, number_of_fatalities &lt;dbl&gt;,
-#   number_of_injuries &lt;dbl&gt;, weather_condition &lt;chr&gt;, road_description &lt;chr&gt;,
-#   slope_description &lt;chr&gt;, geometry &lt;POINT [m]&gt;, Year &lt;dbl&gt;, MonthNum &lt;dbl&gt;,
-#   Month &lt;ord&gt;, DayOfWeek &lt;ord&gt;</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>bmracc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We use the code chunks below to check the data and visualize the data on the BMR boundary map.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary) <span class="sc">+</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"grey"</span>) <span class="sc">+</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmracc) <span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.01</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary) <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"grey"</span>) <span class="sc">+</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmracc) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.01</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -692,50 +702,51 @@ Projected CRS: WGS 84 / UTM zone 47N
 </div>
 <p>The code chunk below writes the resulting accident dataset into an rds file for convenient loading.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bmracc, <span class="st">"data/rds/bmracc.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bmracc, <span class="st">"data/rds/bmracc.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="b.4-thailand-roads-open-streetmap-shapefile" class="level2">
 <h2 class="anchored" data-anchor-id="b.4-thailand-roads-open-streetmap-shapefile">B.4 Thailand Roads Open StreetMap, Shapefile</h2>
 <p>The second geospatial object is the street map shapefile. We will use the object <code>network</code> to contain the final road network for the study.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>network <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">layer=</span><span class="st">"hotosm_tha_roads_lines_shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>network <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">layer=</span><span class="st">"hotosm_tha_roads_lines_shp"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Running the above code confirms that the dataset is in multilinestring sf format and that it contains 2.8M records across 15 variables. It also shows that there is no CRS applied to the dataset.</p>
 <p>Based on these, the following steps need to be done: apply the right CRS/EPSG code of 32647 or the same as <code>bmr_full</code>, and, filter the network to only include BMR.</p>
 <p>The code below does the first step of applying a reference system and updating the EPSG code to 32647 using <code>st_set_crs()</code> and <code>st_crs()</code> from the sf package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>network <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">layer=</span><span class="st">"hotosm_tha_roads_lines_shp"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_make_valid</span>() <span class="sc">%&gt;%</span> <span class="fu">st_set_crs</span>(<span class="dv">4326</span>) <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="fu">st_crs</span>(bmr_full))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>network <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">layer=</span><span class="st">"hotosm_tha_roads_lines_shp"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_make_valid</span>() <span class="sc">%&gt;%</span> <span class="fu">st_set_crs</span>(<span class="dv">4326</span>) <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="fu">st_crs</span>(bmr_full))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The code below then finds the network within BMR by using <code>st_intersection()</code> to find the overlap between the full road network and the BMR boundary.</p>
+<p>The code below then finds the network within BMR by using <code>st_intersection()</code> to find the overlap between the full road network and the BMR boundary. We also include <code>write_rds()</code> in the chunk to store this object into an rds file for easy future loading.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>bmr_network <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(network, bmr_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>network <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(network, bmr_full)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(network, <span class="st">"data/rds/network.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Calling the object name allows us to inspect the contents.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>bmr_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The size of the object has now been reduced to 585K features from the original 2.8M. This still appears a very large number if we want to visualize the data, so we need to inspect if there are any opportunities to reduce the dataset by excluding any irrelevant records.</p>
 <p>The data includes a column named highway which gives information on the the type or classification of the road.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bmr_network, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(highway, <span class="fu">table</span>(highway)[highway]))) <span class="sc">+</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Roads by Highway type"</span>) <span class="sc">+</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
-<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Number of Records"</span>, <span class="at">y =</span> <span class="st">"Highway Type"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(network, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(highway, <span class="fu">table</span>(highway)[highway]))) <span class="sc">+</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Roads by Highway type"</span>) <span class="sc">+</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Highway Type"</span>, <span class="at">y =</span> <span class="st">"Number of Roads"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The resulting chart shows that roads with highway type of <strong>residential</strong> and <strong>service</strong> make up 522K of the 585K roads in the dataset. We refer to the OpenStreetMap wiki page to see the definition of the <a href="https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification">different types of highways</a> in the Thailand map and see that these two highway types are access roads for residences or specific buildings. For our objective, we should be able to limit to roads where accidents (are expected to frequently) happen, and only to roads that should be accessible by vehicles. Going through the definition of the highway types, we see that the following 6 types could be out of scope for our study:</p>
 <ul>
@@ -748,84 +759,50 @@ Projected CRS: WGS 84 / UTM zone 47N
 </ul>
 <p>We can then use the following code chunk which uses the <code>filter()</code> function to remove these classifications from the current <code>network</code> object. We call the object name in the succeeding code chunk to check the new dataset.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bmr_network <span class="ot">&lt;-</span> bmr_network <span class="sc">%&gt;%</span> </span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(highway <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"residential"</span>, <span class="st">"service"</span>, <span class="st">"footway"</span>, <span class="st">"track"</span>, <span class="st">"path"</span>, <span class="st">"steps"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>bmr_network <span class="ot">&lt;-</span> bmr_network <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(highway <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"residential"</span>, <span class="st">"service"</span>, <span class="st">"footway"</span>, <span class="st">"track"</span>, <span class="st">"path"</span>, <span class="st">"steps"</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>bmr_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Simple feature collection with 34056 features and 14 fields
-Geometry type: GEOMETRY
-Dimension:     XY
-Bounding box:  xmin: 590124.8 ymin: 1484506 xmax: 712235 ymax: 1579041
-Projected CRS: WGS 84 / UTM zone 47N
-First 10 features:
-           name                    name_en        highway  surface smoothness
-1    ถนนฉลองกรุง         Chalong Krung Road      secondary    paved       &lt;NA&gt;
-2          &lt;NA&gt;                       &lt;NA&gt; secondary_link     &lt;NA&gt;       &lt;NA&gt;
-3    ถนนฉลองกรุง         Chalong Krung Road      secondary concrete       &lt;NA&gt;
-4   ถนนเอราวัณ 1              Erawan 1 Road       tertiary     &lt;NA&gt;       &lt;NA&gt;
-5     ถนนลำลูกกา            Lam Luk Ka Road      secondary     &lt;NA&gt;       &lt;NA&gt;
-6     ถนนลำลูกกา            Lam Luk Ka Road      secondary     &lt;NA&gt;       &lt;NA&gt;
-7     ถนนลำลูกกา            Lam Luk Ka Road      secondary     &lt;NA&gt;       &lt;NA&gt;
-8     ถนนลำลูกกา            Lam Luk Ka Road      secondary     &lt;NA&gt;       &lt;NA&gt;
-9  ถนนบรมราชชนนี Borommaratchachonnani Road          trunk  asphalt       &lt;NA&gt;
-10         &lt;NA&gt;                       &lt;NA&gt;   unclassified     &lt;NA&gt;       &lt;NA&gt;
-   width lanes oneway bridge layer source      name_th     osm_id  osm_type
-1   &lt;NA&gt;  &lt;NA&gt;    yes   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;   ถนนฉลองกรุง 1125681229 ways_line
-2   &lt;NA&gt;  &lt;NA&gt;    yes   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;         &lt;NA&gt;  472283206 ways_line
-3   &lt;NA&gt;     2    yes    yes     1   Bing   ถนนฉลองกรุง  116847248 ways_line
-4   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;  ถนนเอราวัณ 1  378672881 ways_line
-5   &lt;NA&gt;     3    yes   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;    ถนนลำลูกกา 1312138113 ways_line
-6   &lt;NA&gt;     3    yes   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;    ถนนลำลูกกา 1312138112 ways_line
-7   &lt;NA&gt;     3    yes   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;    ถนนลำลูกกา  155900618 ways_line
-8   &lt;NA&gt;     3    yes   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;    ถนนลำลูกกา  156365723 ways_line
-9   &lt;NA&gt;     3    yes   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt; ถนนบรมราชชนนี  615741634 ways_line
-10  &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;         &lt;NA&gt;  106732198 ways_line
-                         geometry
-1  LINESTRING (693686.1 151979...
-2  LINESTRING (692949.1 151886...
-3  LINESTRING (692810.8 151863...
-4  LINESTRING (677182.3 156542...
-5  LINESTRING (676813.7 154284...
-6  LINESTRING (677134.2 154283...
-7  LINESTRING (675989.4 154300...
-8  LINESTRING (676815 1542831,...
-9  LINESTRING (632625.1 152356...
-10 LINESTRING (620655.3 152906...</code></pre>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>bmr_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>While this looks good, it looks like the object is being identified as a GEOMETRY rather than a LINESTRING object. We can use the code below to correct it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>bmr_network <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(bmr_network, <span class="st">"LINESTRING"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bmr_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The new road network object is now reduced to 34K records or roads which is a 94% reduction in the number of records. We will use some visual inspection to see if this reduction in records will affect our analysis. The two code chunks below plot the road network within the boundaries, while the second plots the three objects together. We use the tmap function to create these maps.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">BMR filtered road network only</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">BMR filtered road network with road accident dataset</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">BMR filtered road network only</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">BMR filtered road network with road accident dataset</a></li></ul>
 <div class="tab-content">
-<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_full) <span class="sc">+</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmr_network) <span class="sc">+</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col =</span> <span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_full) <span class="sc">+</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmr_network) <span class="sc">+</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col =</span> <span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </div>
-<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_full) <span class="sc">+</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmr_network) <span class="sc">+</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmracc) <span class="sc">+</span></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_full) <span class="sc">+</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmr_network) <span class="sc">+</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmracc) <span class="sc">+</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -841,7 +818,7 @@ First 10 features:
 <p>Based on these, we will go ahead with this version of the network for our analysis.</p>
 <p>The following code writes the resulting network into an rds file for more convenient loading in the future.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bmr_network, <span class="st">"data/rds/bmr_network.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(bmr_network, <span class="st">"data/rds/bmr_network.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="b.5-resolving-duplicate-points" class="level2">
@@ -849,29 +826,616 @@ First 10 features:
 <p>In this section, we perform some additional transformations to perform the required analyses.</p>
 <p>First, we check the event or accident dataset to see if there are any <strong>duplicated data points</strong> or locations as the methods require that the points are unique. The code below checks if any duplicate points exist. Note that we specify the column in the argument as we are double-checking duplicate locations rather than completely duplicate records.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">any</span>(<span class="fu">duplicated</span>(bmracc<span class="sc">$</span>geometry))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">any</span>(<span class="fu">duplicated</span>(bmracc<span class="sc">$</span>geometry))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
 <p>As the code returned TRUE, it confirms the presence of duplicate points, we use <code>st_jitter()</code> from the <strong>sf</strong> package to introduce some jitter to each point and ensure that points do not lie on the same location. Without any additional arguments, the function uses a default factor 0.002 of the bounding box diagonal as the bounds for the amount of jitter introduced. In the code below, we define an amount of 0.01 instead.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>bmracc <span class="ot">&lt;-</span> <span class="fu">st_jitter</span>(bmracc, <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>bmracc_jitt <span class="ot">&lt;-</span> <span class="fu">st_jitter</span>(bmracc, <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Rerunning the check using <code>duplicated()</code> shows that there are no duplicate points anymore.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">any</span>(<span class="fu">duplicated</span>(bmracc<span class="sc">$</span>geometry))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">any</span>(<span class="fu">duplicated</span>(bmracc_jitt<span class="sc">$</span>geometry))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] FALSE</code></pre>
 </div>
 </div>
 </section>
 </section>
-<section id="c.-exploratory-data-analysis" class="level1">
-<h1>C. Exploratory Data Analysis</h1>
-<p>The second thing we want to perform is to generate lixels and sample points (based on those lixels) along the network. These points will be the basis for computing the KDE.</p>
+<section id="c.-nonspatial-data-analysis" class="level1">
+<h1>C. NonSpatial Data Analysis</h1>
+<p>Before we go into performing spatial or spatio-temporal analysis, it would be good to explore and examine the data further. This can reveal some insights and also clarify what variables we can use for drilling down on the required analysis.</p>
+<section id="c.1-categories-of-accidents" class="level2">
+<h2 class="anchored" data-anchor-id="c.1-categories-of-accidents">C.1 Categories of accidents</h2>
+<p>We first would like to understand the different labels we can use from the BMR road accident dataset <code>bmracc</code> The following columns appear to be able to give some insight about the nature of the accident:</p>
+<ul>
+<li><p>vehicle_type</p></li>
+<li><p>presumed_cause</p></li>
+<li><p>accident_type</p></li>
+<li><p>number_of_vehicles_involved</p></li>
+<li><p>number_of_fatalities</p></li>
+<li><p>weather_condition</p></li>
+</ul>
+<p>We will try to be brief in analysing these variables as the main intent is to understand which ones will add the most value to the spatial analysis needed to address the main study objectives.</p>
+<p>Note that while we use <code>bmracc</code> rather than the modified <code>bmracc_jitt</code> in the codes below, the result will be the same as we do not concern ourselves with the geometry innformation yet.</p>
+<section id="c.1.1-vehicle-type" class="level3">
+<h3 class="anchored" data-anchor-id="c.1.1-vehicle-type">C.1.1 Vehicle Type</h3>
+<p>This variable is intended to give the type of vehicle involved in the accident. We use the code block below to understand the categories under this variable using a simple bar chart created through <code>ggplot()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bmracc, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(vehicle_type, <span class="fu">table</span>(vehicle_type)[vehicle_type]))) <span class="sc">+</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Accidents by Vehicle type"</span>) <span class="sc">+</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The dot-dot notation (`..count..`) was deprecated in ggplot2 3.4.0.
+ℹ Please use `after_stat(count)` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The output shows that out of 12,989 accidents, 35% are with private or passenger cars, 27% are with pickup trucks and 13% are with motorcycles. These three make up 75% of all the recorded accidents while the remaining 11 types make up the balance 25%</p>
+</section>
+<section id="c.1.2-presumed-cause" class="level3">
+<h3 class="anchored" data-anchor-id="c.1.2-presumed-cause">C.1.2 Presumed Cause</h3>
+<p>This variable is intended to give the presumed cause of the accident. We again use the code block below to understand the categories under this variable using a simple bar chart created through <code>ggplot()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bmracc, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(presumed_cause, <span class="fu">table</span>(presumed_cause)[presumed_cause]))) <span class="sc">+</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Accidents by Presumed Cause"</span>) <span class="sc">+</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The chart shows that 10,146 or 75% of the accidents are presumed to be caused by speeding. The next largest named presumed cause only accounts for 5% of the overall data.</p>
+</section>
+<section id="c.1.3-accident-type" class="level3">
+<h3 class="anchored" data-anchor-id="c.1.3-accident-type">C.1.3 Accident Type</h3>
+<p>This variable is intended to give the type or nature of the accident. We again use the code block below to understand the categories under this variable using a simple bar chart created through <code>ggplot()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bmracc, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(accident_type, <span class="fu">table</span>(accident_type)[accident_type]))) <span class="sc">+</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Accidents by Type"</span>) <span class="sc">+</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The chart shows that “rear-end collisions” and “rollover/fallen on straight road” are the leading causes recorded and account for 83% of the accidents.</p>
+</section>
+<section id="c.1.4-number-of-fatalities" class="level3">
+<h3 class="anchored" data-anchor-id="c.1.4-number-of-fatalities">C.1.4 Number of Fatalities</h3>
+<p>This variable is intended to give the number of fatalities resulting from the accident. We again use the code block below to understand the categories under this variable using a simple histogram created through <code>ggplot()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bmracc, <span class="fu">aes</span>(<span class="at">x =</span> number_of_fatalities)) <span class="sc">+</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">fill =</span> <span class="st">"darkgrey"</span>) <span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="fu">min</span>(bmracc<span class="sc">$</span>number_of_fatalities), <span class="fu">max</span>(bmracc<span class="sc">$</span>number_of_fatalities), <span class="at">by =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Accidents by Number of Fatalities"</span>, <span class="at">x =</span> <span class="st">"Number of Fatalities"</span>, <span class="at">y =</span> <span class="st">"Number of Accidents"</span>) <span class="sc">+</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">vjust=</span><span class="sc">-</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows that 94% of the recorded accidents are non-fatal. Only 719 were fatal. Although this is a small number, it might be worth looking at the location of such fatal accidents later. We can use the code below to introduce a new column <code>fatal</code> into the data for more convenient filtering later.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>bmracc<span class="sc">$</span>fatal <span class="ot">&lt;-</span> bmracc<span class="sc">$</span>number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="c.1.5-weather-condition" class="level3">
+<h3 class="anchored" data-anchor-id="c.1.5-weather-condition">C.1.5 Weather Condition</h3>
+<p>This variable is intended to indicate the weather condition when the accident was recorded. We first use the code block below to understand the categories under this variable using a simple bar chart created through <code>ggplot()</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bmracc, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(weather_condition, <span class="fu">table</span>(weather_condition)[weather_condition]))) <span class="sc">+</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Accidents by Weather Condition"</span>) <span class="sc">+</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The chart shows that 90% of the accidents occurred during “clear” weather. Online sources suggest that Bangkok experieces a long rainy season and has <a href="https://weatherandclimate.com/thailand/bangkok">153 rainy days per year</a>, so 10% for the occurrence of accidents appears low. The sources also say that the wettest month is September.</p>
+<p>We can use the code chunk below to plot the number of accidents that were not recorded on clear weather (i.e., rainy) by month.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">filter</span>(bmracc, <span class="sc">!</span>weather_condition <span class="sc">==</span> <span class="st">"clear"</span>), <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Month, <span class="fu">table</span>(Month)[Month]))) <span class="sc">+</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Accidents by Month during Non-clear Weather"</span>) <span class="sc">+</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">hjust=</span><span class="sc">-</span><span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot does align with the expectation that September is the wettest month. The very low number of accidents during rainy weather is still questionable though so we will watch out for this if we will use this variable later.</p>
+</section>
+</section>
+</section>
+<section id="d.-non-network-constrained-visualization" class="level1">
+<h1>D. Non-Network-Constrained Visualization</h1>
+<p>While we know that road accidents will only happen along the network / roads, we can still use regular spatial point pattern analysis to get some insights. We will limit this to the highest level as we just want to have some high level insights and want to spend more time working with the network constrained analysis.</p>
+<p>We will also limit this to visualizing the KDE as we know that testing for CSR without considering the constraint of the network is inappropriate for our case.</p>
+<section id="d.1.-converting-objects-into-spatstats-formats" class="level2">
+<h2 class="anchored" data-anchor-id="d.1.-converting-objects-into-spatstats-formats">D.1. Converting Objects into spatstat’s formats</h2>
+<p>The events need to be converted into spatstat’s ppp object using <code>as.ppp()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>bmracc_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_geometry</span>(bmracc_jitt))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then prepare an owin object to define the boundaries using the <code>as.owin()</code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>bmr_owin <span class="ot">&lt;-</span> <span class="fu">as.owin</span>(bmr_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="d.2-kde-for-all-accidents" class="level2">
+<h2 class="anchored" data-anchor-id="d.2-kde-for-all-accidents">D.2 KDE for all Accidents</h2>
+<p>We first combine the accidents (all years, all types) into the owin using the following code chunk</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>bmracc_for_kde <span class="ot">=</span> bmracc_ppp[bmr_owin]</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>bmracc_for_kde <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(bmracc_for_kde, <span class="dv">1000</span>, <span class="st">"km"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then compute for the kde using the <code>density()</code> function. We use the four common methods for automatic bandwidth selection and examine them in a grid using the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span>bw.diggle,</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="st">"KDE using Diggle Method"</span>)</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span><span class="fu">bw.scott</span>(<span class="at">X =</span> bmracc_for_kde),</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="st">"KDE using Scott's Rule"</span>)</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span><span class="fu">bw.CvL</span>(<span class="at">X =</span> bmracc_for_kde),</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="st">"KDE using Cronie &amp; Van Lieshout Criterion"</span>)</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span><span class="fu">bw.ppl</span>(<span class="at">X =</span> bmracc_for_kde),</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="st">"KDE using Likelihood Cross Validation"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Among the four methods, it looks like Scott’s rule (using <code>sigma=bw.scott()</code>) is identifying hot spots unlike the others. There is a hotspot in the southwest and southeast of Bangkok. There also appears to be a high density strip (or maybe a major highway) stretching up northwards.</p>
+<p>We will use this bandwidth selection method for our succeeding analysis.</p>
+<section id="d.3-kde-for-accidents-across-years" class="level3">
+<h3 class="anchored" data-anchor-id="d.3-kde-for-accidents-across-years">D.3 KDE for accidents across years</h3>
+<p>We then want to see if the hotspots move across the years. To do this, we effectively need to compute for the kde across years and see if there are any visible signs of shifts in the hotspots.</p>
+<p>First, let us try to understand the distribution of accidents by year. This will help us understand if the numberical values of the density will move because of change in the absolute number of accidents.</p>
+<p>We use <code>ggplot()</code> in the code chunk below to achieve this.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bmracc, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Year, <span class="fu">table</span>(Year)[Year]))) <span class="sc">+</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Accidents by Year"</span>) <span class="sc">+</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">vjust =</span> <span class="sc">+</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb56-13"><a href="#cb56-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb56-14"><a href="#cb56-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb56-15"><a href="#cb56-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The chart shows that there were significantly more accidents in 2022 compared to the previous years. The other years are within 10% of each other. We should expect that 2022 KDE may have higher numerical values compared to the other years.</p>
+<p>We can then use the following code to generate four different kde’s, one for each year.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">2019</span>, <span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2022</span>)) {</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  bmracc_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_geometry</span>(<span class="fu">filter</span>(bmracc_jitt, Year <span class="sc">==</span> i)))</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  bmracc_for_kde <span class="ot">=</span> bmracc_ppp[bmr_owin]</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  bmracc_for_kde <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(bmracc_for_kde, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span><span class="fu">bw.scott</span>(<span class="at">X =</span> bmracc_for_kde),</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">"KDE for year"</span>,i))</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We see that there appears to be a shift between 2020 and 2021. Before 2020, there appeared to be two separate promininet hotspots for accidents– in the central and southeastern portion of the region. However, after 2020, it seems that the accidents are more frequent in the southeastern part, and in a much wider area.</p>
+</section>
+</section>
+<section id="d.3-kde-across-months" class="level2">
+<h2 class="anchored" data-anchor-id="d.3-kde-across-months">D.3 KDE across Months</h2>
+<p>We can apply a similar approach of analysing by month using the code chunk below. For now, we are aggregating accidents by month across all years, so the insights will apply to the whole period and not any particular year.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">3</span>,<span class="dv">4</span>))</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>) {</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  bmracc_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_geometry</span>(<span class="fu">filter</span>(bmracc_jitt, MonthNum <span class="sc">==</span> i)))</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  bmracc_for_kde <span class="ot">=</span> bmracc_ppp[bmr_owin]</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  bmracc_for_kde <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(bmracc_for_kde, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span><span class="fu">bw.scott</span>(<span class="at">X =</span> bmracc_for_kde),</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">"KDE for month"</span>,i))</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The output reveals no drastic shift in hotspots (using kde) across months. There are months where the intensities and relative intensities differ, but it appears like the hotspots remain in the same areas.</p>
+</section>
+<section id="d.4-kde-for-clear-vs-rainy-days" class="level2">
+<h2 class="anchored" data-anchor-id="d.4-kde-for-clear-vs-rainy-days">D.4 KDE for Clear vs “Rainy” Days</h2>
+<p>The final analysis we want to perform before moving to network-constrained analysis is on clear vs non-clear days. This is indicated in the field called <code>weather_condition</code> in the accident dataset.</p>
+<p>To produce the kde visualization, we can use the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>bmracc_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_geometry</span>(<span class="fu">filter</span>(bmracc_jitt, weather_condition <span class="sc">==</span> <span class="st">"clear"</span>)))</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>bmracc_for_kde <span class="ot">=</span> bmracc_ppp[bmr_owin]</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>bmracc_for_kde <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(bmracc_for_kde, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span><span class="fu">bw.scott</span>(<span class="at">X =</span> bmracc_for_kde),</span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="st">"KDE for Clear Days"</span>)</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>bmracc_ppp <span class="ot">&lt;-</span> <span class="fu">as.ppp</span>(<span class="fu">st_geometry</span>(<span class="fu">filter</span>(bmracc_jitt, <span class="sc">!</span>(weather_condition <span class="sc">==</span> <span class="st">"clear"</span>))))</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>bmracc_for_kde <span class="ot">=</span> bmracc_ppp[bmr_owin]</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>bmracc_for_kde <span class="ot">&lt;-</span> <span class="fu">rescale.ppp</span>(bmracc_for_kde, <span class="dv">1000</span>, <span class="st">"km"</span>)</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(bmracc_for_kde, <span class="at">sigma=</span><span class="fu">bw.scott</span>(<span class="at">X =</span> bmracc_for_kde),</span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">edge=</span><span class="cn">TRUE</span>,<span class="at">kernel=</span><span class="st">"gaussian"</span>), <span class="at">main =</span> <span class="st">"KDE for Rainy Days"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The output are very similar too some of the charts generated earlier. The hotspot in the center of BMR appears to dissipate during rainy days. (relative to the one in the southeast portion of the region.</p>
+</section>
+</section>
+<section id="e.-network-constrained-visualizations-and-analyses" class="level1">
+<h1>E. Network Constrained Visualizations and Analyses</h1>
+<p>In this section, we visualize the locations of accidents using different dimensions, especially based on time, and recognizing the constraint of the network for our particular problem. As such, we will be performing network-constrained methods from this point.</p>
+<section id="e.1-preparation-of-data-for-network-constrained-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="e.1-preparation-of-data-for-network-constrained-analysis">E.1 Preparation of Data for Network Constrained Analysis</h2>
+<p>Before we are able to perform network-constrained NKDE, we first need to define sample points along the road network, and to do that, we can use the midpoint of the lixels of the network.</p>
+<section id="e.1.1-preparing-the-lixels" class="level3">
+<h3 class="anchored" data-anchor-id="e.1.1-preparing-the-lixels">E.1.1 Preparing the lixels</h3>
+<p>To lixelize a network, the minimum and (maximum) length of lixels need to be defined. A logical distance needs to be chosen for a given study. In our case, we might no have enough information to understand what road segment length is relevant to group accidents into. However, we can start with understanding the road lengths in the network.</p>
+<p>We can use the code block below to show the distribution of the road length values using <code>summary()</code> to give the quartiles, and <code>quantile()</code> to give a wider range of view.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">st_length</span>(bmr_network))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+    0.143    31.581   124.691   413.002   433.312 24745.584 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(<span class="fu">st_length</span>(bmr_network), <span class="at">probs =</span> <span class="fu">seq</span>(.<span class="dv">1</span>, .<span class="dv">9</span>, <span class="at">by =</span> .<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Units: [m]
+       10%        20%        30%        40%        50%        60%        70% 
+  13.78247   24.36581   41.45909   71.64269  124.69070  207.11305  337.56988 
+       80%        90% 
+ 556.85935 1074.26696 </code></pre>
+</div>
+</div>
+<p>The output shows that there is a very wide range of values. There is also a surprisingly large number of roads (&gt;40%) that are less than 100m– which seem to be too short for typical roads. We can first choose a min distance of 200m which would allow for at least 40% of roads to not be split. As for the maximum length, let us first set it to 600m so only a little over 20% of the roads will be split into smaller segments.</p>
+<p>We implement this using <code>lixelize_lines()</code> in the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>lixels <span class="ot">&lt;-</span> <span class="fu">lixelize_lines</span>(bmr_network<span class="sc">$</span>geometry, </span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>                         <span class="dv">600</span>, </span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">mindist =</span> <span class="dv">200</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="e.1.2-generating-sample-points" class="level3">
+<h3 class="anchored" data-anchor-id="e.1.2-generating-sample-points">E.1.2 Generating sample points</h3>
+<p>The next step is to define sample points along the network which will be the points where the KDE function will be computed on.</p>
+<p>We can create sample points on the lixel centers using <code>lines_center()</code> in the code below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">lines_center</span>(lixels) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="e.2-all-years-all-accidents-initial-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="e.2-all-years-all-accidents-initial-analysis">E.2 All Years, All Accidents, Initial Analysis</h2>
+<p>Let’s start by looking at the highest levels. We can compute for the nkde for all accidents in the dataset (2019-2022) using the code chunk below. This uses the accidents with the jitter applied.This code uses a bandwidth of 300m, anduses “quartic” for the kernel function, and uses simple calculation method for the KDE</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>densities <span class="ot">&lt;-</span> <span class="fu">nkde</span>(bmr_network, </span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">events =</span> bmracc_jitt,</span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">w =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(bmracc_jitt)),</span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">samples =</span> samples,</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel_name =</span> <span class="st">"quartic"</span>,</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw =</span> <span class="dv">300</span>, </span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">div=</span> <span class="st">"bw"</span>, </span>
+<span id="cb66-8"><a href="#cb66-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"simple"</span>, </span>
+<span id="cb66-9"><a href="#cb66-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">digits =</span> <span class="dv">1</span>, </span>
+<span id="cb66-10"><a href="#cb66-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tol =</span> <span class="dv">1</span>,</span>
+<span id="cb66-11"><a href="#cb66-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">grid_shape =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">10</span>), </span>
+<span id="cb66-12"><a href="#cb66-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">max_depth =</span> <span class="dv">8</span>,</span>
+<span id="cb66-13"><a href="#cb66-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">agg =</span> <span class="dv">5</span>, </span>
+<span id="cb66-14"><a href="#cb66-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sparse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb66-15"><a href="#cb66-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We import the densities into the lixel and sample object using the code below. We use a multiple of 1000 to convert the figures from accidents per square meter to accidents per square kilometer</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>samples<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>lixels<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We use the code below to produce a map with just the calculated densities.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lixels)<span class="sc">+</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The resulting map surprisingly does not show a lot of high density road segments, which is not aligned to the earlier map with the locations of the accidents. We can check if the jitter has caused displacement of the locations and hidden high density road segments by rerunning the below code chunk which uses the accident locations without jitter applied.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>densities <span class="ot">&lt;-</span> <span class="fu">nkde</span>(bmr_network, </span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">events =</span> bmracc,</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">w =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(bmracc)),</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">samples =</span> samples,</span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel_name =</span> <span class="st">"quartic"</span>,</span>
+<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw =</span> <span class="dv">300</span>, </span>
+<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">div=</span> <span class="st">"bw"</span>, </span>
+<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"simple"</span>, </span>
+<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">digits =</span> <span class="dv">1</span>, </span>
+<span id="cb69-10"><a href="#cb69-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tol =</span> <span class="dv">1</span>,</span>
+<span id="cb69-11"><a href="#cb69-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">grid_shape =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">10</span>), </span>
+<span id="cb69-12"><a href="#cb69-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">max_depth =</span> <span class="dv">8</span>,</span>
+<span id="cb69-13"><a href="#cb69-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">agg =</span> <span class="dv">5</span>, </span>
+<span id="cb69-14"><a href="#cb69-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sparse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb69-15"><a href="#cb69-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To see if using the original event points will address our concern, we repeat the code chunk below to create a static map.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>samples<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>lixels<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lixels)<span class="sc">+</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-64-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>It looks like the use of the original accident data does little to reveal dense locations. If we examine the interactive map and zoom in, we see one possible reason for the problem. Major roads are being split into multiple semi-parallel roads. These might denote different directions on the same highway, service roads, etc. These might cause accidents on the same “parent” road to be split across their parts.</p>
+<p>We try to solve this problem by recreating our network while merging such roads into one.</p>
+</section>
+<section id="e.3-transformation-step---merging-of-parallel-roads" class="level2">
+<h2 class="anchored" data-anchor-id="e.3-transformation-step---merging-of-parallel-roads">E.3 Transformation step - merging of parallel roads</h2>
+<p>One way to merge the roads, is to first use <code>st_buffer()</code> to create a width dimension on the roads. We would prefer to use the actual width of the roads, plus the islands here, but there is no way to do this accurately and this would vary from road to road. (e.g., some roads could have one lane, while others could have four or more lanes) For our case, we will use a width of 2 x 15m, which is based on a ~3m lane width estimate, which means we are buffering up to the width of five lanes or five cars on each side.</p>
+<p>We use the code chunk below to produce a buffered network.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>bmr_network_buffered <span class="ot">&lt;-</span> <span class="fu">st_buffer</span>(bmr_network, <span class="at">dist =</span> <span class="dv">15</span>)</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>bmr_network_dissolved <span class="ot">&lt;-</span> <span class="fu">st_union</span>(bmr_network_buffered)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The next step is to convert or cast this into a linestring object, but before that we would want to make sure that the geometries are simple enough so the casting is executed properly. To do this, we fist use <code>st_simplify()</code> which simplifies objects by reducing vertices.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>bmr_network_simplified <span class="ot">&lt;-</span> <span class="fu">st_simplify</span>(bmr_network_dissolved, <span class="at">dTolerance =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With the network simplified, we can then use <code>st_cast()</code> to convert the geometries back into linestrings. Note that we use two calls since we cannot cast polygons directly into linestrings.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>bmr_network_v2 <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(bmr_network_simplified, <span class="st">"MULTILINESTRING"</span>)</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>bmr_network_v2 <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(bmr_network_v2, <span class="st">"LINESTRING"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that the resulting object was a list rather than a dataframe, we can use st_as_sf() to ensure that it is in an sf dataframe format.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>bmr_network_v2 <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(bmr_network_v2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can examine the original and new network side by side using <code>tmap_arrange()</code> in the code below to see that the new network has worked sufficiently.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>orig_network <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bmr_full) <span class="sc">+</span></span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmr_network) <span class="sc">+</span></span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Original Road Network"</span>)</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>new_network <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(bmr_full) <span class="sc">+</span></span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"lightgrey"</span>) <span class="sc">+</span></span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmr_network_v2) <span class="sc">+</span></span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Simplified Road Network"</span>)</span>
+<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(orig_network, new_network, <span class="at">asp=</span><span class="dv">1</span>, <span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-71-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The transformation seems to have worked, and we see by counting the objects using length() st_geometry() in the code below, that the number of roads has been reduced dramatically from 34K to 4.2K– even with the very similar high level map.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">st_geometry</span>(bmr_network))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 34056</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">st_geometry</span>(bmr_network_v2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4162</code></pre>
+</div>
+</div>
+<p>Let us examine the road lengths in the updated network using <code>summary()</code> and <code>quantile()</code> in the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">st_length</span>(bmr_network_v2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+      4.0     326.1    1935.9    4529.2    5826.1 1263640.1 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(<span class="fu">st_length</span>(bmr_network_v2), <span class="at">probs =</span> <span class="fu">seq</span>(.<span class="dv">1</span>, .<span class="dv">9</span>, <span class="at">by =</span> .<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Units: [m]
+       10%        20%        30%        40%        50%        60%        70% 
+  111.8646   236.2789   474.0794  1023.5185  1935.9245  3231.7745  4846.3553 
+       80%        90% 
+ 7074.5520 10733.3337 </code></pre>
+</div>
+</div>
+<p>The simplified network now has longer road segments with the median being close to 2km in length.</p>
+<p>We can then repeat the preparation of data from the creation of the lixels to the creation of the sample points. we will use exactly a similar code using <code>lixelize_lines()</code> as in the earlier sections. Given the distribution of the lengths, we decide to use longer lixel lengths with this new network. We choose 1km and 2km for the parameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>lixels_v2 <span class="ot">&lt;-</span> <span class="fu">lixelize_lines</span>(<span class="fu">st_geometry</span>(bmr_network_v2), </span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>                         <span class="dv">2000</span>, </span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">mindist =</span> <span class="dv">1000</span>)</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>samples_v2 <span class="ot">&lt;-</span> <span class="fu">lines_center</span>(lixels_v2) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Before we move, let us remove the intermediate objects from memory using <code>rm()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(bmr_network_buffered)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in rm(bmr_network_buffered): object 'bmr_network_buffered' not found</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(bmr_network_dissolved)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in rm(bmr_network_dissolved): object 'bmr_network_dissolved' not found</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(bmr_network_simplified)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in rm(bmr_network_simplified): object 'bmr_network_simplified' not
+found</code></pre>
+</div>
+</div>
+</section>
+<section id="e.4-all-years-all-accidents-initial-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="e.4-all-years-all-accidents-initial-analysis">E.4 All Years, All Accidents, Initial Analysis</h2>
+<p>We now rerun the highest level KDE with the updated network to see if we are getting more insightful output.</p>
+<p>We rerun <code>nkde()</code> to compute the network constrained KDE on the new network and using the new sample points.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>densities <span class="ot">&lt;-</span> <span class="fu">nkde</span>(bmr_network_v2, </span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">events =</span> bmracc,</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">w =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(bmracc)),</span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">samples =</span> samples_v2,</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel_name =</span> <span class="st">"quartic"</span>,</span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw =</span> <span class="dv">500</span>, </span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">div=</span> <span class="st">"bw"</span>, </span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"simple"</span>, </span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">digits =</span> <span class="dv">1</span>, </span>
+<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tol =</span> <span class="dv">1</span>,</span>
+<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">grid_shape =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">10</span>), </span>
+<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">max_depth =</span> <span class="dv">2</span>,</span>
+<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">agg =</span> <span class="dv">5</span>, </span>
+<span id="cb91-14"><a href="#cb91-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sparse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We again transfer these densities into the lixels and sample dataframes using the code chunk below</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>samples_v2<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>lixels_v2<span class="sc">$</span>density_all <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, we can create a static map to show the computed KDEs visually using <strong>tmap</strong> package in the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lixels_v2)<span class="sc">+</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_all"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-80-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>WIP</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

@@ -781,6 +781,7 @@ samples <- lines_center(lixels)
 Let's start by looking at the highest levels. We can compute for the nkde for all accidents in the dataset (2019-2022) using the code chunk below. This uses the accidents with the jitter applied.This code uses a bandwidth of 300m, anduses "quartic" for the kernel function, and uses simple calculation method for the KDE
 
 ```{r}
+#| eval: false
 densities <- nkde(bmr_network, 
                   events = bmracc_jitt,
                   w = rep(1, nrow(bmracc_jitt)),
@@ -798,6 +799,17 @@ densities <- nkde(bmr_network,
                   verbose = FALSE)
 ```
 
+```{r}
+#| eval: false
+#| echo: false
+write_rds(densities, "data/rds/densities.rds")
+```
+
+```{r}
+#| echo: false
+densities = read_rds("data/rds/densities.rds")
+```
+
 We import the densities into the lixel and sample object using the code below. We use a multiple of 1000 to convert the figures from accidents per square meter to accidents per square kilometer
 
 ```{r}
@@ -805,13 +817,11 @@ samples$density_all <- densities*1000000
 lixels$density_all <- densities*1000000
 ```
 
-We use the code below to produce an interactive map with just the calculated densities.
+We use the code below to produce a map with just the calculated densities.
 
 ```{r}
-tmap_mode("view")
 tm_shape(lixels)+
   tm_lines(col="density_all")
-tmap_mode("plot")
 ```
 
 The resulting map surprisingly does not show a lot of high density road segments, which is not aligned to the earlier map with the locations of the accidents. We can check if the jitter has caused displacement of the locations and hidden high density road segments by rerunning the below code chunk which uses the accident locations without jitter applied.
@@ -834,16 +844,25 @@ densities <- nkde(bmr_network,
                   verbose = FALSE)
 ```
 
-To see if using the original event points will address our concern, we repeat the code chunk below to recreate the interactive map.
+```{r}
+#| eval: false
+#| echo: false
+write_rds(densities, "data/rds/densities_nojitt.rds")
+```
+
+```{r}
+#| echo: false
+densities = read_rds("data/rds/densities_nojitt.rds")
+```
+
+To see if using the original event points will address our concern, we repeat the code chunk below to create a static map.
 
 ```{r}
 samples$density_all <- densities*1000000
 lixels$density_all <- densities*1000000
 
-tmap_mode("view")
 tm_shape(lixels)+
   tm_lines(col="density_all")
-tmap_mode("plot")
 ```
 
 It looks like the use of the original accident data does little to reveal dense locations. If we examine the interactive map and zoom in, we see one possible reason for the problem. Major roads are being split into multiple semi-parallel roads. These might denote different directions on the same highway, service roads, etc. These might cause accidents on the same "parent" road to be split across their parts.
@@ -857,6 +876,7 @@ One way to merge the roads, is to first use `st_buffer()` to create a width dime
 We use the code chunk below to produce a buffered network.
 
 ```{r}
+#| eval: false
 bmr_network_buffered <- st_buffer(bmr_network, dist = 15)
 bmr_network_dissolved <- st_union(bmr_network_buffered)
 ```
@@ -864,12 +884,14 @@ bmr_network_dissolved <- st_union(bmr_network_buffered)
 The next step is to convert or cast this into a linestring object, but before that we would want to make sure that the geometries are simple enough so the casting is executed properly. To do this, we fist use `st_simplify()` which simplifies objects by reducing vertices.
 
 ```{r}
+#| eval: false
 bmr_network_simplified <- st_simplify(bmr_network_dissolved, dTolerance = 1)
 ```
 
 With the network simplified, we can then use `st_cast()` to convert the geometries back into linestrings. Note that we use two calls since we cannot cast polygons directly into linestrings.
 
 ```{r}
+#| eval: false
 bmr_network_v2 <- st_cast(bmr_network_simplified, "MULTILINESTRING")
 bmr_network_v2 <- st_cast(bmr_network_v2, "LINESTRING")
 ```
@@ -877,7 +899,19 @@ bmr_network_v2 <- st_cast(bmr_network_v2, "LINESTRING")
 Note that the resulting object was a list rather than a dataframe, we can use st_as_sf() to ensure that it is in an sf dataframe format.
 
 ```{r}
+#| eval: false
 bmr_network_v2 <- st_as_sf(bmr_network_v2)
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(bmr_network_v2, "data/rds/bmr_network_v2.rds")
+```
+
+```{r}
+#| echo: false
+bmr_network_v2 = read_rds("data/rds/bmr_network_v2.rds")
 ```
 
 We can examine the original and new network side by side using `tmap_arrange()` in the code below to see that the new network has worked sufficiently.
@@ -940,6 +974,7 @@ We now rerun the highest level KDE with the updated network to see if we are get
 We rerun `nkde()` to compute the network constrained KDE on the new network and using the new sample points.
 
 ```{r}
+#| eval: false
 densities <- nkde(bmr_network_v2, 
                   events = bmracc,
                   w = rep(1, nrow(bmracc)),
@@ -957,6 +992,17 @@ densities <- nkde(bmr_network_v2,
                   verbose = FALSE)
 ```
 
+```{r}
+#| eval: false
+#| echo: false
+write_rds(densities, "data/rds/densities_v2.rds")
+```
+
+```{r}
+#| echo: false
+densities = read_rds("data/rds/densities_v2.rds")
+```
+
 We again transfer these densities into the lixels and sample dataframes using the code chunk below
 
 ```{r}
@@ -964,13 +1010,11 @@ samples_v2$density_all <- densities*1000000
 lixels_v2$density_all <- densities*1000000
 ```
 
-Next, we can create an interactive map to show the computed KDEs visually using **tmap** package in the code chunk below.
+Next, we can create a static map to show the computed KDEs visually using **tmap** package in the code chunk below.
 
 ```{r}
-tmap_mode("view")
 tm_shape(lixels_v2)+
   tm_lines(col="density_all")
-tmap_mode("plot")
 ```
 
 WIP
