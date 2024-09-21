@@ -41,7 +41,7 @@ The appropriate technique must be used for these deliverables and all the analys
 The study makes use of the following datasets which are publicly available online.
 
 | Dataset Short Name | Description                                               | Datasource                                                                              |
-|--------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------|
+|------------------|----------------------|--------------------------------|
 | THRA               | Thailand road accident data from 2019 to 2022             | [Kaggle](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) |
 | THOSM              | Thailand roads open street map in shapefile format        | [HDX](https://data.humdata.org/dataset/hotosm_tha_roads)                                |
 | THSAB              | Thailand - Subnational Administrative Boudaries shapefile | [HDX](https://data.humdata.org/dataset/cod-ab-tha?)                                     |
@@ -1187,3 +1187,132 @@ kfun_bmracc$plotk
 ```
 
 The envelop depicts a 95% confidence level CSR interval for each function. Both functions do not support th hypothesis of CSR except for very short intervals. (where the blue lines fall within the envelope) The K-function supports the view on clustering from a distance of around 300m-1.9km, while the G-function supports this from around 250-650m. The G-function supports a view on regular distribution beyond 750m. While these differ in the details, both tests do not support CSR for the distribution of accidents in 2022.
+
+## E.5 Distribution of Accidents by Month
+
+We can then look into the distribution of accidents across months. Seasonal events including holidays, climate, etc can be linked to the months, so it is good to see if there are months that deviate from most of the others.
+
+To do this, we need to generate the nkde for each month similar to the approach for the yearly analysis.
+
+```{r}
+#| eval: false
+for (i in 1:12) {
+   densities <- nkde(bmr_network_v2, 
+                  events = filter(bmracc, MonthNum == i),
+                  w = rep(1, nrow(filter(bmracc, MonthNum == i))),
+                  samples = samples_v2,
+                  kernel_name = "quartic",
+                  bw = 500, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(10,10), 
+                  max_depth = 2,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+   if (i > 9){
+     lixels_v2[[paste("density_M",as.character(i),sep="")]] <- densities * 100000
+     samples_v2[[paste("density_M",as.character(i),sep="")]] <- densities * 100000
+   }
+   else{
+     lixels_v2[[paste("density_M0",as.character(i),sep="")]] <- densities * 100000
+     samples_v2[[paste("density_M0",as.character(i),sep="")]] <- densities * 100000
+   }
+  
+  }
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(lixels_v2, "data/rds/lixels_with_months.rds")
+write_rds(samples_v2, "data/rds/samples_with_months.rds")
+```
+
+```{r}
+#| echo: false
+lixels_v2 <- read_rds("data/rds/lixels_with_months.rds")
+samples_v2 <- read_rds("data/rds/samples_with_months.rds")
+```
+
+We can then use the code block below to generate the map of the different months using tmap package.
+
+```{r}
+columns_to_map <- c("density_M01", "density_M02", "density_M03",
+                    "density_M04","density_M05","density_M06",
+                    "density_M07", "density_M08", "density_M09",
+                    "density_M10","density_M11","density_M12")
+monthly = list()
+for (col in columns_to_map)
+{
+  monthly[[col]] <- tm_shape(bmr_boundary)+
+  tm_polygons(col = "lightblue", border.col = "black", lwd = 0.5)+
+  tm_shape(lixels_v2)+
+  tm_lines(col=col, palette = "-inferno", lwd = 1, title.col = "Per sq km") +
+  tm_shape(lixels_v2[lixels_v2[[col]] == 0, ]) +
+  tm_lines(col="grey", lwd = 2) +
+  tm_layout(title = paste("Month -",substr(col,10,11)),
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
+}
+```
+
+To be able to view the maps clearly, we display them individually in the tabs below.
+
+::: panel-tabset
+#### January
+```{r}
+monthly[[1]]
+```
+#### February
+```{r}
+monthly[[2]]
+```
+#### March
+```{r}
+monthly[[3]]
+```
+#### April
+```{r}
+monthly[[4]]
+```
+#### May
+```{r}
+monthly[[5]]
+```
+#### June
+```{r}
+monthly[[6]]
+```
+#### July
+```{r}
+monthly[[7]]
+```
+#### August
+```{r}
+monthly[[8]]
+```
+#### September
+```{r}
+monthly[[9]]
+```
+#### October
+```{r}
+monthly[[10]]
+```
+#### November
+```{r}
+monthly[[11]]
+```
+#### December
+```{r}
+monthly[[12]]
+```
+
+:::
+
+The output shows no clear shift across months on the location of hotspots..
