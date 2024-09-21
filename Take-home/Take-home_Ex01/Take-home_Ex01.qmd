@@ -1265,54 +1265,260 @@ To be able to view the maps clearly, we display them individually in the tabs be
 
 ::: panel-tabset
 #### January
+
 ```{r}
 monthly[[1]]
 ```
+
 #### February
+
 ```{r}
 monthly[[2]]
 ```
+
 #### March
+
 ```{r}
 monthly[[3]]
 ```
+
 #### April
+
 ```{r}
 monthly[[4]]
 ```
+
 #### May
+
 ```{r}
 monthly[[5]]
 ```
+
 #### June
+
 ```{r}
 monthly[[6]]
 ```
+
 #### July
+
 ```{r}
 monthly[[7]]
 ```
+
 #### August
+
 ```{r}
 monthly[[8]]
 ```
+
 #### September
+
 ```{r}
 monthly[[9]]
 ```
+
 #### October
+
 ```{r}
 monthly[[10]]
 ```
+
 #### November
+
 ```{r}
 monthly[[11]]
 ```
+
 #### December
+
 ```{r}
 monthly[[12]]
 ```
-
 :::
 
-The output shows no clear shift across months on the location of hotspots..
+The output shows a few hotspots arising on specific months. We mention the ones where there are highly dense segments outside Bangkok:
+
+-   Pathum Thani - January, March, June
+
+-   Samut Sakhon - January
+
+## E.6 Fatal Accidents
+
+As mentioned in the earlier section, only a small 6% or 719 of the total number of accidents were fatal. While small, this is still a large number for the affected families. We expect that such accidents would have also caused more disruption compared to most of the non-fatal ones.
+
+### E.6.1 Fatal Accidents by Year and by Province, Non-Network Constrained
+
+If we look at the distribution of these accidents across years using the chart below, the annual number has ranged from 153-203, and 2020 and 2021 had 33% more accidents than the other years.
+
+```{r}
+ggplot(filter(bmracc, number_of_fatalities > 0), aes(x = reorder(Year, table(Year)[Year]))) +
+  geom_bar() +
+  ggtitle("Number of Fatal Accidents by Year") +
+  theme_minimal() +
+  geom_text(stat='count', aes(label=..count..), vjust = +2) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title.x = element_text(size = 15),
+    axis.title.y = element_text(size = 12),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(size = 12),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  labs(x = "", y = "")
+```
+
+We can then visualize the location of these using the tmap package. The code below displays a map of the location of the fatal accidents in BMR between 2019 and 2022.
+
+```{r}
+tm_shape(bmr_boundary)+
+  tm_polygons(col = "ADM1_EN", palette = "Blues", border.col = "black", lwd = 0.5, title = "Province")+
+  tm_shape(bmr_network_v2)+
+  tm_lines(col="grey", lwd = 2) +
+  tm_shape(filter(bmracc, number_of_fatalities > 0)) +
+  tm_dots(col="red", size = 0.1) +
+  tm_layout(title = "BMR Fatal Road Accident Density - 2019-2022",
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
+```
+
+It looks like fatal accidents are more frequent outside Bangkok. With the exception of Nakhon Pathom, it looks like there is a larger number of accidents, in number and in density, happening in the four other provinces.
+
+It is hard to judge whether or not there are more accidents in a province using the graph above because of the presence of close or overlapping dots. One approach is to use the functions from sf package to count the accidents or events that fall within each province and then also compute for a density by computing the areas of each province.
+
+We first compute for the number of fatal accidents that occur in each province by using `st_intersects()` function from sf package. We produce this for the total number of accidents and the accidents for each year by using the code chunk below. We create a copy of the bmr_boundary object to store these values.
+
+```{r}
+bmr_with_fatacc <- bmr_boundary %>%
+  mutate('FatAcc19-22' = lengths(st_intersects(bmr_boundary,filter(bmracc, number_of_fatalities > 0)))) %>%
+  mutate('FatAcc19' = lengths(st_intersects(bmr_boundary,filter(bmracc, (number_of_fatalities > 0) & (Year == 2019) )))) %>%
+  mutate('FatAcc20' = lengths(st_intersects(bmr_boundary,filter(bmracc, (number_of_fatalities > 0) & (Year == 2020) )))) %>%
+  mutate('FatAcc21' = lengths(st_intersects(bmr_boundary,filter(bmracc, (number_of_fatalities > 0) & (Year == 2021) )))) %>%
+  mutate('FatAcc22' = lengths(st_intersects(bmr_boundary,filter(bmracc, (number_of_fatalities > 0) & (Year == 2022) ))))
+  
+```
+
+We then compute for the area of each province using st_area() in the code chunk below.
+
+```{r}
+bmr_with_fatacc$Area <- st_area(bmr_with_fatacc)
+```
+
+Finally, we can compute for the density of accidents in each province by taking the ration of the last two measures we computed. Note that we are multiplying each by 1 million to convert the units from per meter to per square kilometer.
+
+```{r}
+bmr_with_fatacc$FatDensAll <- bmr_with_fatacc$`FatAcc19-22` / bmr_with_fatacc$Area * 1000000
+bmr_with_fatacc$FatDens19 <- bmr_with_fatacc$`FatAcc19` / bmr_with_fatacc$Area * 1000000
+bmr_with_fatacc$FatDens20 <- bmr_with_fatacc$`FatAcc20` / bmr_with_fatacc$Area * 1000000
+bmr_with_fatacc$FatDens21 <- bmr_with_fatacc$`FatAcc21` / bmr_with_fatacc$Area * 1000000
+bmr_with_fatacc$FatDens22 <- bmr_with_fatacc$`FatAcc22` / bmr_with_fatacc$Area * 1000000
+```
+
+We can now compare the occurence of fatal accidents across provinces visually. First, we can produce a choropleth map for the number of accidents and the density of accidents side by side using the code below. This is done by passing a list of arguments for the different tmap elements. In the code below, we use this on the color of the polygons, the label and the chart title.
+
+```{r}
+tm_shape(bmr_with_fatacc)+
+  tm_polygons(col = c('FatAcc19-22', 'FatDensAll'), style = "equal", palette = "Blues", border.col = "black", lwd = 0.5, title = c("Number", "Per Sq Km"))+
+  tm_shape(filter(bmracc, number_of_fatalities > 0)) +
+  tm_dots(col="red", size = 0.1) +
+  tm_layout(title = c("Fatal Road Accidents 19-22","Fatal Road Accidents Density"),
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
+```
+
+The plot shows that Pathum Thani in the northeast and Samut Prakan in the southeast have the highest number of accidents. However, if we normalize by the area, Nonthaburi in the center and Samut Prakan, still, have the highest density of fatal accidents.
+
+We can use the same approach to look at the density across the different years.
+
+```{r}
+tm_shape(bmr_with_fatacc)+
+  tm_polygons(col = c('FatDens19', 'FatDens20', 'FatDens21', 'FatDens22'), style = "equal", palette = "Blues", border.col = "black", lwd = 0.5, title = "Per Sq Km")+
+  tm_shape(filter(bmracc, number_of_fatalities > 0)) +
+  tm_dots(col="red", size = 0.1) +
+  tm_layout(title = c("2019 Fatal Accidents","2020 Fatal Accidents","2021 Fatal Accidents","2022 Fatal Accidents"),
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
+```
+
+At a province-level, Nonthaburi has been consistently the most dense with regards to fatal road accidents. In the meantime, Samut Prakan appears to have increased its density and risen in rank between 2020 and 2021.
+
+We will not attempt to perform kde on this set of accidents and go straight to an nkde which considers the road network.'
+
+### E.6.2 Fatal Accidents, Network Constrained
+
+The final analyses we will perform is on the distribution of the fatal accidents along the road network. For this, we will also focus only on one year– 2022, as we recognize a shift in the hotspots over the years, at least across provinces
+
+To facilitate the analysis, we create a subset of the accident dataset to only consider fatal accidents and the latest year.
+
+```{r}
+bmr_fatacc_2022 <- filter(bmracc, (number_of_fatalities > 0) & (Year == 2022) )
+```
+
+```{r}
+bmr_fatacc_2022
+```
+
+There are 159 fatal accidents in the BMR in 2022, and in the new dataset– consistent with the summary in the previous section.
+
+We then use the following code chunk to compute for the network-constrained KDE of the 2022 fatal accidents in our network. Note that in the code, we create a duplicate lixels and samples object to keep the original one unchanged. We take this opportunity to widen the computation range by increasing the bandwidth or `bw` parameter and the `max_depth` parameter.
+
+```{r}
+#| eval: false
+samples_22 <- samples_v2
+lixels_22 <- lixels_v2
+
+densities <- nkde(bmr_network_v2, 
+                  events = bmr_fatacc_2022,
+                  w = rep(1, nrow(bmr_fatacc_2022)),
+                  samples = samples_22,
+                  kernel_name = "quartic",
+                  bw = 10000, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(10,10), 
+                  max_depth = 20,
+                  agg = 5, 
+                  sparse = TRUE,
+                  verbose = FALSE)
+
+samples_22$density_22 <- densities*1000000
+lixels_22$density_22 <- densities*1000000
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(samples_22, "data/rds/samples_22.rds")
+write_rds(lixels_22, "data/rds/lixels_22.rds")
+```
+
+```{r}
+#| echo: false
+samples_22 <- read_rds("data/rds/samples_22.rds")
+lixels_22 <- read_rds("data/rds/lixels_22.rds")
+```
+
+We can then use the following codeblock to visualize the nKDE using **tmap** package.
+
+```{r}
+tm_shape(bmr_boundary)+
+  tm_polygons(col = "ADM1_EN", palette = "Blues", border.col = "black", lwd = 0.5, title = "Province")+
+  tm_shape(lixels_22)+
+  tm_lines(col="density_22", palette = "-inferno", lwd = 2, title.col = "Per sq km") +
+  tm_shape(filter(lixels_22, density_22 == 0)) +
+  tm_lines(col="grey", lwd = 2) +
+  tm_layout(title = "BMR Fatal Road Accident Density - 2022",
+            title.position = c("left", "top"),
+            legend.position = c("left", "bottom"),
+            bg.color = "grey90")
+```
+
+# F. Conclusion
+
+We have used techniques to visualize and analyze the road traffic accidents in the Bangkok Metropolitan Region. The location of accidents is not random. There are some shifts seen in the location of hotspots across the years and across months. We have shown these using KDE and nKDE. We then focused on fatal accidents and see an increasing trend for Samut Prakan, while Nonthaburi has consistently been the most dense with regards to fatal road accidents. Further study on why these two provinces are the "deadliest" need to be conducted to understand if there are any features of these regions that are driving the higher incidence of fatal accidents.

@@ -289,7 +289,13 @@ window.Quarto = {
   <li><a href="#e.5-distribution-of-accidents-by-year" id="toc-e.5-distribution-of-accidents-by-year" class="nav-link" data-scroll-target="#e.5-distribution-of-accidents-by-year">E.5 Distribution of Accidents by Year</a></li>
   <li><a href="#e.6-test-for-csr---2022-accidents" id="toc-e.6-test-for-csr---2022-accidents" class="nav-link" data-scroll-target="#e.6-test-for-csr---2022-accidents">E.6 Test for CSR - 2022 Accidents</a></li>
   <li><a href="#e.5-distribution-of-accidents-by-month" id="toc-e.5-distribution-of-accidents-by-month" class="nav-link" data-scroll-target="#e.5-distribution-of-accidents-by-month">E.5 Distribution of Accidents by Month</a></li>
+  <li><a href="#e.6-fatal-accidents" id="toc-e.6-fatal-accidents" class="nav-link" data-scroll-target="#e.6-fatal-accidents">E.6 Fatal Accidents</a>
+  <ul class="collapse">
+  <li><a href="#e.6.1-fatal-accidents-by-year-and-by-province-non-network-constrained" id="toc-e.6.1-fatal-accidents-by-year-and-by-province-non-network-constrained" class="nav-link" data-scroll-target="#e.6.1-fatal-accidents-by-year-and-by-province-non-network-constrained">E.6.1 Fatal Accidents by Year and by Province, Non-Network Constrained</a></li>
+  <li><a href="#e.6.2-fatal-accidents-network-constrained" id="toc-e.6.2-fatal-accidents-network-constrained" class="nav-link" data-scroll-target="#e.6.2-fatal-accidents-network-constrained">E.6.2 Fatal Accidents, Network Constrained</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#f.-conclusion" id="toc-f.-conclusion" class="nav-link" data-scroll-target="#f.-conclusion">F. Conclusion</a></li>
   </ul>
 </nav>
     </div>
@@ -1825,10 +1831,215 @@ found</code></pre>
 </div>
 </div>
 </div>
-<p>The output shows no clear shift across months on the location of hotspots..</p>
-
-
+<p>The output shows a few hotspots arising on specific months. We mention the ones where there are highly dense segments outside Bangkok:</p>
+<ul>
+<li><p>Pathum Thani - January, March, June</p></li>
+<li><p>Samut Sakhon - January</p></li>
+</ul>
 </section>
+<section id="e.6-fatal-accidents" class="level2">
+<h2 class="anchored" data-anchor-id="e.6-fatal-accidents">E.6 Fatal Accidents</h2>
+<p>As mentioned in the earlier section, only a small 6% or 719 of the total number of accidents were fatal. While small, this is still a large number for the affected families. We expect that such accidents would have also caused more disruption compared to most of the non-fatal ones.</p>
+<section id="e.6.1-fatal-accidents-by-year-and-by-province-non-network-constrained" class="level3">
+<h3 class="anchored" data-anchor-id="e.6.1-fatal-accidents-by-year-and-by-province-non-network-constrained">E.6.1 Fatal Accidents by Year and by Province, Non-Network Constrained</h3>
+<p>If we look at the distribution of these accidents across years using the chart below, the annual number has ranged from 153-203, and 2020 and 2021 had 33% more accidents than the other years.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="fu">filter</span>(bmracc, number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>), <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Year, <span class="fu">table</span>(Year)[Year]))) <span class="sc">+</span></span>
+<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb123-3"><a href="#cb123-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Number of Fatal Accidents by Year"</span>) <span class="sc">+</span></span>
+<span id="cb123-4"><a href="#cb123-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb123-5"><a href="#cb123-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">stat=</span><span class="st">'count'</span>, <span class="fu">aes</span>(<span class="at">label=</span>..count..), <span class="at">vjust =</span> <span class="sc">+</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb123-6"><a href="#cb123-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb123-7"><a href="#cb123-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">16</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb123-8"><a href="#cb123-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
+<span id="cb123-9"><a href="#cb123-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb123-10"><a href="#cb123-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb123-11"><a href="#cb123-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb123-12"><a href="#cb123-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb123-13"><a href="#cb123-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb123-14"><a href="#cb123-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb123-15"><a href="#cb123-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-110-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can then visualize the location of these using the tmap package. The code below displays a map of the location of the fatal accidents in BMR between 2019 and 2022.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary)<span class="sc">+</span></span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"ADM1_EN"</span>, <span class="at">palette =</span> <span class="st">"Blues"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>, <span class="at">title =</span> <span class="st">"Province"</span>)<span class="sc">+</span></span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(bmr_network_v2)<span class="sc">+</span></span>
+<span id="cb124-4"><a href="#cb124-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"grey"</span>, <span class="at">lwd =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb124-5"><a href="#cb124-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(<span class="fu">filter</span>(bmracc, number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb124-6"><a href="#cb124-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col=</span><span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb124-7"><a href="#cb124-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"BMR Fatal Road Accident Density - 2019-2022"</span>,</span>
+<span id="cb124-8"><a href="#cb124-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb124-9"><a href="#cb124-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb124-10"><a href="#cb124-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-111-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>It looks like fatal accidents are more frequent outside Bangkok. With the exception of Nakhon Pathom, it looks like there is a larger number of accidents, in number and in density, happening in the four other provinces.</p>
+<p>It is hard to judge whether or not there are more accidents in a province using the graph above because of the presence of close or overlapping dots. One approach is to use the functions from sf package to count the accidents or events that fall within each province and then also compute for a density by computing the areas of each province.</p>
+<p>We first compute for the number of fatal accidents that occur in each province by using <code>st_intersects()</code> function from sf package. We produce this for the total number of accidents and the accidents for each year by using the code chunk below. We create a copy of the bmr_boundary object to store these values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a>bmr_with_fatacc <span class="ot">&lt;-</span> bmr_boundary <span class="sc">%&gt;%</span></span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">'FatAcc19-22'</span> <span class="ot">=</span> <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(bmr_boundary,<span class="fu">filter</span>(bmracc, number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>)))) <span class="sc">%&gt;%</span></span>
+<span id="cb125-3"><a href="#cb125-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">'FatAcc19'</span> <span class="ot">=</span> <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(bmr_boundary,<span class="fu">filter</span>(bmracc, (number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (Year <span class="sc">==</span> <span class="dv">2019</span>) )))) <span class="sc">%&gt;%</span></span>
+<span id="cb125-4"><a href="#cb125-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">'FatAcc20'</span> <span class="ot">=</span> <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(bmr_boundary,<span class="fu">filter</span>(bmracc, (number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (Year <span class="sc">==</span> <span class="dv">2020</span>) )))) <span class="sc">%&gt;%</span></span>
+<span id="cb125-5"><a href="#cb125-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">'FatAcc21'</span> <span class="ot">=</span> <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(bmr_boundary,<span class="fu">filter</span>(bmracc, (number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (Year <span class="sc">==</span> <span class="dv">2021</span>) )))) <span class="sc">%&gt;%</span></span>
+<span id="cb125-6"><a href="#cb125-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">'FatAcc22'</span> <span class="ot">=</span> <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(bmr_boundary,<span class="fu">filter</span>(bmracc, (number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (Year <span class="sc">==</span> <span class="dv">2022</span>) ))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We then compute for the area of each province using st_area() in the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>bmr_with_fatacc<span class="sc">$</span>Area <span class="ot">&lt;-</span> <span class="fu">st_area</span>(bmr_with_fatacc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Finally, we can compute for the density of accidents in each province by taking the ration of the last two measures we computed. Note that we are multiplying each by 1 million to convert the units from per meter to per square kilometer.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>bmr_with_fatacc<span class="sc">$</span>FatDensAll <span class="ot">&lt;-</span> bmr_with_fatacc<span class="sc">$</span><span class="st">`</span><span class="at">FatAcc19-22</span><span class="st">`</span> <span class="sc">/</span> bmr_with_fatacc<span class="sc">$</span>Area <span class="sc">*</span> <span class="dv">1000000</span></span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>bmr_with_fatacc<span class="sc">$</span>FatDens19 <span class="ot">&lt;-</span> bmr_with_fatacc<span class="sc">$</span><span class="st">`</span><span class="at">FatAcc19</span><span class="st">`</span> <span class="sc">/</span> bmr_with_fatacc<span class="sc">$</span>Area <span class="sc">*</span> <span class="dv">1000000</span></span>
+<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>bmr_with_fatacc<span class="sc">$</span>FatDens20 <span class="ot">&lt;-</span> bmr_with_fatacc<span class="sc">$</span><span class="st">`</span><span class="at">FatAcc20</span><span class="st">`</span> <span class="sc">/</span> bmr_with_fatacc<span class="sc">$</span>Area <span class="sc">*</span> <span class="dv">1000000</span></span>
+<span id="cb127-4"><a href="#cb127-4" aria-hidden="true" tabindex="-1"></a>bmr_with_fatacc<span class="sc">$</span>FatDens21 <span class="ot">&lt;-</span> bmr_with_fatacc<span class="sc">$</span><span class="st">`</span><span class="at">FatAcc21</span><span class="st">`</span> <span class="sc">/</span> bmr_with_fatacc<span class="sc">$</span>Area <span class="sc">*</span> <span class="dv">1000000</span></span>
+<span id="cb127-5"><a href="#cb127-5" aria-hidden="true" tabindex="-1"></a>bmr_with_fatacc<span class="sc">$</span>FatDens22 <span class="ot">&lt;-</span> bmr_with_fatacc<span class="sc">$</span><span class="st">`</span><span class="at">FatAcc22</span><span class="st">`</span> <span class="sc">/</span> bmr_with_fatacc<span class="sc">$</span>Area <span class="sc">*</span> <span class="dv">1000000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can now compare the occurence of fatal accidents across provinces visually. First, we can produce a choropleth map for the number of accidents and the density of accidents side by side using the code below. This is done by passing a list of arguments for the different tmap elements. In the code below, we use this on the color of the polygons, the label and the chart title.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_with_fatacc)<span class="sc">+</span></span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="fu">c</span>(<span class="st">'FatAcc19-22'</span>, <span class="st">'FatDensAll'</span>), <span class="at">style =</span> <span class="st">"equal"</span>, <span class="at">palette =</span> <span class="st">"Blues"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>, <span class="at">title =</span> <span class="fu">c</span>(<span class="st">"Number"</span>, <span class="st">"Per Sq Km"</span>))<span class="sc">+</span></span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(<span class="fu">filter</span>(bmracc, number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col=</span><span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="fu">c</span>(<span class="st">"Fatal Road Accidents 19-22"</span>,<span class="st">"Fatal Road Accidents Density"</span>),</span>
+<span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb128-7"><a href="#cb128-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb128-8"><a href="#cb128-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-115-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The plot shows that Pathum Thani in the northeast and Samut Prakan in the southeast have the highest number of accidents. However, if we normalize by the area, Nonthaburi in the center and Samut Prakan, still, have the highest density of fatal accidents.</p>
+<p>We can use the same approach to look at the density across the different years.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_with_fatacc)<span class="sc">+</span></span>
+<span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="fu">c</span>(<span class="st">'FatDens19'</span>, <span class="st">'FatDens20'</span>, <span class="st">'FatDens21'</span>, <span class="st">'FatDens22'</span>), <span class="at">style =</span> <span class="st">"equal"</span>, <span class="at">palette =</span> <span class="st">"Blues"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>, <span class="at">title =</span> <span class="st">"Per Sq Km"</span>)<span class="sc">+</span></span>
+<span id="cb129-3"><a href="#cb129-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(<span class="fu">filter</span>(bmracc, number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb129-4"><a href="#cb129-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col=</span><span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb129-5"><a href="#cb129-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="fu">c</span>(<span class="st">"2019 Fatal Accidents"</span>,<span class="st">"2020 Fatal Accidents"</span>,<span class="st">"2021 Fatal Accidents"</span>,<span class="st">"2022 Fatal Accidents"</span>),</span>
+<span id="cb129-6"><a href="#cb129-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb129-7"><a href="#cb129-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb129-8"><a href="#cb129-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-116-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At a province-level, Nonthaburi has been consistently the most dense with regards to fatal road accidents. In the meantime, Samut Prakan appears to have increased its density and risen in rank between 2020 and 2021.</p>
+<p>We will not attempt to perform kde on this set of accidents and go straight to an nkde which considers the road network.’</p>
+</section>
+<section id="e.6.2-fatal-accidents-network-constrained" class="level3">
+<h3 class="anchored" data-anchor-id="e.6.2-fatal-accidents-network-constrained">E.6.2 Fatal Accidents, Network Constrained</h3>
+<p>The final analyses we will perform is on the distribution of the fatal accidents along the road network. For this, we will also focus only on one year– 2022, as we recognize a shift in the hotspots over the years, at least across provinces</p>
+<p>To facilitate the analysis, we create a subset of the accident dataset to only consider fatal accidents and the latest year.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>bmr_fatacc_2022 <span class="ot">&lt;-</span> <span class="fu">filter</span>(bmracc, (number_of_fatalities <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">&amp;</span> (Year <span class="sc">==</span> <span class="dv">2022</span>) )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a>bmr_fatacc_2022</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 159 features and 21 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 610274.5 ymin: 1489002 xmax: 706582.6 ymax: 1570658
+Projected CRS: WGS 84 / UTM zone 47N
+# A tibble: 159 × 22
+   acc_code incident_datetime   report_datetime     province_th  province_en  
+ *    &lt;dbl&gt; &lt;dttm&gt;              &lt;dttm&gt;              &lt;chr&gt;        &lt;chr&gt;        
+ 1  5484851 2022-01-01 02:30:00 2022-01-02 02:43:00 สมุทรปราการ   Samut Prakan 
+ 2  5493686 2022-01-01 05:30:00 2022-01-03 10:23:00 นนทบุรี        Nonthaburi   
+ 3  5493725 2022-01-01 14:00:00 2022-01-03 10:28:00 นครปฐม       Nakhon Pathom
+ 4  6950193 2022-01-03 21:00:00 2022-09-21 10:53:00 นนทบุรี        Nonthaburi   
+ 5  5837858 2022-01-03 23:34:00 2022-03-03 14:19:00 กรุงเทพมหานคร Bangkok      
+ 6  6567040 2022-01-04 21:19:00 2022-01-05 11:27:00 สมุทรปราการ   Samut Prakan 
+ 7  6567055 2022-01-09 22:00:00 2022-01-11 10:56:00 ปทุมธานี       Pathum Thani 
+ 8  5861456 2022-01-11 18:00:00 2022-03-07 11:28:00 สมุทรปราการ   Samut Prakan 
+ 9  5579080 2022-01-15 00:10:00 2022-01-15 09:11:00 กรุงเทพมหานคร Bangkok      
+10  5843213 2022-01-16 11:30:00 2022-03-04 10:48:00 ปทุมธานี       Pathum Thani 
+# ℹ 149 more rows
+# ℹ 17 more variables: agency &lt;chr&gt;, route &lt;chr&gt;, vehicle_type &lt;chr&gt;,
+#   presumed_cause &lt;chr&gt;, accident_type &lt;chr&gt;,
+#   number_of_vehicles_involved &lt;dbl&gt;, number_of_fatalities &lt;dbl&gt;,
+#   number_of_injuries &lt;dbl&gt;, weather_condition &lt;chr&gt;, road_description &lt;chr&gt;,
+#   slope_description &lt;chr&gt;, geometry &lt;POINT [m]&gt;, Year &lt;dbl&gt;, MonthNum &lt;dbl&gt;,
+#   Month &lt;ord&gt;, DayOfWeek &lt;ord&gt;, fatal &lt;lgl&gt;</code></pre>
+</div>
+</div>
+<p>There are 159 fatal accidents in the BMR in 2022, and in the new dataset– consistent with the summary in the previous section.</p>
+<p>We then use the following code chunk to compute for the network-constrained KDE of the 2022 fatal accidents in our network. Note that in the code, we create a duplicate lixels and samples object to keep the original one unchanged. We take this opportunity to widen the computation range by increasing the bandwidth or <code>bw</code> parameter and the <code>max_depth</code> parameter.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a>samples_22 <span class="ot">&lt;-</span> samples_v2</span>
+<span id="cb133-2"><a href="#cb133-2" aria-hidden="true" tabindex="-1"></a>lixels_22 <span class="ot">&lt;-</span> lixels_v2</span>
+<span id="cb133-3"><a href="#cb133-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb133-4"><a href="#cb133-4" aria-hidden="true" tabindex="-1"></a>densities <span class="ot">&lt;-</span> <span class="fu">nkde</span>(bmr_network_v2, </span>
+<span id="cb133-5"><a href="#cb133-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">events =</span> bmr_fatacc_2022,</span>
+<span id="cb133-6"><a href="#cb133-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">w =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(bmr_fatacc_2022)),</span>
+<span id="cb133-7"><a href="#cb133-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">samples =</span> samples_22,</span>
+<span id="cb133-8"><a href="#cb133-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel_name =</span> <span class="st">"quartic"</span>,</span>
+<span id="cb133-9"><a href="#cb133-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw =</span> <span class="dv">10000</span>, </span>
+<span id="cb133-10"><a href="#cb133-10" aria-hidden="true" tabindex="-1"></a>                  <span class="at">div=</span> <span class="st">"bw"</span>, </span>
+<span id="cb133-11"><a href="#cb133-11" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"simple"</span>, </span>
+<span id="cb133-12"><a href="#cb133-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">digits =</span> <span class="dv">1</span>, </span>
+<span id="cb133-13"><a href="#cb133-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">tol =</span> <span class="dv">1</span>,</span>
+<span id="cb133-14"><a href="#cb133-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">grid_shape =</span> <span class="fu">c</span>(<span class="dv">10</span>,<span class="dv">10</span>), </span>
+<span id="cb133-15"><a href="#cb133-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">max_depth =</span> <span class="dv">20</span>,</span>
+<span id="cb133-16"><a href="#cb133-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">agg =</span> <span class="dv">5</span>, </span>
+<span id="cb133-17"><a href="#cb133-17" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sparse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb133-18"><a href="#cb133-18" aria-hidden="true" tabindex="-1"></a>                  <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb133-19"><a href="#cb133-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb133-20"><a href="#cb133-20" aria-hidden="true" tabindex="-1"></a>samples_22<span class="sc">$</span>density_22 <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span>
+<span id="cb133-21"><a href="#cb133-21" aria-hidden="true" tabindex="-1"></a>lixels_22<span class="sc">$</span>density_22 <span class="ot">&lt;-</span> densities<span class="sc">*</span><span class="dv">1000000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can then use the following codeblock to visualize the nKDE using <strong>tmap</strong> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(bmr_boundary)<span class="sc">+</span></span>
+<span id="cb134-2"><a href="#cb134-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"ADM1_EN"</span>, <span class="at">palette =</span> <span class="st">"Blues"</span>, <span class="at">border.col =</span> <span class="st">"black"</span>, <span class="at">lwd =</span> <span class="fl">0.5</span>, <span class="at">title =</span> <span class="st">"Province"</span>)<span class="sc">+</span></span>
+<span id="cb134-3"><a href="#cb134-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(lixels_22)<span class="sc">+</span></span>
+<span id="cb134-4"><a href="#cb134-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density_22"</span>, <span class="at">palette =</span> <span class="st">"-inferno"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">title.col =</span> <span class="st">"Per sq km"</span>) <span class="sc">+</span></span>
+<span id="cb134-5"><a href="#cb134-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(<span class="fu">filter</span>(lixels_22, density_22 <span class="sc">==</span> <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb134-6"><a href="#cb134-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"grey"</span>, <span class="at">lwd =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb134-7"><a href="#cb134-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"BMR Fatal Road Accident Density - 2022"</span>,</span>
+<span id="cb134-8"><a href="#cb134-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"top"</span>),</span>
+<span id="cb134-9"><a href="#cb134-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>),</span>
+<span id="cb134-10"><a href="#cb134-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">bg.color =</span> <span class="st">"grey90"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-122-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="f.-conclusion" class="level1">
+<h1>F. Conclusion</h1>
+<p>We have used techniques to visualize and analyze the road traffic accidents in the Bangkok Metropolitan Region. The location of accidents is not random. There are some shifts seen in the location of hotspots across the years and across months. We have shown these using KDE and nKDE. We then focused on fatal accidents and see an increasing trend for Samut Prakan, while Nonthaburi has consistently been the most dense with regards to fatal road accidents. Further study on why these two provinces are the “deadliest” need to be conducted to understand if there are any features of these regions that are driving the higher incidence of fatal accidents.</p>
+
+
 </section>
 
 </main> <!-- /main -->
