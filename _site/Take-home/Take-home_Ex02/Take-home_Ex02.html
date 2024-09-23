@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Federico Jose Rodriguez">
+<meta name="dcterms.date" content="2024-09-23">
 
-<title>Geospatial Analytics and Applications (in R) – Geospatial Analytics w/ Derek</title>
+<title>Discovering Impact of COVID-19 on Thai Tourism Economy – Geospatial Analytics w/ Derek</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -24,22 +25,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -69,7 +70,7 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
 <body class="nav-fixed">
@@ -79,7 +80,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Geospatial Analytics w/ Derek</span>
     </a>
   </div>
@@ -95,35 +96,35 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex01/Hands-on_Ex01.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex01/Hands-on_Ex01.html">
  <span class="dropdown-text">Hands-on Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex02/Hands-on_Ex02.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex02/Hands-on_Ex02.html">
  <span class="dropdown-text">Hands-on Exercise 2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex03/Hands-on_Ex03.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex03/Hands-on_Ex03.html">
  <span class="dropdown-text">Hands-on Exercise 3</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex04/Hands-on_Ex04.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex04/Hands-on_Ex04.html">
  <span class="dropdown-text">Hands-on Exercise 4</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex05/Hands-on_Ex05.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex05/Hands-on_Ex05.html">
  <span class="dropdown-text">Hands-on Exercise 5</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex06/Hands-on_Ex06.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex06/Hands-on_Ex06.html">
  <span class="dropdown-text">Hands-on Exercise 6</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex07/Hands-on_Ex07.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex07/Hands-on_Ex07.html">
  <span class="dropdown-text">Hands-on Exercise 7</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on/Hands-on_Ex08/Hands-on_Ex08.html">
+    <a class="dropdown-item" href="../../Hands-on/Hands-on_Ex08/Hands-on_Ex08.html">
  <span class="dropdown-text">Hands-on Exercise 8</span></a>
   </li>  
     </ul>
@@ -134,19 +135,19 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
-    <a class="dropdown-item" href="./In-class/In-class_Ex01/In-class_Ex01.html">
+    <a class="dropdown-item" href="../../In-class/In-class_Ex01/In-class_Ex01.html">
  <span class="dropdown-text">In-Class Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class/In-class_Ex02/In-class_Ex02.html">
+    <a class="dropdown-item" href="../../In-class/In-class_Ex02/In-class_Ex02.html">
  <span class="dropdown-text">In-Class Exercise 2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class/In-class_Ex03/In-class_Ex03.html">
+    <a class="dropdown-item" href="../../In-class/In-class_Ex03/In-class_Ex03.html">
  <span class="dropdown-text">In-Class Exercise 3</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./In-class/In-class_Ex04/In-class_Ex04.html">
+    <a class="dropdown-item" href="../../In-class/In-class_Ex04/In-class_Ex04.html">
  <span class="dropdown-text">In-Class Exercise 4</span></a>
   </li>  
     </ul>
@@ -157,11 +158,11 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
         <li>
-    <a class="dropdown-item" href="./Take-home/Take-home_Ex01/Take-home_Ex01.html">
+    <a class="dropdown-item" href="../../Take-home/Take-home_Ex01/Take-home_Ex01.html">
  <span class="dropdown-text">Take Home Exercise 1</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Take-home/Take-home_Ex02/Take-home_Ex02.html">
+    <a class="dropdown-item" href="../../Take-home/Take-home_Ex02/Take-home_Ex02.html">
  <span class="dropdown-text">Take Home Exercise 2</span></a>
   </li>  
     </ul>
@@ -169,11 +170,11 @@ ul.task-list li input[type="checkbox"] {
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -192,9 +193,14 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#hands-on-exercises" id="toc-hands-on-exercises" class="nav-link active" data-scroll-target="#hands-on-exercises">Hands-On Exercises</a></li>
-  <li><a href="#in-class-exercises" id="toc-in-class-exercises" class="nav-link" data-scroll-target="#in-class-exercises">In-Class Exercises</a></li>
-  <li><a href="#take-home-exercises" id="toc-take-home-exercises" class="nav-link" data-scroll-target="#take-home-exercises">Take-Home Exercises</a></li>
+  <li><a href="#a.-getting-started" id="toc-a.-getting-started" class="nav-link active" data-scroll-target="#a.-getting-started">A. Getting Started</a>
+  <ul class="collapse">
+  <li><a href="#a.1-background" id="toc-a.1-background" class="nav-link" data-scroll-target="#a.1-background">A.1 Background</a></li>
+  <li><a href="#a.2-objectives" id="toc-a.2-objectives" class="nav-link" data-scroll-target="#a.2-objectives">A.2 Objectives</a></li>
+  <li><a href="#a.3-data-sources" id="toc-a.3-data-sources" class="nav-link" data-scroll-target="#a.3-data-sources">A.3 Data Sources</a></li>
+  <li><a href="#a.4-importing-and-launching-r-packages" id="toc-a.4-importing-and-launching-r-packages" class="nav-link" data-scroll-target="#a.4-importing-and-launching-r-packages">A.4 Importing and Launching R Packages</a></li>
+  </ul></li>
+  <li><a href="#b.-data-loading-and-preparation" id="toc-b.-data-loading-and-preparation" class="nav-link" data-scroll-target="#b.-data-loading-and-preparation">B. Data Loading and Preparation</a></li>
   </ul>
 </nav>
     </div>
@@ -203,7 +209,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Geospatial Analytics and Applications (in R)</h1>
+<h1 class="title">Discovering Impact of COVID-19 on Thai Tourism Economy</h1>
 </div>
 
 
@@ -217,7 +223,19 @@ ul.task-list li input[type="checkbox"] {
           </div>
   </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 23, 2024</p>
+    </div>
+  </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 23, 2024</p>
+    </div>
+  </div>
     
   </div>
   
@@ -226,40 +244,31 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Welcome to my website for my work in the course <u><strong>ISSS 626 - Geospatial Analytics and Applications</strong></u> during the August term of 2024 under <strong>Dr Kam Tin Seong</strong>.</p>
-<p>The course covers theory and methods of geospatial analysis and the tools in R to implement such analyses.</p>
-<section id="hands-on-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="hands-on-exercises">Hands-On Exercises</h2>
-<p>Hands-on exercises are assigned before each lesson to give us hands-on experience in using R on the geospatial analysis methods and functions we learned. We are given step-by-step instructions and explanations (through Dr Kam’s online <a href="https://r4gdsa.netlify.app/" title="R for Geospatial Data Science and Analytics by Dr Kam">book</a>) which complement our pre-class reading, and prepares us for the in-class exercises.</p>
-<ol type="1">
-<li><p><a href="Hands-on/Hands-on_Ex01/Hands-on_Ex01.html">Geospatial Data Wrangling with R</a> (for Session 1, 26 Aug ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex02/Hands-on_Ex02.html">Choropleth Mapping with R</a> (for Session 1, 26 Aug ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex03/Hands-on_Ex03.html">1st Order Spatial Point Patterns Analysis Methods</a> (for Session 2, 2 Sept ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex04/Hands-on_Ex04.html">2nd Order Spatial Point Patterns Analysis Methods</a> (for Session 2, 2 Sept ’24)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex05/Hands-on_Ex05.html">Network Constrained Spatial Point Pattern Analysis</a> (for Session 3, 9 Sept 2024)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex06/Hands-on_Ex06.html">Spatial Weights and Applications</a> (for Session 4, 16 Sept 2024)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex07/Hands-on_Ex07.html">Global Measures of Spatial Autocorrelation</a> (for Session 5, 23 Sept 2024)</p></li>
-<li><p><a href="Hands-on/Hands-on_Ex08/Hands-on_Ex08.html">Local Measures of Spatial Autocorrelation</a> (for Session 5, 23 Sept 2024)</p></li>
-</ol>
+<p>(Exercise Summary)</p>
+<section id="a.-getting-started" class="level1">
+<h1>A. Getting Started</h1>
+<section id="a.1-background" class="level2">
+<h2 class="anchored" data-anchor-id="a.1-background">A.1 Background</h2>
+<p>WIP</p>
 </section>
-<section id="in-class-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="in-class-exercises">In-Class Exercises</h2>
-<p>In each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.</p>
-<ol type="1">
-<li><p><a href="In-class/In-class_Ex01/In-class_Ex01.html">Introduction to Geospatial Analytics</a> (26 Aug ’24)</p></li>
-<li><p><a href="In-class/In-class_Ex02/In-class_Ex02.html">Spatial Point Pattern Analysis</a> - Data Load for Take-home Exercise 1 (2 Sept ’24)</p></li>
-<li><p><a href="In-class/In-class_Ex03/In-class_Ex03.html">Advanced Spatial Point Patterns Analysis</a> (9 Sept ’24)</p></li>
-<li><p><a href="In-class/In-class_Ex04/In-class_Ex04.html">Spatial Autocorrelation</a> (23 Sept’24)</p></li>
-</ol>
+<section id="a.2-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="a.2-objectives">A.2 Objectives</h2>
+<p>WIP</p>
 </section>
-<section id="take-home-exercises" class="level2">
-<h2 class="anchored" data-anchor-id="take-home-exercises">Take-Home Exercises</h2>
-<p>Take-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.</p>
-<p>For each of these, we are given a specific problem, objectives and a base data set. Each student will work on the problem independently, guided only by the previous exercises and lessons.</p>
-<ol type="1">
-<li><a href="Take-home/Take-home_Ex01/Take-home_Ex01.html">Geospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region</a></li>
-<li><a href="Take-home/Take-home_Ex02/Take-home_Ex02.html">Discovering the Impact of COVID-19 on Thai tourism economy</a></li>
-</ol>
+<section id="a.3-data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="a.3-data-sources">A.3 Data Sources</h2>
+<p>WIP</p>
+</section>
+<section id="a.4-importing-and-launching-r-packages" class="level2">
+<h2 class="anchored" data-anchor-id="a.4-importing-and-launching-r-packages">A.4 Importing and Launching R Packages</h2>
+<p>(WIP) For this study, XXX R packages will be used. A description of the packages and the code, using <code>p_load()</code> of the <strong>pacman</strong> package, to import them is given below.</p>
+<p>As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.</p>
+<p><code>lnd set.seed(1234)}</code></p>
+</section>
+</section>
+<section id="b.-data-loading-and-preparation" class="level1">
+<h1>B. Data Loading and Preparation</h1>
+<p>WIP</p>
 
 
 </section>

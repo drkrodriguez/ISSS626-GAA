@@ -1,0 +1,227 @@
+---
+title: "Global and Local Measures of Spatial Autocorrelation"
+author: "Federico Jose Rodriguez"
+date: "Sep 23 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this exercise, we are introduced to the **sfdep** package which is a wrapper on **spdep** and enables us to work directly with sf objects. It is also written in such a way to fully take advantage of the **tidyverse** framework.
+
+# Importing and Loading packages
+
+This exercise will make use of five R packages: **sf**, **tidyverse,** **tmap, and sfdep**.
+
+-   **sf -** for importing, managing and processing vector-based geospatial data
+
+-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+
+-   **tmap -** for plotting cartographic quality maps
+
+-   **sfdep** - functions to create spatial weights, autocorrelation statistics for sf objects
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, sfdep, tmap, tidyverse)
+```
+
+We also define a random seed value for repeatability of any simulation results.
+
+```{r}
+set.seed(1234)
+```
+
+# Data Import and Preparation
+
+For this exercise, we will make use of the Hunan administrative map shapefile and economic indicators csv that we have used in the hands-on exercises.
+
+The code chunk below uses `st_read()` of the **sf** package to load the Hunan shapefile into an R object.
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+We then use the code chunk below to load the csv file with the indicators into R using `read_csv()`
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+## Data Preparation
+
+We then update the first object, which is of sf type, by adding in the economic indicators from the second object using `left_join()` as in the code chunk below
+
+```{r}
+hunan <- left_join(hunan,hunan2012) %>%
+  select(1:4, 7, 15)
+```
+
+If we check the contents of `hunan` using `head()`, we see that it now includes a column `GDDPPC`
+
+```{r}
+head(hunan)
+```
+
+## Visualization of the Development Indicator
+
+Before we move to the main analyses, we can visualize the distribution of GCPPC by using **tmap** package.
+
+```{r}
+tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "quantile",
+          palette = "Blues") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Hunan GDP per capita")
+```
+
+# Global Measures of Spatial Autocorrelation
+
+## Step 1: Computing Deriving Queen's Contiguity Weights
+
+We use the code chunk below to compute for the contiguity weight matrix using Queen's criterion.
+
+```{r}
+wm_q <- hunan %>%
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style="W"),
+         .before=1)
+```
+
+The `st_weights()` function allows three arguments:
+
+1.  `nb` -
+2.  `style` -
+3.  `allow_zero` -
+
+## Step 2a: Performing Global Moran's I Test
+
+The Global Moran's I test can be performed using `global_moran_test()` of the **sfdep** package.
+
+```{r}
+global_moran_test(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt)
+```
+
+At α=0.05, the test shows that we reject a null hypothesis that the GDPPC values are randomly distributed. As the test statistic is above 0, then the data is showing signs of clustering.
+
+## Step 2b: Performing Global Moran's I Permutation Test
+
+Monte Carlo simulation on the (Global Moran's I) statistic is performed using `global_moran_perm()` of the **sfdep** package. The code chunk below performs 100 simulations (`nsim` + 1)
+
+```{r}
+global_moran_perm(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+We get consistent result with the one-time run, but with a lower p-value. (and higher confidence)
+
+# Local Measures of Spatial Autocorrelation
+
+As we see that there are presence of clusters, the next step is to use local measure's of spatial autocorrelation, or local indicators of spatial association, LISA, to identify where the clusters are.
+
+## Computing Local Moran's I
+
+We compute for the local Moran's I statistic for each unit by using `local_moran()` of **sfdep** package. The `unnest()` function expands the elements of list `local_moran` as separate columns in the `lisa` object.
+
+```{r}
+lisa <- wm_q %>%
+  mutate(local_moran = local_moran(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+```
+
+We can examine the columns of `lisa` using the code chunk below.
+
+```{r}
+glimpse(lisa)
+```
+
+The `local_moran()` function generated 12 columns– which are the first twelve in the `lisa` dataframe. Key columns are:
+
+-   `ii` - local Moran i statistic
+
+-   `p_ii_sim` - p value from simulation
+
+-   For the clustering / outlier classification, there are three options in different columns: `mean`, `median`, `pysal`.
+
+## Visualising Local Moran I's
+
+The code chunk below prepares a choropleth map of the statistic in the `ii` and the `p_ii_sim` field
+
+```{r}
+tmap_mode("plot")
+
+tm_shape(lisa) +
+  tm_fill(c("ii", "p_ii_sim"), title = c("Local Moran's I","P Value")) +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(
+    main.title = "Local Moran's I and P-values")
+```
+
+## LISA map
+
+A LISA map is a categorical map showing outliers and clusters.
+
+```{r}
+lisa_sig <- lisa %>%
+  filter(p_ii < 0.05)
+
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean") +
+  tm_borders(alpha = 0.4)
+```
+
+## Computing Local Gi\* Statistics
+
+The code below computes the weight matrix using inverse distance.
+
+```{r}
+wm_idw <- hunan %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before=1)
+```
+
+We then compute the local Gi\* by using the code below.
+
+```{r}
+HCSA <- wm_idw %>%
+  mutate(local_Gi = local_gstar_perm(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_Gi)
+```
+
+```{r}
+HCSA
+```
+
+## Visualising Gi\*
+
+The code chunk
+
+```{r}
+tm_shape(HCSA) +
+  tm_polygons()+
+tm_shape(filter(HCSA,p_sim < 0.05)) +
+  tm_polygons(c("cluster","p_sim"), title=c("Cluster","P-Value"))
+```

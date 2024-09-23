@@ -18,14 +18,14 @@
     "href": "index.html#in-class-exercises",
     "title": "Geospatial Analytics and Applications (in R)",
     "section": "In-Class Exercises",
-    "text": "In-Class Exercises\nIn each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.\n\nIntroduction to Geospatial Analytics (26 Aug ’24)\nSpatial Point Pattern Analysis - Data Load for Take-home Exercise 1 (2 Sept ’24)\nAdvanced Spatial Point Patterns Analysis (9 Sept ’24)"
+    "text": "In-Class Exercises\nIn each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.\n\nIntroduction to Geospatial Analytics (26 Aug ’24)\nSpatial Point Pattern Analysis - Data Load for Take-home Exercise 1 (2 Sept ’24)\nAdvanced Spatial Point Patterns Analysis (9 Sept ’24)\nSpatial Autocorrelation (23 Sept’24)"
   },
   {
     "objectID": "index.html#take-home-exercises",
     "href": "index.html#take-home-exercises",
     "title": "Geospatial Analytics and Applications (in R)",
     "section": "Take-Home Exercises",
-    "text": "Take-Home Exercises\nTake-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.\nFor each of these, we are given a specific problem, objectives and a base data set. Each student will work on the problem independently, guided only by the previous exercises and lessons.\n\nGeospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region"
+    "text": "Take-Home Exercises\nTake-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.\nFor each of these, we are given a specific problem, objectives and a base data set. Each student will work on the problem independently, guided only by the previous exercises and lessons.\n\nGeospatial Analysis for Public Good: A Data-driven Perspective on Road Traffic Accidents in the Bangkok Metropolitan Region\nDiscovering the Impact of COVID-19 on Thai tourism economy"
   },
   {
     "objectID": "Take-home/Take-home_Ex01/Take-home_Ex01.html",
@@ -460,5 +460,117 @@
     "title": "Local Measures of Spatial Autocorrelation",
     "section": "Gi statistics using adaptive distance",
     "text": "Gi statistics using adaptive distance\nThe code chunk below computes the Gi values for GDPPC by suing an adaptive distance matrix\n\nfips &lt;- order(hunan$County)\ngi.adaptive &lt;- localG(hunan$GDPPC, knn_lw)\nhunan.gi &lt;- cbind(hunan, as.matrix(gi.adaptive)) %&gt;%\n  rename(gstat_adaptive = as.matrix.gi.adaptive.)\n\nWe then visualize this (also beside the original GDPPC values) using the code below.\n\ngdppc&lt;- qtm(hunan, \"GDPPC\")\n\nGimap_ad &lt;- tm_shape(hunan.gi) + \n  tm_fill(col = \"gstat_adaptive\", \n          style = \"pretty\", \n          palette=\"-RdBu\", \n          title = \"local Gi\") + \n  tm_borders(alpha = 0.5)\n\ntmap_arrange(gdppc, \n             Gimap_ad, \n             asp=1, \n             ncol=2)\n\nVariable(s) \"gstat_adaptive\" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.\n\n\n\n\n\n\n\n\n\nWe show the fixed and adaptive maps side-by-side using the chunk below\n\ntmap_arrange(Gimap_fix,Gimap_ad, asp=1,ncol=2)\n\nVariable(s) \"gstat_fixed\" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.\n\n\nVariable(s) \"gstat_adaptive\" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette."
+  },
+  {
+    "objectID": "Take-home/Take-home_Ex02/Take-home_Ex02.html",
+    "href": "Take-home/Take-home_Ex02/Take-home_Ex02.html",
+    "title": "Discovering Impact of COVID-19 on Thai Tourism Economy",
+    "section": "",
+    "text": "(Exercise Summary)"
+  },
+  {
+    "objectID": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.1-background",
+    "href": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.1-background",
+    "title": "Discovering Impact of COVID-19 on Thai Tourism Economy",
+    "section": "A.1 Background",
+    "text": "A.1 Background\nWIP"
+  },
+  {
+    "objectID": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.2-objectives",
+    "href": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.2-objectives",
+    "title": "Discovering Impact of COVID-19 on Thai Tourism Economy",
+    "section": "A.2 Objectives",
+    "text": "A.2 Objectives\nWIP"
+  },
+  {
+    "objectID": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.3-data-sources",
+    "href": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.3-data-sources",
+    "title": "Discovering Impact of COVID-19 on Thai Tourism Economy",
+    "section": "A.3 Data Sources",
+    "text": "A.3 Data Sources\nWIP"
+  },
+  {
+    "objectID": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.4-importing-and-launching-r-packages",
+    "href": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.4-importing-and-launching-r-packages",
+    "title": "Discovering Impact of COVID-19 on Thai Tourism Economy",
+    "section": "A.4 Importing and Launching R Packages",
+    "text": "A.4 Importing and Launching R Packages\n(WIP) For this study, XXX R packages will be used. A description of the packages and the code, using p_load() of the pacman package, to import them is given below.\nAs we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.\nlnd set.seed(1234)}"
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "",
+    "text": "In this exercise, we are introduced to the sfdep package which is a wrapper on spdep and enables us to work directly with sf objects. It is also written in such a way to fully take advantage of the tidyverse framework."
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#data-preparation",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#data-preparation",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Data Preparation",
+    "text": "Data Preparation\nWe then update the first object, which is of sf type, by adding in the economic indicators from the second object using left_join() as in the code chunk below\n\nhunan &lt;- left_join(hunan,hunan2012) %&gt;%\n  select(1:4, 7, 15)\n\nJoining with `by = join_by(County)`\n\n\nIf we check the contents of hunan using head(), we see that it now includes a column GDDPPC\n\nhead(hunan)\n\nSimple feature collection with 6 features and 6 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 110.4922 ymin: 28.61762 xmax: 112.3013 ymax: 30.12812\nGeodetic CRS:  WGS 84\n   NAME_2  ID_3  NAME_3   ENGTYPE_3  County GDPPC\n1 Changde 21098 Anxiang      County Anxiang 23667\n2 Changde 21100 Hanshou      County Hanshou 20981\n3 Changde 21101  Jinshi County City  Jinshi 34592\n4 Changde 21102      Li      County      Li 24473\n5 Changde 21103   Linli      County   Linli 25554\n6 Changde 21104  Shimen      County  Shimen 27137\n                        geometry\n1 POLYGON ((112.0625 29.75523...\n2 POLYGON ((112.2288 29.11684...\n3 POLYGON ((111.8927 29.6013,...\n4 POLYGON ((111.3731 29.94649...\n5 POLYGON ((111.6324 29.76288...\n6 POLYGON ((110.8825 30.11675..."
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#visualization-of-the-development-indicator",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#visualization-of-the-development-indicator",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Visualization of the Development Indicator",
+    "text": "Visualization of the Development Indicator\nBefore we move to the main analyses, we can visualize the distribution of GCPPC by using tmap package.\n\ntm_shape(hunan) +\n  tm_fill(\"GDPPC\",\n          n = 5,\n          style = \"quantile\",\n          palette = \"Blues\") +\n  tm_borders(alpha = 0.5) +\n  tm_layout(main.title = \"Hunan GDP per capita\")"
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#step-1-computing-deriving-queens-contiguity-weights",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#step-1-computing-deriving-queens-contiguity-weights",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Step 1: Computing Deriving Queen’s Contiguity Weights",
+    "text": "Step 1: Computing Deriving Queen’s Contiguity Weights\nWe use the code chunk below to compute for the contiguity weight matrix using Queen’s criterion.\n\nwm_q &lt;- hunan %&gt;%\n  mutate(nb = st_contiguity(geometry),\n         wt = st_weights(nb,\n                         style=\"W\"),\n         .before=1)\n\nThe st_weights() function allows three arguments:\n\nnb -\nstyle -\nallow_zero -"
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#step-2a-performing-global-morans-i-test",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#step-2a-performing-global-morans-i-test",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Step 2a: Performing Global Moran’s I Test",
+    "text": "Step 2a: Performing Global Moran’s I Test\nThe Global Moran’s I test can be performed using global_moran_test() of the sfdep package.\n\nglobal_moran_test(wm_q$GDPPC,\n                  wm_q$nb,\n                  wm_q$wt)\n\n\n    Moran I test under randomisation\n\ndata:  x  \nweights: listw    \n\nMoran I statistic standard deviate = 4.7351, p-value = 1.095e-06\nalternative hypothesis: greater\nsample estimates:\nMoran I statistic       Expectation          Variance \n      0.300749970      -0.011494253       0.004348351 \n\n\nAt α=0.05, the test shows that we reject a null hypothesis that the GDPPC values are randomly distributed. As the test statistic is above 0, then the data is showing signs of clustering."
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#step-2b-performing-global-morans-i-permutation-test",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#step-2b-performing-global-morans-i-permutation-test",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Step 2b: Performing Global Moran’s I Permutation Test",
+    "text": "Step 2b: Performing Global Moran’s I Permutation Test\nMonte Carlo simulation on the (Global Moran’s I) statistic is performed using global_moran_perm() of the sfdep package. The code chunk below performs 100 simulations (nsim + 1)\n\nglobal_moran_perm(wm_q$GDPPC,\n                  wm_q$nb,\n                  wm_q$wt,\n                  nsim = 99)\n\n\n    Monte-Carlo simulation of Moran I\n\ndata:  x \nweights: listw  \nnumber of simulations + 1: 100 \n\nstatistic = 0.30075, observed rank = 100, p-value &lt; 2.2e-16\nalternative hypothesis: two.sided\n\n\nWe get consistent result with the one-time run, but with a lower p-value. (and higher confidence)"
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#computing-local-morans-i",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#computing-local-morans-i",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Computing Local Moran’s I",
+    "text": "Computing Local Moran’s I\nWe compute for the local Moran’s I statistic for each unit by using local_moran() of sfdep package. The unnest() function expands the elements of list local_moran as separate columns in the lisa object.\n\nlisa &lt;- wm_q %&gt;%\n  mutate(local_moran = local_moran(\n    GDPPC, nb, wt, nsim = 99),\n    .before = 1) %&gt;%\n  unnest(local_moran)\n\nWe can examine the columns of lisa using the code chunk below.\n\nglimpse(lisa)\n\nRows: 88\nColumns: 21\n$ ii           &lt;dbl&gt; -1.468468e-03, 2.587817e-02, -1.198765e-02, 1.022468e-03,…\n$ eii          &lt;dbl&gt; 0.0017692414, 0.0064149158, -0.0374068734, -0.0000348833,…\n$ var_ii       &lt;dbl&gt; 4.179959e-04, 1.051040e-02, 1.020555e-01, 4.367565e-06, 1…\n$ z_ii         &lt;dbl&gt; -0.15836231, 0.18984794, 0.07956903, 0.50594053, 0.448752…\n$ p_ii         &lt;dbl&gt; 0.874171311, 0.849428289, 0.936580031, 0.612898396, 0.653…\n$ p_ii_sim     &lt;dbl&gt; 0.82, 0.96, 0.76, 0.64, 0.50, 0.82, 0.08, 0.08, 0.02, 0.2…\n$ p_folded_sim &lt;dbl&gt; 0.41, 0.48, 0.38, 0.32, 0.25, 0.41, 0.04, 0.04, 0.01, 0.1…\n$ skewness     &lt;dbl&gt; -0.8122108, -1.0905447, 0.8239085, 1.0401038, 1.6357304, …\n$ kurtosis     &lt;dbl&gt; 0.651875433, 1.889177462, 0.046095140, 1.613439800, 3.960…\n$ mean         &lt;fct&gt; Low-High, Low-Low, High-Low, High-High, High-High, High-L…\n$ median       &lt;fct&gt; High-High, High-High, High-High, High-High, High-High, Hi…\n$ pysal        &lt;fct&gt; Low-High, Low-Low, High-Low, High-High, High-High, High-L…\n$ nb           &lt;nb&gt; &lt;2, 3, 4, 57, 85&gt;, &lt;1, 57, 58, 78, 85&gt;, &lt;1, 4, 5, 85&gt;, &lt;1,…\n$ wt           &lt;list&gt; &lt;0.2, 0.2, 0.2, 0.2, 0.2&gt;, &lt;0.2, 0.2, 0.2, 0.2, 0.2&gt;, &lt;0…\n$ NAME_2       &lt;chr&gt; \"Changde\", \"Changde\", \"Changde\", \"Changde\", \"Changde\", \"C…\n$ ID_3         &lt;int&gt; 21098, 21100, 21101, 21102, 21103, 21104, 21109, 21110, 2…\n$ NAME_3       &lt;chr&gt; \"Anxiang\", \"Hanshou\", \"Jinshi\", \"Li\", \"Linli\", \"Shimen\", …\n$ ENGTYPE_3    &lt;chr&gt; \"County\", \"County\", \"County City\", \"County\", \"County\", \"C…\n$ County       &lt;chr&gt; \"Anxiang\", \"Hanshou\", \"Jinshi\", \"Li\", \"Linli\", \"Shimen\", …\n$ GDPPC        &lt;dbl&gt; 23667, 20981, 34592, 24473, 25554, 27137, 63118, 62202, 7…\n$ geometry     &lt;POLYGON [°]&gt; POLYGON ((112.0625 29.75523..., POLYGON ((112.228…\n\n\nThe local_moran() function generated 12 columns– which are the first twelve in the lisa dataframe. Key columns are:\n\nii - local Moran i statistic\np_ii_sim - p value from simulation\nFor the clustering / outlier classification, there are three options in different columns: mean, median, pysal."
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#visualising-local-moran-is",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#visualising-local-moran-is",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Visualising Local Moran I’s",
+    "text": "Visualising Local Moran I’s\nThe code chunk below prepares a choropleth map of the statistic in the ii and the p_ii_sim field\n\ntmap_mode(\"plot\")\n\ntmap mode set to plotting\n\ntm_shape(lisa) +\n  tm_fill(c(\"ii\", \"p_ii_sim\"), title = c(\"Local Moran's I\",\"P Value\")) +\n  tm_borders(alpha = 0.5) +\n  tm_view(set.zoom.limits = c(6,8)) +\n  tm_layout(\n    main.title = \"Local Moran's I and P-values\")\n\nVariable(s) \"ii\" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette."
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#lisa-map",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#lisa-map",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "LISA map",
+    "text": "LISA map\nA LISA map is a categorical map showing outliers and clusters.\n\nlisa_sig &lt;- lisa %&gt;%\n  filter(p_ii &lt; 0.05)\n\ntm_shape(lisa) +\n  tm_polygons() +\n  tm_borders(alpha = 0.5) +\ntm_shape(lisa_sig) +\n  tm_fill(\"mean\") +\n  tm_borders(alpha = 0.4)\n\nWarning: One tm layer group has duplicated layer types, which are omitted. To\ndraw multiple layers of the same type, use multiple layer groups (i.e. specify\ntm_shape prior to each of them)."
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#computing-local-gi-statistics",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#computing-local-gi-statistics",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Computing Local Gi* Statistics",
+    "text": "Computing Local Gi* Statistics\nThe code below computes the weight matrix using inverse distance.\n\nwm_idw &lt;- hunan %&gt;%\n  mutate(nb = st_contiguity(geometry),\n         wts = st_inverse_distance(nb, geometry,\n                                   scale = 1,\n                                   alpha = 1),\n         .before=1)\n\n! Polygon provided. Using point on surface.\n\n\nWarning: There was 1 warning in `stopifnot()`.\nℹ In argument: `wts = st_inverse_distance(nb, geometry, scale = 1, alpha = 1)`.\nCaused by warning in `st_point_on_surface.sfc()`:\n! st_point_on_surface may not give correct results for longitude/latitude data\n\n\nWe then compute the local Gi* by using the code below.\n\nHCSA &lt;- wm_idw %&gt;%\n  mutate(local_Gi = local_gstar_perm(\n    GDPPC, nb, wt, nsim = 99),\n    .before = 1) %&gt;%\n  unnest(local_Gi)\n\n\nHCSA\n\nSimple feature collection with 88 features and 18 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\n# A tibble: 88 × 19\n   gi_star cluster   e_gi     var_gi std_dev p_value p_sim p_folded_sim skewness\n     &lt;dbl&gt; &lt;fct&gt;    &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;        &lt;dbl&gt;    &lt;dbl&gt;\n 1  0.0416 Low     0.0114 0.00000641  0.0493 9.61e-1  0.7          0.35    0.875\n 2 -0.333  Low     0.0106 0.00000384 -0.0941 9.25e-1  1            0.5     0.661\n 3  0.281  High    0.0126 0.00000751 -0.151  8.80e-1  0.9          0.45    0.640\n 4  0.411  High    0.0118 0.00000922  0.264  7.92e-1  0.6          0.3     0.853\n 5  0.387  High    0.0115 0.00000956  0.339  7.34e-1  0.62         0.31    1.07 \n 6 -0.368  High    0.0118 0.00000591 -0.583  5.60e-1  0.72         0.36    0.594\n 7  3.56   High    0.0151 0.00000731  2.61   9.01e-3  0.06         0.03    1.09 \n 8  2.52   High    0.0136 0.00000614  1.49   1.35e-1  0.2          0.1     1.12 \n 9  4.56   High    0.0144 0.00000584  3.53   4.17e-4  0.04         0.02    1.23 \n10  1.16   Low     0.0104 0.00000370  1.82   6.86e-2  0.12         0.06    0.416\n# ℹ 78 more rows\n# ℹ 10 more variables: kurtosis &lt;dbl&gt;, nb &lt;nb&gt;, wts &lt;list&gt;, NAME_2 &lt;chr&gt;,\n#   ID_3 &lt;int&gt;, NAME_3 &lt;chr&gt;, ENGTYPE_3 &lt;chr&gt;, County &lt;chr&gt;, GDPPC &lt;dbl&gt;,\n#   geometry &lt;POLYGON [°]&gt;"
+  },
+  {
+    "objectID": "In-class/In-class_Ex04/In-class_Ex04.html#visualising-gi",
+    "href": "In-class/In-class_Ex04/In-class_Ex04.html#visualising-gi",
+    "title": "Global and Local Measures of Spatial Autocorrelation",
+    "section": "Visualising Gi*",
+    "text": "Visualising Gi*\nThe code chunk\n\ntm_shape(HCSA) +\n  tm_polygons()+\ntm_shape(filter(HCSA,p_sim &lt; 0.05)) +\n  tm_polygons(c(\"cluster\",\"p_sim\"), title=c(\"Cluster\",\"P-Value\"))"
   }
 ]

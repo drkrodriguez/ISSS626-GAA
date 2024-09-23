@@ -1,0 +1,40 @@
+---
+title: "Discovering Impact of COVID-19 on Thai Tourism Economy"
+author: "Federico Jose Rodriguez"
+date: "Sep 23 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+(Exercise Summary)
+
+# A. Getting Started
+
+## A.1 Background
+
+WIP
+
+## A.2 Objectives
+
+WIP
+
+## A.3 Data Sources
+
+WIP
+
+## A.4 Importing and Launching R Packages
+
+(WIP) For this study, XXX R packages will be used. A description of the packages and the code, using `p_load()` of the **pacman** package, to import them is given below.
+
+As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.
+
+```{r} set.seed(1234)}
+```
+
+# B. Data Loading and Preparation
+
+WIP
