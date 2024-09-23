@@ -1,0 +1,285 @@
+---
+title: "Global Measures of Spatial Autocorrelation"
+author: "Federico Jose Rodriguez"
+date: "Sep 22 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this hands-on exercise, we learn how to compute and interpret global measures of spatial autocorrelation (GMSA) using the **spdep** package.
+
+This exercise is based on Chapter 9 of Dr Kam's online book which can be accessed [here](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam").
+
+# Getting Started
+
+## Analytical Question
+
+One of the main development objective in spatial policy is for local governments and planners to ensure that there is equal distribution of development in the province. We then need to apply the appropriate spatial methods to verify if there is indeed even distribution of wealth geographically. If there is uneven distribution, then the next step is to identify if and where clusters are happening.
+
+We continue studying the Hunan Province in China and focus on GDP per capita as the key indicator of development.
+
+## Data Sources
+
+Data for this exercise are based on the Hunan county coming from two files:
+
+-   Hunan county boundary layer in ESRI shapefile format
+
+-   Hunan local development indicators for 2012 stored in a csv file
+
+## Installing and launching R packages
+
+This exercise will make use of five R packages: **sf**, **tidyverse,** **tmap, and spdep**.
+
+-   **sf -** for importing, managing and processing vector-based geospatial data
+
+-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+
+-   **tmap -** for plotting cartographic quality maps
+
+-   **spdep** - functions to create spatial weights, autocorrelation statistics
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse)
+```
+
+We also define a random seed value for repeatability of any simulation results.
+
+```{r}
+set.seed(1234)
+```
+
+# Data Import and Preparation
+
+## Data Loading
+
+The code chunk below uses `st_read()` of the **sf** package to load the Hunan shapefile into an R object.
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+We then use the code chunk below to load the csv file with the indicators into R using `read_csv()`
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+## Data Preparation
+
+We then update the first object, which is of sf type, by adding in the economic indicators from the second object using `left_join()` as in the code chunk below
+
+```{r}
+hunan <- left_join(hunan,hunan2012) %>%
+  select(1:4, 7, 15)
+```
+
+If we check the contents of `hunan` using `head()`, we see that it now includes a column `GDDPPC`
+
+```{r}
+head(hunan)
+```
+
+## Visualization of the Development Indicator
+
+Before we move to the main analyses, we can visualize the distribution of GCPPC by using **tmap** package. We present these uas two maps using classes of equal intervals and equal quantiles.
+
+```{r}
+equal <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "equal") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal interval classification")
+
+quantile <- tm_shape(hunan) +
+  tm_fill("GDPPC",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Equal quantile classification")
+
+tmap_arrange(equal, 
+             quantile, 
+             asp=1, 
+             ncol=2)
+```
+
+# Global Measures of Spatial Autocorrelation: Preparation
+
+In the succeeding sections, we compute global spatial autocorrelation statistics and perform spatial CSR test for global spatial autocorrelation.
+
+## Computing Contiguity Spatial Weights
+
+Prior to computing GMSA's, we need t construct spatial weights of the study area. Spatial weights are used to define the neighborhood relationship between units. (i.e., neighbors or adjacent units)
+
+The code chunk below uses `poly2nb()` of the **spdep** package to compute contiguity weight matrices for the study area. The function builds a neighbor list based on regions with shared boundaries. The `queen` argument takes TRUE (default) or FALSE as options. This instructs the function if Queen criteria should be used in defining neighbors. For the code below, we use the Queen criteria to build the contiguity matrix
+
+```{r}
+wm_q <- poly2nb(hunan, 
+                queen=TRUE)
+summary(wm_q)
+```
+
+The output shows that there are 88 units in the `hunan` dataset, The most connected unit has 11 neighbors and two units have only one neighbor.
+
+## Row-standardised weights matrix
+
+The next step is assigning weights to each neighbor. For our case, we assign equal weight (using `style="W"`) to each neighboring polygon. This assigns the fraction 1/n, where n is the number of neighbors a unit has, as the weight of each unit's neighbor. The drawback of this approach is that polygons in the edge of the study area will base their value on a smaller number of neighbors. This means that we may be potentially over- or under-estimating the true nature of spatial autocorrelation. The alternative more robust `style="B"` can address this.
+
+```{r}
+rswm_q <- nb2listw(wm_q, 
+                   style="W", 
+                   zero.policy = TRUE)
+rswm_q
+```
+
+# Global Measures of Spatial Autocorrelation: Moran's I
+
+In this section, we compute for Moran's I statistics by using `moran.test()` of the **spdep** package.
+
+## Moran's I test
+
+The code chunk below performs Moran's I statistical testing using `moran.test()` of the **spdep** package
+
+```{r}
+moran.test(hunan$GDPPC, 
+           listw=rswm_q, 
+           zero.policy = TRUE, 
+           na.action=na.omit)
+```
+
+The p-value does not support CSR for the GDPPC, while a positive statistic indicates signs of clustering. If the statistic value were below 0, or negative, then it would indicate signs of dispersion.
+
+## Monte Carlo Simulation for Moran's I
+
+We use the code chunk below to perform permutation test for the statistic by using `moran.mc()` of **spdep**. The `nsim` argument is set so that 1000 simulations will be performed.
+
+```{r}
+set.seed(1234)
+bperm= moran.mc(hunan$GDPPC, 
+                listw=rswm_q, 
+                nsim=999, 
+                zero.policy = TRUE, 
+                na.action=na.omit)
+bperm
+```
+
+## Visualization of Monte Carlo Simulation Results (Moran's I)
+
+It is good practice to analyse and visualize the simulation results in more detail. We can do this by checking the values and distribution of the statistic numerically and graphically.
+
+We can use the code chunk below to show individual statistics of the simulated value.
+
+```{r}
+summary(bperm$res[1:999])
+
+paste("Standard Dev:", var(bperm$res[1:999]))
+```
+
+We can visualize graphically using `hist()` and `abline()` from R Graphics.
+
+```{r}
+hist(bperm$res, 
+     freq=TRUE, 
+     breaks=20, 
+     xlab="Simulated Moran's I")
+abline(v=0, 
+       col="red") 
+```
+
+# Global Measures of Spatial Autocorrelation: Geary's C
+
+In this section, we compute for Geary's C statistic by using the spdep package
+
+## Geary's C test
+
+The code chunk below uses `geary.test()` to perform Geary's C test for spatial autocorrelation.
+
+```{r}
+geary.test(hunan$GDPPC, listw=rswm_q)
+```
+
+Geary's C test uses a different interpretation compared to Moran's I. A statistic value less than one, as in the case above, indicates signs of clustering, while a value of greater than one indicates dispersion. The very low p-value means that any hypothesis of compete spatial randomness (with α \> 0.015%) is not supported by the observed data.
+
+## Monte Carlo Simulation for Geary's C
+
+We use the code chunk below to perform permutation test for the statistic by using `geary.mc()` of **spdep**. The `nsim` argument is set so that 1000 simulations will be performed.
+
+```{r}
+set.seed(1234)
+bperm=geary.mc(hunan$GDPPC, 
+               listw=rswm_q, 
+               nsim=999)
+bperm
+```
+
+## Visualization of Monte Carlo Simulation Results (Geary's C)
+
+It is good practice to analyse and visualize the simulation results in more detail. We can do this by checking the values and distribution of the statistic numerically and graphically.
+
+We can use the code chunk below to show individual statistics of the simulated value.
+
+```{r}
+summary(bperm$res[1:999])
+
+paste("Standard Dev:", var(bperm$res[1:999]))
+```
+
+We can visualize graphically using `hist()` and `abline()` from R Graphics.
+
+```{r}
+hist(bperm$res,
+     freq=TRUE,
+     breaks=20,
+     xlab="Simulated Geary c")
+abline(v=1, col="red") 
+```
+
+# Spatial Correlogram
+
+Spatial correlograms let us examine patterns of spatial autocorrelation in the data or in the model residuals. They show correlation between pairs of observations when the distance between them are increased. they plot an index of correlation (e.g., Moran's I or Geary's C) against the distance.
+
+## Moran's I Correlogram and Plot
+
+The code chunk below uses `sp.correlogram()` of spdep package to compute a 6-lag (`order=6`) spatial correlogram of GDPPC using Moran's I. (`method="I"`) We then `plot()` to produce the visualization.
+
+```{r}
+MI_corr <- sp.correlogram(wm_q, 
+                          hunan$GDPPC, 
+                          order=6, 
+                          method="I", 
+                          style="W")
+plot(MI_corr)
+```
+
+Aside from the output, we can also display the full content of the analysis using the code below. This lets us see the result for each lag in more detail.
+
+```{r}
+print(MI_corr)
+```
+
+## Geary's C Correlogram and Plot
+
+The code chunk below uses `sp.correlogram()` of spdep package to compute a 6-lag (`order=6`) spatial correlogram of GDPPC using Geary's C. (`method="C"`) We then `plot()` to produce the visualization.
+
+```{r}
+GC_corr <- sp.correlogram(wm_q, 
+                          hunan$GDPPC, 
+                          order=6, 
+                          method="C", 
+                          style="W")
+plot(GC_corr)
+```
+
+We can also examine the results in more detail using the code chunk below
+
+```{r}
+print(GC_corr)
+```
