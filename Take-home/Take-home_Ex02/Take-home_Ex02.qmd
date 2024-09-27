@@ -32,8 +32,7 @@ WIP
 
 As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.
 
-```{r} set.seed(1234)}
-```
+`{r} set.seed(1234)}`
 
 # B. Data Loading and Preparation
 
