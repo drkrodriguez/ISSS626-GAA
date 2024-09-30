@@ -18,7 +18,7 @@
     "href": "index.html#in-class-exercises",
     "title": "Geospatial Analytics and Applications (in R)",
     "section": "In-Class Exercises",
-    "text": "In-Class Exercises\nIn each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.\n\nIntroduction to Geospatial Analytics (26 Aug ’24)\nSpatial Point Pattern Analysis - Data Load for Take-home Exercise 1 (2 Sept ’24)\nAdvanced Spatial Point Patterns Analysis (9 Sept ’24)\nSpatial Autocorrelation (23 Sept’24)"
+    "text": "In-Class Exercises\nIn each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.\n\nIntroduction to Geospatial Analytics (26 Aug ’24)\nSpatial Point Pattern Analysis - Data Load for Take-home Exercise 1 (2 Sept ’24)\nAdvanced Spatial Point Patterns Analysis (9 Sept ’24)\nSpatial Autocorrelation (23 Sept’24)\nEmerging Hot Spot Analysis (30 Sept ’24)"
   },
   {
     "objectID": "index.html#take-home-exercises",
@@ -487,7 +487,7 @@
     "href": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.3-data-sources",
     "title": "Discovering Impact of COVID-19 on Thai Tourism Economy",
     "section": "A.3 Data Sources",
-    "text": "A.3 Data Sources\nWIP"
+    "text": "A.3 Data Sources\nThe following data sources are used for this analysis:\n\nThailand Domestic Tourism Statistics from Kaggle covering the years 2019-2023 and are at province and month level across 8 indicators:\n\nno_tourist_all - XXX\nno_tourist_foreign - XXX\nno_tourist_occupied - XXX\nno_tourist_thai - XXX\noccupancy_rate - XXX\nrevenue_all - XXX\nrevenue_foreign - XXX\nrevenue_thai - XXX\n\nThailand-Subnational Administrative Boundaries from Human Data Exchange in shapefile format"
   },
   {
     "objectID": "Take-home/Take-home_Ex02/Take-home_Ex02.html#a.4-importing-and-launching-r-packages",
@@ -782,5 +782,47 @@
     "title": "Geographic Segmentation with Spatially Constrained Clustering Techniques",
     "section": "Multi-variate visualisation",
     "text": "Multi-variate visualisation\nParallel coordinate plots can be used to reveal insights on clustering variables by clusters effectively, We can perform this using ggparcoord() of GGally package.\n\nggparcoord(data = shan_sf_ngeo_cluster, \n           columns = c(17:21), \n           scale = \"globalminmax\",\n           alphaLines = 0.2,\n           boxplot = TRUE, \n           title = \"Multiple Parallel Coordinates Plots of ICT Variables by Cluster\") +\n  facet_grid(~ CLUSTER) + \n  theme(axis.text.x = element_text(angle = 30))\n\n\n\n\n\n\n\n\nThe scale argument of ggparcorr() provides several options to scale the variables:\n\nstd - univariately, scaled as Z value\nrobust - univariately, subtract median and divide by mean absolute deviation\nuniminmax - univariately, scale to [0-1]\nglobalminmax - no scaling is done, range is defined by global min and max values\ncenter - use uniminmax to standardize vertical height, then center at a specified value (scaleSummary parameter)\ncenterObs - use uniminmax to standardize vertical height, then center at a specified observation’s value (centerObsIDparameter)\n\nWe can also compare the clusters by computing for statistics that will complement the visual interpretation. The code chunk below uses group_by() and summarise() of dplyr to derive the mean values for the clustering variables by cluster\n\nshan_sf_ngeo_cluster %&gt;% \n  st_set_geometry(NULL) %&gt;%\n  group_by(CLUSTER) %&gt;%\n  summarise(mean_RADIO_PR = mean(RADIO_PR),\n            mean_TV_PR = mean(TV_PR),\n            mean_LLPHONE_PR = mean(LLPHONE_PR),\n            mean_MPHONE_PR = mean(MPHONE_PR),\n            mean_COMPUTER_PR = mean(COMPUTER_PR))\n\n# A tibble: 6 × 6\n  CLUSTER mean_RADIO_PR mean_TV_PR mean_LLPHONE_PR mean_MPHONE_PR\n  &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;\n1 1               221.        521.            44.2           246.\n2 2               237.        402.            23.9           134.\n3 3               300.        611.            52.2           392.\n4 4               196.        744.            99.0           651.\n5 5               124.        224.            38.0           132.\n6 6                98.6       499.            74.5           468.\n# ℹ 1 more variable: mean_COMPUTER_PR &lt;dbl&gt;"
+  },
+  {
+    "objectID": "In-class/In-class_Ex05/In-class_Ex05.html",
+    "href": "In-class/In-class_Ex05/In-class_Ex05.html",
+    "title": "Emerging Hot Spot Analysis",
+    "section": "",
+    "text": "In this exercise, we perform emerging hotspot analysis on the Hunan GDPPC data."
+  },
+  {
+    "objectID": "In-class/In-class_Ex05/In-class_Ex05.html#deriving-the-spatial-weights",
+    "href": "In-class/In-class_Ex05/In-class_Ex05.html#deriving-the-spatial-weights",
+    "title": "Emerging Hot Spot Analysis",
+    "section": "Deriving the spatial weights",
+    "text": "Deriving the spatial weights\nWe use the code chunk below to identify the neighbors and to derive inverse distance weights. The alpha argument of st_inverse_distance() determines the level of distance decay.\n\nGDPPC_nb &lt;- GDPPC_st %&gt;%\n  activate(\"geometry\") %&gt;%\n  mutate(nb = include_self(\n    st_contiguity(geometry)),\n    wt=st_inverse_distance(nb,\n                  geometry,\n                  scale = 1,\n                  alpha = 1),\n    .before = 1) %&gt;%\n  set_nbs(\"nb\") %&gt;%\n  set_wts(\"wt\")\n\n! Polygon provided. Using point on surface.\n\n\nWarning: There was 1 warning in `stopifnot()`.\nℹ In argument: `wt = st_inverse_distance(nb, geometry, scale = 1, alpha = 1)`.\nCaused by warning in `st_point_on_surface.sfc()`:\n! st_point_on_surface may not give correct results for longitude/latitude data"
+  },
+  {
+    "objectID": "In-class/In-class_Ex05/In-class_Ex05.html#computing-gi",
+    "href": "In-class/In-class_Ex05/In-class_Ex05.html#computing-gi",
+    "title": "Emerging Hot Spot Analysis",
+    "section": "Computing Gi*",
+    "text": "Computing Gi*\nWe use the following chunk to calculate the local Gi* for each location. We do this using local_gstar_perm() of sfdep package. We then use unnest() to unnest the gi_star column of the newly created data frame.\n\ngi_stars &lt;- GDPPC_nb %&gt;%\n  group_by(Year) %&gt;%\n  mutate(gi_star = local_gstar_perm(\n    GDPPC, nb, wt)) %&gt;%\n  tidyr::unnest(gi_star)"
+  },
+  {
+    "objectID": "In-class/In-class_Ex05/In-class_Ex05.html#performing-mann-kendall-test-on-gi-of-one-location",
+    "href": "In-class/In-class_Ex05/In-class_Ex05.html#performing-mann-kendall-test-on-gi-of-one-location",
+    "title": "Emerging Hot Spot Analysis",
+    "section": "Performing Mann-Kendall Test on Gi of one location",
+    "text": "Performing Mann-Kendall Test on Gi of one location\nThe code chunk below evaluates Changsha county for trends\n\ncbg &lt;- gi_stars %&gt;%\n  ungroup() %&gt;%\n  filter(County == \"Changsha\") %&gt;%\n  select(County, Year, gi_star)\n\nWe then plot the result using ggplot2 package\n\nggplot(data = cbg,\n       aes(x = Year,\n           y = gi_star)) +\n  geom_line() +\n  theme_light()\n\n\n\n\n\n\n\n\nWe can convert this into an interactive plot by passing the chart into ggplotly()\n\np &lt;- ggplot(data = cbg,\n       aes(x = Year,\n           y = gi_star)) +\n  geom_line() +\n  theme_light()\n\nggplotly(p)\n\n\n\n\n\nWe can conduct the Mann-Kendall test on Changsha by using MannKendall() from the Kendall package in the code chunk below\n\n\\(H_0\\) - No monotonic trend on the GDPPC value of Changsha\n\\(H_1\\) - Monotonic trend is present on the GDPPC value of Changsha\n\n\ncbg %&gt;%\n  summarise(mk = list(\n    unclass(\n      Kendall::MannKendall(gi_star)))) %&gt;%\n  tidyr::unnest_wider(mk)\n\n# A tibble: 1 × 5\n    tau      sl     S     D  varS\n  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 0.485 0.00742    66  136.  589.\n\n\nThe output gives the tau value, the significance level (sl) or p-value."
+  },
+  {
+    "objectID": "In-class/In-class_Ex05/In-class_Ex05.html#mann-kendall-test-dataframe",
+    "href": "In-class/In-class_Ex05/In-class_Ex05.html#mann-kendall-test-dataframe",
+    "title": "Emerging Hot Spot Analysis",
+    "section": "Mann-Kendall Test Dataframe",
+    "text": "Mann-Kendall Test Dataframe\nThe code chunk below runs the Mann-Kendall test on all counties in Hunan.\n\nehsa &lt;- gi_stars %&gt;%\n  group_by(County) %&gt;%\n  summarise(mk = list(\n    unclass(\n      Kendall::MannKendall(gi_star)))) %&gt;%\n  tidyr::unnest_wider(mk)\nhead(ehsa)\n\n# A tibble: 6 × 6\n  County        tau        sl     S     D  varS\n  &lt;chr&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 Anhua      0.191  0.303        26  136.  589.\n2 Anren     -0.294  0.108       -40  136.  589.\n3 Anxiang    0      1             0  136.  589.\n4 Baojing   -0.691  0.000128    -94  136.  589.\n5 Chaling   -0.0882 0.650       -12  136.  589.\n6 Changning -0.750  0.0000318  -102  136.  589.\n\n\nNot all the counties are showing statistically significant result (i.e., sl &lt; 0.05)\nWe can examine some of the counties to observe how their Gi* values change overtime.\nThe code chunk below\n\ncountycheck &lt;- gi_stars %&gt;%\n  ungroup() %&gt;%\n  filter(County == \"Changsha\") %&gt;%\n  select(County, Year, gi_star)\n\np &lt;- ggplot(data = countycheck,\n       aes(x = Year,\n           y = gi_star)) +\n  geom_line() +\n  theme_light()\n\nggplotly(p)"
+  },
+  {
+    "objectID": "In-class/In-class_Ex05/In-class_Ex05.html#visualising-ehsa",
+    "href": "In-class/In-class_Ex05/In-class_Ex05.html#visualising-ehsa",
+    "title": "Emerging Hot Spot Analysis",
+    "section": "Visualising EHSA",
+    "text": "Visualising EHSA\nTo visualize, we first hoing the ehsa results with the sf dataframe\n\nhunan_ehsa &lt;- hunan %&gt;%\n  left_join(ehsa,\n            by = join_by(County == location))\n\nWe can then use tmap package to create a filled map based on the classification filtered for statistically significant results.\n\nehsa_sig &lt;- hunan_ehsa %&gt;%\n  filter(p_value &lt; 0.05)\ntmap_mode(\"plot\")\n\ntmap mode set to plotting\n\ntm_shape(hunan_ehsa) +\n  tm_polygons() +\n  tm_borders(alpha = 0.5) +\n  tm_shape(ehsa_sig) +\n  tm_fill(\"classification\") +\n  tm_borders(alpha = 0.4)\n\nWarning: One tm layer group has duplicated layer types, which are omitted. To\ndraw multiple layers of the same type, use multiple layer groups (i.e. specify\ntm_shape prior to each of them)."
   }
 ]

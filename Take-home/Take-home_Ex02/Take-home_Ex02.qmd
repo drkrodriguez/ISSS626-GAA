@@ -24,7 +24,27 @@ WIP
 
 ## A.3 Data Sources
 
-WIP
+The following data sources are used for this analysis:
+
+-   [Thailand Domestic Tourism Statistics](https://www.kaggle.com/datasets/thaweewatboy/thailand-domestic-tourism-statistics) from Kaggle covering the years 2019-2023 and are at province and month level across 8 indicators:
+
+    1.  `no_tourist_all` - XXX
+
+    2.  `no_tourist_foreign` - XXX
+
+    3.  `no_tourist_occupied` - XXX
+
+    4.  `no_tourist_thai` - XXX
+
+    5.  `occupancy_rate` - XXX
+
+    6.  `revenue_all` - XXX
+
+    7.  `revenue_foreign` - XXX
+
+    8.  `revenue_thai` - XXX
+
+-   [Thailand-Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-tha?) from Human Data Exchange in shapefile format
 
 ## A.4 Importing and Launching R Packages
 

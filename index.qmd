@@ -41,6 +41,8 @@ In each session, we go through a hands-on exercise to revise the readings for th
 
 4.  [Spatial Autocorrelation](In-class/In-class_Ex04/In-class_Ex04.html) (23 Sept'24)
 
+5.  [Emerging Hot Spot Analysis](In-class/In-class_Ex05/In-class_Ex05.html) (30 Sept '24)
+
 ## Take-Home Exercises
 
 Take-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.
