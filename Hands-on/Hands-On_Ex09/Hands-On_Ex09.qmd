@@ -1,5 +1,5 @@
 ---
-title: "Geographic Segmentation wwith Spatially Constrained Clustering Techniques"
+title: "Geographic Segmentation with Spatially Constrained Clustering Techniques"
 author: "Federico Jose Rodriguez"
 date: "Sep 27 2024"
 date-modified: "last-modified"
@@ -383,4 +383,472 @@ ggarrange(r, s, z,
 
 ## Computing the proximity matrix
 
-xx
+There are many packages in R that provide functions to compute for the distance matrix. We will use `dist()` for our case.
+
+This function supports six distance calculations: **euclidean (*default*), maximum, manhattan, canberra, binary and minkowski**. The code chunk below is used to compute the proximity matrix using the *euclidean* method.
+
+```{r}
+proxmat <- dist(shan_ict, method = 'euclidean')
+```
+
+The code chunk below displays the content of `proxmat` for inspection
+
+```{r}
+proxmat
+```
+
+## Computing hierarchical clustering
+
+There are several packages in R that can perform hierarchical clustering. In this exercise, we use `hclust()` of **R stats**.
+
+`hlcust()` employs agglomeration method to compute clusters. Eight clustering algorithms are supported: (1) ward.D, (2) ward.D2, (3) single, (4) complete, (5) average(UPGMA), (6) mcquitty(WPGMA), (7) median(WPGMC), and (8) centroid (UPGMC)
+
+The code chunk below performs hierarchical clustering using ward.D method. The output is stored in an object of class hclust which describes the tree produced by the clustering process.
+
+```{r}
+hclust_ward <- hclust(proxmat, method = 'ward.D')
+```
+
+Once ran, we can plot the resulting object as tree by using `plot()`
+
+```{r}
+plot(hclust_ward, cex = 0.6)
+```
+
+## Selecting the optimal clustering algorithm
+
+A challenge in performing hierarchical clustering is identifying strong clustering structures. This can be solved by using `agnes()` of the **cluster** package. The function acts like `hclust()`, but can also get the agglomerative coefficients– or the measure of the strength of the clustering structure. (with a value of 1 indicating a strong structure)
+
+The code chunk below computes the agglomerative coefficient of all algorithms.
+
+```{r}
+m <- c( "average", "single", "complete", "ward")
+names(m) <- c( "average", "single", "complete", "ward")
+
+ac <- function(x) {
+  agnes(shan_ict, method = x)$ac
+}
+
+map_dbl(m, ac)
+```
+
+The output above shows that Ward's method provides the best coefficient, and therefore the strongest cluster, among the four methods assessed. We will then focus on this method in succeeding analyses.
+
+## Determining optimal clusters
+
+Another challenge in cluster analysis is determining the number of clusters to retain. For this, there are three commonly used methods to determine the number of clusters:
+
+1.  Elbow method
+
+2.  Average Silhouette method
+
+3.  Gap Statistic Method
+
+### Gap statistic method
+
+The gap statistic compares intra-cluster variation for different values of k with their expected values under null reference data distribution. The optimal cluster will be the one that maximizes the gap statistic– meaning that the optimal cluster is the farthest from representing a random distribution of points.
+
+We use the code chunk below to compute the gap statistic using `clusGap()` of cluster package. One of the arguments, `FUN`, use the `hcut` function which comes from **factoextra** package indicating that hierarchical clustering is used.
+
+```{r}
+set.seed(12345)
+gap_stat <- clusGap(shan_ict, 
+                    FUN = hcut, 
+                    nstart = 25, 
+                    K.max = 10, 
+                    B = 50)
+# Print the result
+print(gap_stat, method = "firstmax")
+```
+
+We can then visualize the plot by using `fviz_gap_stat()` of **factoextra** package.
+
+```{r}
+fviz_gap_stat(gap_stat)
+```
+
+While the chart above shows that k=1 cluster(s) gives the highest gap statistic, it is not logical. Aside from k=1, we see that k=6 clusters gives the largest statistic and would be the best number of clusters to pick.
+
+In addition to the above, the **NbClust** package provides 30 indices for determining the optimal number of clusters.
+
+## Interpreting the dendograms
+
+Each leaf in the dendogram represents one observation. (townships in our example) Moving up the dendogram, leaves are combined into similar ones using branches. The heights of the fusion indicates the dissimilarity between the two observations, i.e., the higher the height the larger the difference between the two observations. The horizontal axis does not provide any information on the similarity or dissimilarity of pairs of observations.
+
+The dendogram can be redrawn with a border around selected (number of) clusters by using `rect.hclust()` of **R stat**. The `border` argument specifies the border colors for the rectangles.
+
+```{r}
+plot(hclust_ward, cex = 0.6)
+rect.hclust(hclust_ward, 
+            k = 6, 
+            border = 2:5)
+```
+
+## Visually-driven hierarchical clustering analysis
+
+In this section, we use **heatmaply** package to perform visually driven hierarchical clustering analysis. With this package, we can build interactive or static cluster heatmaps.
+
+### Transforming dataframe into a matrix
+
+To create a heatmap, the data needs to be in a matrix. We convert the data frame to this format using the code below
+
+```{r}
+shan_ict_mat <- data.matrix(shan_ict)
+```
+
+### Plotting interactive cluster heatmap using `heatmaply()`
+
+The code chunk below uses `heatmaply()` of **heatmap** package to produce an interactive cluster heatmap
+
+```{r}
+heatmaply(normalize(shan_ict_mat),
+          Colv=NA,
+          dist_method = "euclidean",
+          hclust_method = "ward.D",
+          seriate = "OLO",
+          colors = Blues,
+          k_row = 6,
+          margins = c(NA,200,60,NA),
+          fontsize_row = 4,
+          fontsize_col = 5,
+          main="Geographic Segmentation of Shan State by ICT indicators",
+          xlab = "ICT Indicators",
+          ylab = "Townships of Shan State"
+          )
+```
+
+## Mapping the clusters formed
+
+We can use `cutree()` for **R base** to derive a 6-cluster model. The code below outputs a list object.
+
+```{r}
+groups <- as.factor(cutree(hclust_ward, k=6))
+```
+
+In order to visualize the clusters, the list first needs to be appended to the `shan_sf` simple feature object.
+
+This is accomplished in the following code chunk in three steps:
+
+1.  The object is converted to a matrix
+2.  `cbind()` is used to append the matrix object onto `shan_sf` as a new sf object
+3.  `rename()` is then used to rename the appended field `as.matrix.groups` into `CLUSTER`
+
+```{r}
+shan_sf_cluster <- cbind(shan_sf, as.matrix(groups)) %>%
+  rename(`CLUSTER`=`as.matrix.groups.`)
+```
+
+We then use `qtm()` of **tmap** package to produce a quick map of Shan state with the clusters
+
+```{r}
+qtm(shan_sf_cluster, "CLUSTER")
+```
+
+The plot shows that the resulting clusters are quite fragmented. This is a limitation of performing non-spatial clustering algorithm.
+
+# Spatially Constrained Clustering: SKATER Approach
+
+In this section we use `skater()` of **spdep** package to derive spatially constrained clusters.
+
+## Converting into SpatialPolygons DataFrame
+
+The `skater()` function can only support sp objects, so conversion into the appropriate type is required
+
+The code chunk performs the conversion using `as_Spatial()` of **sf** package.
+
+```{r}
+shan_sp <- as_Spatial(shan_sf)
+```
+
+```{r}
+class(shan_sp)
+```
+
+## Computing Neighbor list
+
+We then use `poly2nd()` of **spdep** package to generate the neighbor list from the polygon dataframe.
+
+```{r}
+shan.nb <- poly2nb(shan_sp)
+summary(shan.nb)
+```
+
+We can visualize the neighbor lists using the chunks below. We first plot the boundaries based on `shan_sf`. We follow this with the neighbor list object `shan.nd` and use the shape centroids to represent nodes for the graph representation. The `add=TRUE` argument specifies plotting the network on top of the plot of the boundaries.
+
+```{r}
+coords <- st_coordinates(
+  st_centroid(st_geometry(shan_sf)))
+```
+
+```{r}
+plot(st_geometry(shan_sf), 
+     border=grey(.5))
+plot(shan.nb,
+     coords, 
+     col="blue", 
+     add=TRUE)
+```
+
+## Computing minimum spanning tree
+
+### Calculating edge costs
+
+We then use `nbcosts()` of **spdep** package to compute the cost of each edge. The cost will be the "distance" between nodes.
+
+```{r}
+lcosts <- nbcosts(shan.nb, shan_ict)
+```
+
+The function computes the dissimilarity between pairs of neighbors across the value of the five variables.
+
+We then incorporate these costs into a weights object which is equivalent to converting the neighbor list into a list weights object by specifying `lcosts` as weights. We achieve this by using nb2listw() of spdep package in the code chunk below. We specify `style="B"` to make sure the cost values are not row-standardised.
+
+```{r}
+shan.w <- nb2listw(shan.nb, 
+                   lcosts, 
+                   style="B")
+summary(shan.w)
+```
+
+### Computing the minimum spanning tree
+
+We use `mstree()` of **spdep** package to compute the minimal spanning tree.
+
+```{r}
+shan.mst <- mstree(shan.w)
+```
+
+```{r}
+dim(shan.mst)
+```
+
+Note that the resulting minimum spanning tree has a dimension n-1 (55-1=54) as it consists of n-1 links to connect the nodes that allow traversal from any any pair of nodes.
+
+We can display the content of the spanning tree using `head()` where we see the first six links and their respective weight
+
+```{r}
+head(shan.mst)
+```
+
+The `plot` method for MST includes a way to show the observation (numbers/index) in addition to the connecting edge. The resulting plot will be similar to the neighbor list's except there will only be at most two edges connecting to any node
+
+```{r}
+plot(st_geometry(shan_sf), 
+                 border=gray(.5))
+plot.mst(shan.mst, 
+         coords, 
+         col="blue", 
+         cex.lab=0.7, 
+         cex.circles=0.005, 
+         add=TRUE)
+```
+
+## Computing spatially constrained clusters using SKATER method
+
+We can use `skater()` of **spdep** package to compute spatially constrained clusters as in the code chink below
+
+```{r}
+clust6 <- spdep::skater(edges = shan.mst[,1:2], 
+                 data = shan_ict, 
+                 method = "euclidean", 
+                 ncuts = 5)
+```
+
+The function requires three mandatory arguments:
+
+1.  The first two columes of the MST (the edge, or pair of nodes)
+2.  the data matrix
+3.  the number of cuts which is equal to the number of clusters minus 1
+
+The resulting object is of class skater. We can examine the contents using the code chunk below
+
+```{r}
+str(clust6)
+```
+
+The first field `groups` contains the label of the cluster membership for that observation. The next object contains details of the different clusters which include the nodes and edges in that cluster.
+
+We can check the cluster assignments using the following code chunk
+
+```{r}
+ccs6 <- clust6$groups
+ccs6
+```
+
+We can check how many observations are in each cluster using the `table()` function.
+
+```{r}
+table(ccs6)
+```
+
+We can also plot the pruned tree showing the six clusters. Note that two of the clusters have only one township each so they will not produce a colored edge in the plot (Group 5 with node 23, group 6 with node 3)
+
+```{r}
+plot(st_geometry(shan_sf), 
+     border=gray(.5))
+plot(clust6, 
+     coords, 
+     cex.lab=.7,
+     groups.colors=c("red","green","blue", "brown", "pink", "black"),
+     cex.circles=0.005, 
+     add=TRUE)
+```
+
+## Visualizing the clusters in a choropleth map
+
+The code chunk below can be used to plot the clusters derived from SKATER method using tmap package
+
+```{r}
+groups_mat <- as.matrix(clust6$groups)
+shan_sf_spatialcluster <- cbind(shan_sf_cluster, as.factor(groups_mat)) %>%
+  rename(`SP_CLUSTER`=`as.factor.groups_mat.`)
+qtm(shan_sf_spatialcluster, "SP_CLUSTER")
+```
+
+For easier comparison, we can put the clusters generated using hierarchical clustering and spatially constrained hierarchical clustering side by side.
+
+```{r}
+hclust.map <- qtm(shan_sf_cluster,
+                  "CLUSTER") + 
+  tm_borders(alpha = 0.5) 
+
+shclust.map <- qtm(shan_sf_spatialcluster,
+                   "SP_CLUSTER") + 
+  tm_borders(alpha = 0.5) 
+
+tmap_arrange(hclust.map, shclust.map,
+             asp=NA, ncol=2)
+```
+
+# Spatially Constrained Clustering: ClustGeo Method
+
+In this section, we use functions from the **ClustGeo** package to perform non-spatially constrained and spatially constrained hierarchical cluster analysis
+
+## Ward-like hierarchical clustering: ClustGeo
+
+The package contains a function `hclustgeo()` to perform Ward-like hierarchical clustering similar to `hclust()`
+
+The function only requires the dissimilarity matrix to perform non-spatially constrained clustering as in the code chunk below. Note that the dissimilarity matrix needs to be of class dist, an object generated by `dist()`
+
+```{r}
+nongeo_cluster <- hclustgeo(proxmat)
+plot(nongeo_cluster, cex = 0.5)
+rect.hclust(nongeo_cluster, 
+            k = 6, 
+            border = 2:5)
+```
+
+## Mapping the clusters formed
+
+We can plot the generated clusters in a shaded map using the code chunks below
+
+```{r}
+groups <- as.factor(cutree(nongeo_cluster, k=6))
+```
+
+```{r}
+shan_sf_ngeo_cluster <- cbind(shan_sf, as.matrix(groups)) %>%
+  rename(`CLUSTER` = `as.matrix.groups.`)
+```
+
+```{r}
+qtm(shan_sf_ngeo_cluster, "CLUSTER")
+```
+
+As it is not spatially-constrained, the resulting clusters are quite fragmented
+
+## Spatially-constrained hierarchical clustering
+
+Before performing spatially-constrained hierarchical clustering, we use `st_distance()` of **sf** package to generate a spatial distance matrix. We use the code chunk below which also include `as.dist()` to convert the dataframe into a matrix.
+
+```{r}
+dist <- st_distance(shan_sf, shan_sf)
+distmat <- as.dist(dist)
+```
+
+Next, we determine a suitable value for the mixing parameter alpha using `choicealpha()`
+
+```{r}
+cr <- choicealpha(proxmat, distmat, range.alpha = seq(0, 1, 0.1), K=6, graph = TRUE)
+```
+
+Based on the charts above, we select alpha = 0.3 as the input to `hclustgeo()`
+
+```{r}
+clustG <- hclustgeo(proxmat, distmat, alpha = 0.3)
+```
+
+We then use `cutree()` to derive the cluster object
+
+```{r}
+groups <- as.factor(cutree(clustG, k=6))
+```
+
+We then join the group list back into the `shan_sf` polygon feature dataframe using the code chunk below
+
+```{r}
+shan_sf_Gcluster <- cbind(shan_sf, as.matrix(groups)) %>%
+  rename(`CLUSTER` = `as.matrix.groups.`)
+```
+
+We can then use `qtm()` to map the spatially constrained clusters.
+
+```{r}
+qtm(shan_sf_Gcluster, "CLUSTER")
+```
+
+# Visual Interpretation of Clusters
+
+## Visualising individual clustering variable
+
+The code chunk below reveals the distribution of a clustering variable (`RADIO_PR`) based on one of the clustering approaches (non-spatially constrained ClustGeo)
+
+```{r}
+ggplot(data = shan_sf_ngeo_cluster,
+       aes(x = CLUSTER, y = RADIO_PR)) +
+  geom_boxplot()
+```
+
+The boxplot reveals that cluster 3 (in this method) has the highest mean radio penetration rate while clusters 4,5, and 6 have the lowest
+
+## Multi-variate visualisation
+
+Parallel coordinate plots can be used to reveal insights on clustering variables by clusters effectively, We can perform this using `ggparcoord()` of **GGally** package.
+
+```{r}
+ggparcoord(data = shan_sf_ngeo_cluster, 
+           columns = c(17:21), 
+           scale = "globalminmax",
+           alphaLines = 0.2,
+           boxplot = TRUE, 
+           title = "Multiple Parallel Coordinates Plots of ICT Variables by Cluster") +
+  facet_grid(~ CLUSTER) + 
+  theme(axis.text.x = element_text(angle = 30))
+```
+
+The `scale` argument of `ggparcorr()` provides several options to scale the variables:
+
+-   std - univariately, scaled as Z value
+
+-   robust - univariately, subtract median and divide by mean absolute deviation
+
+-   uniminmax - univariately, scale to \[0-1\]
+
+-   globalminmax - no scaling is done, range is defined by global min and max values
+
+-   center - use uniminmax to standardize vertical height, then center at a specified value (`scaleSummary` parameter)
+
+-   centerObs - use uniminmax to standardize vertical height, then center at a specified observation's value (`centerObsID`parameter)
+
+We can also compare the clusters by computing for statistics that will complement the visual interpretation. The code chunk below uses `group_by()` and `summarise()` of **dplyr** to derive the mean values for the clustering variables by cluster
+
+```{r}
+shan_sf_ngeo_cluster %>% 
+  st_set_geometry(NULL) %>%
+  group_by(CLUSTER) %>%
+  summarise(mean_RADIO_PR = mean(RADIO_PR),
+            mean_TV_PR = mean(TV_PR),
+            mean_LLPHONE_PR = mean(LLPHONE_PR),
+            mean_MPHONE_PR = mean(MPHONE_PR),
+            mean_COMPUTER_PR = mean(COMPUTER_PR))
+```
