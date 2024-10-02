@@ -22,6 +22,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -208,7 +242,11 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#a.3-data-sources" id="toc-a.3-data-sources" class="nav-link" data-scroll-target="#a.3-data-sources">A.3 Data Sources</a></li>
   <li><a href="#a.4-importing-and-launching-r-packages" id="toc-a.4-importing-and-launching-r-packages" class="nav-link" data-scroll-target="#a.4-importing-and-launching-r-packages">A.4 Importing and Launching R Packages</a></li>
   </ul></li>
-  <li><a href="#b.-data-loading-and-preparation" id="toc-b.-data-loading-and-preparation" class="nav-link" data-scroll-target="#b.-data-loading-and-preparation">B. Data Loading and Preparation</a></li>
+  <li><a href="#b.-data-loading-and-preparation" id="toc-b.-data-loading-and-preparation" class="nav-link" data-scroll-target="#b.-data-loading-and-preparation">B. Data Loading and Preparation</a>
+  <ul class="collapse">
+  <li><a href="#b.1.-thailand-subnational-boundary-provincial-level" id="toc-b.1.-thailand-subnational-boundary-provincial-level" class="nav-link" data-scroll-target="#b.1.-thailand-subnational-boundary-provincial-level">B.1. Thailand Subnational Boundary, Provincial Level</a></li>
+  <li><a href="#b.2.-thailand-tourism-data-by-province-jan-2019---feb-2023" id="toc-b.2.-thailand-tourism-data-by-province-jan-2019---feb-2023" class="nav-link" data-scroll-target="#b.2.-thailand-tourism-data-by-province-jan-2019---feb-2023">B.2. Thailand Tourism Data by Province, Jan 2019 - Feb 2023</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -241,7 +279,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 30, 2024</p>
+      <p class="date-modified">October 2, 2024</p>
     </div>
   </div>
     
@@ -257,11 +295,18 @@ ul.task-list li input[type="checkbox"] {
 <h1>A. Getting Started</h1>
 <section id="a.1-background" class="level2">
 <h2 class="anchored" data-anchor-id="a.1-background">A.1 Background</h2>
-<p>WIP</p>
+<p>Tourism is a major industry in Thailand as it made up to 20% of their gross domestic product pre-pandemic. However, like the rest of the world, the industry has taken a hit with COVID-19 in 2020, and has slowly been recovering since 2021. Recent reports are stating that Thailand is already, but still, at 80% of its peak level in 2019.</p>
+<p>While we speak about the industry in general, the state of tourism within Thailand, and their recovery status are not the same. For example, tourism revenues have been focused on Bangkok, Phuket and Chonburi pre-pandemic.</p>
+<p>We are interested in understanding the state of tourism across Thailand with regards to its spatial distribution and time and space distribution– both in absolutes and in terms of the trend with respect to the pandemic.</p>
 </section>
 <section id="a.2-objectives" class="level2">
 <h2 class="anchored" data-anchor-id="a.2-objectives">A.2 Objectives</h2>
-<p>WIP</p>
+<p>For this study, we want to understand the state of tourism in Thailand at a provincial level, and answer the following questions:</p>
+<ol type="1">
+<li><p>Are the key tourism indicators in Thailand (at a province level) independent from space and from space and time?</p></li>
+<li><p>If tourism or any tourism indicators are not independent, what are the clusters, outliers and emerging hotspots and coldspots?</p></li>
+</ol>
+<p>We will use the appropriate packages in R in order to perform the different analysis (spatial and otherwise) to support our answers to the above questions.</p>
 </section>
 <section id="a.3-data-sources" class="level2">
 <h2 class="anchored" data-anchor-id="a.3-data-sources">A.3 Data Sources</h2>
@@ -269,30 +314,205 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><p><a href="https://www.kaggle.com/datasets/thaweewatboy/thailand-domestic-tourism-statistics">Thailand Domestic Tourism Statistics</a> from Kaggle covering the years 2019-2023 and are at province and month level across 8 indicators:</p>
 <ol type="1">
-<li><p><code>no_tourist_all</code> - XXX</p></li>
-<li><p><code>no_tourist_foreign</code> - XXX</p></li>
-<li><p><code>no_tourist_occupied</code> - XXX</p></li>
-<li><p><code>no_tourist_thai</code> - XXX</p></li>
-<li><p><code>occupancy_rate</code> - XXX</p></li>
-<li><p><code>revenue_all</code> - XXX</p></li>
-<li><p><code>revenue_foreign</code> - XXX</p></li>
-<li><p><code>revenue_thai</code> - XXX</p></li>
+<li><p><code>no_tourist_all</code> - total number of domestic tourists</p></li>
+<li><p><code>no_tourist_foreign</code> - number of foreign tourists</p></li>
+<li><p><code>no_tourist_occupied</code> - number of hotel rooms occupied</p></li>
+<li><p><code>no_tourist_thai</code> - number of Thai tourists</p></li>
+<li><p><code>occupancy_rate</code> - the percentage of occupied travel accommodations</p></li>
+<li><p><code>revenue_all</code> - total tourism revenue, in THB</p></li>
+<li><p><code>revenue_foreign</code> - revenue generated by foreign tourists, in THB</p></li>
+<li><p><code>revenue_thai</code> - revenue generated by Thai tourists, in THB</p></li>
 </ol></li>
 <li><p><a href="https://data.humdata.org/dataset/cod-ab-tha?">Thailand-Subnational Administrative Boundaries</a> from Human Data Exchange in shapefile format</p></li>
 </ul>
 </section>
 <section id="a.4-importing-and-launching-r-packages" class="level2">
 <h2 class="anchored" data-anchor-id="a.4-importing-and-launching-r-packages">A.4 Importing and Launching R Packages</h2>
-<p>(WIP) For this study, XXX R packages will be used. A description of the packages and the code, using <code>p_load()</code> of the <strong>pacman</strong> package, to import them is given below.</p>
+<p>For this study, the following R packages will be used. A description of the packages and the code, using <code>p_load()</code> of the <strong>pacman</strong> package, to import them is given below.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Package Description</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Import Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>The loaded packages include:</p>
+<ul>
+<li><p><strong>sf -</strong> package for importing, managing and processing vector-based geospatial data</p></li>
+<li><p><strong>tidyverse -</strong> collection of packages for performing data importation, wrangling and visualization</p></li>
+<li><p><strong>tmap -</strong> package with functions for plotting cartographic quality maps</p></li>
+<li><p><strong>sfdep</strong> - for handling spatial data</p></li>
+<li><p><strong>coorplot, ggpubr, heatmaply, factoextra</strong> - packages for multivariate data visualization and analysis</p></li>
+<li><p><strong>cluster, ClustGeo, NbClust</strong> - packages for performing cluster analysis</p></li>
+</ul>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, tmap, sfdep, tidyverse,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               ggpubr, heatmaply, factoextra,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               NbClust, cluster, ClustGeo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
 <p>As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.</p>
-<p><code>{r} set.seed(1234)}</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="b.-data-loading-and-preparation" class="level1">
 <h1>B. Data Loading and Preparation</h1>
-<p>WIP</p>
+<section id="b.1.-thailand-subnational-boundary-provincial-level" class="level2">
+<h2 class="anchored" data-anchor-id="b.1.-thailand-subnational-boundary-provincial-level">B.1. Thailand Subnational Boundary, Provincial Level</h2>
+<p>We load the Thailand subnational administrative boundary shapefile into an R dataframe using <code>st_read()</code> from the sf package. We need to analyze at the provincial level so we will be using the files suffixed by “1”.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>thai_sf <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">layer=</span><span class="st">"tha_admbnda_adm1_rtsd_20220121"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `tha_admbnda_adm1_rtsd_20220121' from data source 
+  `C:\drkrodriguez\ISSS626-GAA\Take-home\Take-home_Ex02\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 77 features and 16 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 97.34336 ymin: 5.613038 xmax: 105.637 ymax: 20.46507
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<p>The output states that the object is of multipolygon geometry type containing 77 features (records) across 16 fields. (columns) We can check the contents of the object using a number of methods. For the code chunk below, we use <code>glimpse()</code> which lists the columns, gives the data type and the first elements.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(thai_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 77
+Columns: 17
+$ Shape_Leng &lt;dbl&gt; 2.417227, 1.695100, 1.251111, 1.884945, 3.041716, 1.739908,…
+$ Shape_Area &lt;dbl&gt; 0.13133873, 0.07926199, 0.05323766, 0.12698345, 0.21393797,…
+$ ADM1_EN    &lt;chr&gt; "Bangkok", "Samut Prakan", "Nonthaburi", "Pathum Thani", "P…
+$ ADM1_TH    &lt;chr&gt; "กรุงเทพมหานคร", "สมุทรปราการ", "นนทบุรี", "ปทุมธานี", "พระนครศรีอ…
+$ ADM1_PCODE &lt;chr&gt; "TH10", "TH11", "TH12", "TH13", "TH14", "TH15", "TH16", "TH…
+$ ADM1_REF   &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ ADM1ALT1EN &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ ADM1ALT2EN &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ ADM1ALT1TH &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ ADM1ALT2TH &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…
+$ ADM0_EN    &lt;chr&gt; "Thailand", "Thailand", "Thailand", "Thailand", "Thailand",…
+$ ADM0_TH    &lt;chr&gt; "ประเทศไทย", "ประเทศไทย", "ประเทศไทย", "ประเทศไทย", "ประเทศ…
+$ ADM0_PCODE &lt;chr&gt; "TH", "TH", "TH", "TH", "TH", "TH", "TH", "TH", "TH", "TH",…
+$ date       &lt;date&gt; 2019-02-18, 2019-02-18, 2019-02-18, 2019-02-18, 2019-02-18…
+$ validOn    &lt;date&gt; 2022-01-22, 2022-01-22, 2022-01-22, 2022-01-22, 2022-01-22…
+$ validTo    &lt;date&gt; -001-11-30, -001-11-30, -001-11-30, -001-11-30, -001-11-30…
+$ geometry   &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((100.6139 13..., MULTIPOLYGON (…</code></pre>
+</div>
+</div>
+<p>For clarity, we can clean up this dataframe by:</p>
+<ol type="1">
+<li>Keeping only relevant columns: The province name and code, geometry</li>
+<li>Renaming the columns: change ADM1 to Province</li>
+</ol>
+<p>The following code chunk executes these steps by using <code>select()</code> for the first step and <code>rename()</code> for the second step. We again use <code>glimpse()</code> to give a preview of the dataset’s columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>thai_sf <span class="ot">&lt;-</span> thai_sf <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ADM1_EN, ADM1_PCODE, geometry) <span class="sc">%&gt;%</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Province =</span> ADM1_EN, <span class="at">ProvCode =</span> ADM1_PCODE)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(thai_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 77
+Columns: 3
+$ Province &lt;chr&gt; "Bangkok", "Samut Prakan", "Nonthaburi", "Pathum Thani", "Phr…
+$ ProvCode &lt;chr&gt; "TH10", "TH11", "TH12", "TH13", "TH14", "TH15", "TH16", "TH17…
+$ geometry &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((100.6139 13..., MULTIPOLYGON (((…</code></pre>
+</div>
+</div>
+<p>We can check if there are any missing values by using <code>is.na()</code> and then check across each column using <code>colSums()</code> from <strong>Base R</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(thai_sf))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Province ProvCode geometry 
+       0        0        0 </code></pre>
+</div>
+</div>
+<p>The output shows that there are no missing values for any of the retained columns.</p>
+<p>Finally, we can quickly check if the object depicts Thailand properly by producing a quick map using <code>qtm()</code> from <strong>tmap</strong> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qtm</span>(thai_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="b.2.-thailand-tourism-data-by-province-jan-2019---feb-2023" class="level2">
+<h2 class="anchored" data-anchor-id="b.2.-thailand-tourism-data-by-province-jan-2019---feb-2023">B.2. Thailand Tourism Data by Province, Jan 2019 - Feb 2023</h2>
+<p>The code chunk below loads the tourism statistics data into a dataframe <code>tourism</code>. We use read_csv() to import the data from the file.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>tourism <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/thailand_domestic_tourism_2019_2023_ver2.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 30800 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (5): province_thai, province_eng, region_thai, region_eng, variable
+dbl  (1): value
+date (1): date
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<p>We can check the contents by using the code chunk below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tourism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 30,800 × 7
+   date       province_thai province_eng   region_thai region_eng variable value
+   &lt;date&gt;     &lt;chr&gt;         &lt;chr&gt;          &lt;chr&gt;       &lt;chr&gt;      &lt;chr&gt;    &lt;dbl&gt;
+ 1 2019-01-01 กรุงเทพมหานคร  Bangkok        ภาคกลาง     central    ratio_t…  93.4
+ 2 2019-01-01 ลพบุรี          Lopburi        ภาคกลาง     central    ratio_t…  61.3
+ 3 2019-01-01 พระนครศรีอยุธยา Phra Nakhon S… ภาคกลาง     central    ratio_t…  73.4
+ 4 2019-01-01 สระบุรี         Saraburi       ภาคกลาง     central    ratio_t…  67.3
+ 5 2019-01-01 ชัยนาท         Chainat        ภาคกลาง     central    ratio_t…  79.3
+ 6 2019-01-01 นครปฐม        Nakhon Pathom  ภาคกลาง     central    ratio_t…  71.7
+ 7 2019-01-01 สิงห์บุรี         Sing Buri      ภาคกลาง     central    ratio_t…  64.6
+ 8 2019-01-01 อ่างทอง        Ang Thong      ภาคกลาง     central    ratio_t…  71.2
+ 9 2019-01-01 นนทบุรี         Nonthaburi     ภาคกลาง     central    ratio_t…  75.1
+10 2019-01-01 ปทุมธานี        Pathum Thani   ภาคกลาง     central    ratio_t…  60.8
+# ℹ 30,790 more rows</code></pre>
+</div>
+</div>
+<p>The imported data contains 7 fields and 30,800 records at a province and month level.</p>
+<p>Before we analyze the dataset, let use remove unnecessary columns and rename the column names, similar to the previous dataset, using the code chunk below. (by using <code>select()</code> and <code>rename()</code>)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>tourism <span class="ot">&lt;-</span> tourism <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(date, province_eng, region_eng, variable, value) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Date =</span> date, <span class="at">Province =</span> province_eng, <span class="at">Region =</span> region_eng, <span class="at">Indicator =</span> variable, <span class="at">Value =</span> value)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tourism)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  Date       Province                 Region  Indicator          Value
+  &lt;date&gt;     &lt;chr&gt;                    &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;
+1 2019-01-01 Bangkok                  central ratio_tourist_stay  93.4
+2 2019-01-01 Lopburi                  central ratio_tourist_stay  61.3
+3 2019-01-01 Phra Nakhon Si Ayutthaya central ratio_tourist_stay  73.4
+4 2019-01-01 Saraburi                 central ratio_tourist_stay  67.3
+5 2019-01-01 Chainat                  central ratio_tourist_stay  79.3
+6 2019-01-01 Nakhon Pathom            central ratio_tourist_stay  71.7</code></pre>
+</div>
+</div>
+<p>We have kept only five of the columns which provides the date, the English descriptions for the location (province and region) as well as the (potential) tourism indicator and its value.</p>
+<p>We can also check for any missing values across these five columns using the code below. (using <code>is.na()</code> and <code>colSums()</code>)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(tourism))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Date  Province    Region Indicator     Value 
+        0         0         0         0         0 </code></pre>
+</div>
+</div>
+<p>We check the (WIP)</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
