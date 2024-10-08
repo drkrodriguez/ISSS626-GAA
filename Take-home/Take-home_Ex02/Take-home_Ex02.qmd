@@ -80,7 +80,7 @@ The loaded packages include:
 #### Import Code
 
 ```{r}
-pacman::p_load(sf, tmap, sfdep, tidyverse,
+pacman::p_load(sf, tmap, spdep, sfdep, tidyverse,
                ggpubr, heatmaply, factoextra,
                NbClust, cluster, ClustGeo)
 ```
@@ -744,7 +744,7 @@ thaitourism_sf <- mutate(thaitourism_sf, Occupancy_recovery = ifelse(PreCovid_oc
 ```
 
 ```{r}
-head(thaitourism_sf)
+class(thaitourism_sf)
 ```
 
 For the first visualization, let us plot the occupancy rate at a total level. The code below summarizes based on `occupancy_df` and computes a national occupancy rate to plot in a line chart.
@@ -834,7 +834,7 @@ plot
 
 Below 10M rooms, there appears to be an upward trend in occupancy rate to the number of rooms. Provinces with more than 10M rooms go against the trend and appear to be capped to 60% occupancy.
 
-# D. Spatial Autocorrelation
+# D. Testing for Global Spatial Autocorrelation
 
 Testing for spatial autocorrelation allows us to statistically determine if any of the indicator variables are dependent on space or location. These techniques also are useful for classifying clusters and outliers for particular variables of concern.
 
@@ -846,11 +846,32 @@ We will focus on checking signs of spatial autocorrelation or association before
 
 ## D.2 Deriving the Contiguity and Weight Matrix
 
-For the tests for this section, we need to derive a neighbor list as well as a weight matrix for each province to its neighbors. We do this in the code chunk below which creates a copy of `thai_tourism_sf` and includes a neighbour list `nb` and the weights `wt` using the Queen's criterion and using equal weights. We use the `include_self()` on `st_contiguity()` so that each node will have itself, at the minimum, as its neighbor. We need to ensure that each node has a non-empty neighbor list and this approach still limits neighbors to provinces that share a border.
+For the tests for this section, we need to derive a neighbor list as well as a weight matrix for each province to its neighbors. Given the presence of islands, we need to use distance rather than contiguity to define neighbors.
+
+The first step is to understand the distribution of distances between nearest neighbors to find a proper cut-off distance. The code chunk below
 
 ```{r}
-wm_q <- thaitourism_sf %>%
-  mutate(nb = include_self(st_contiguity(geometry)),
+longitude <- map_dbl(thaitourism_sf$geometry, ~st_centroid(.x)[[1]])
+latitude <- map_dbl(thaitourism_sf$geometry, ~st_centroid(.x)[[2]])
+coords <- cbind(longitude, latitude)
+
+k1 <- knn2nb(knearneigh(coords))
+k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
+summary(k1dists)
+```
+
+The maximum distance is 110.94 so setting a distance threshold of 111 should ensure that each province should have at least one neighbor. We then produce a nearest neighbor list for each province using `dnearneigh()`
+
+```{r}
+wm_d111 <- dnearneigh(coords, 0, 111, longlat = TRUE)
+wm_d111
+```
+
+We import this as a new column in our sf object and compute for weights using `st_weights()` based on this.
+
+```{r}
+wm_thai <- thaitourism_sf %>%
+  mutate(nb = I(wm_d111),
          wt = st_weights(nb,
                          style="W"),
          .before=1)
@@ -882,27 +903,27 @@ The code chunks in the tabs below run the Global Moran's I permutation test on t
 #### Pre-Covid Revenue
 
 ```{r}
-global_moran_perm(wm_q$PreCovid_Revenue_total,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$PreCovid_Revenue_total,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 
 #### Post-Covid Revenue
 
 ```{r}
-global_moran_perm(wm_q$PostCovid_Revenue_total,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$PostCovid_Revenue_total,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 
 #### Revenue Recovery Rate
 
 ```{r}
-global_moran_perm(wm_q$Revenue_total_recovery,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$Revenue_total_recovery,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 :::
@@ -917,27 +938,27 @@ The code chunks in the tabs below run the Global Moran's I permutation test on t
 #### Pre-Covid Number of Tourists
 
 ```{r}
-global_moran_perm(wm_q$PreCovid_tourists_total,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$PreCovid_tourists_total,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 
 #### Post-Covid Number of Tourists
 
 ```{r}
-global_moran_perm(wm_q$PostCovid_tourists_total,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$PostCovid_tourists_total,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 
 #### Number of Tourists Recovery Rate
 
 ```{r}
-global_moran_perm(wm_q$Tourists_total_recovery,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$Tourists_total_recovery,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 :::
@@ -952,29 +973,88 @@ The code chunks in the tabs below run the Global Moran's I permutation test on a
 #### Pre-Covid Average Spend
 
 ```{r}
-global_moran_perm(wm_q$PreCovidSpend_total,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$PreCovidSpend_total,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 
 #### Post-Covid Average Spend
 
 ```{r}
-global_moran_perm(wm_q$PostCovidSpend_total,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$PostCovidSpend_total,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 
 #### Average Spend Recovery Rate
 
 ```{r}
-global_moran_perm(wm_q$Spend_total_recovery,
-                  wm_q$nb,
-                  wm_q$wt,
+global_moran_perm(wm_thai$Spend_total_recovery,
+                  wm_thai$nb,
+                  wm_thai$wt,
                   nsim = 99)
 ```
 :::
 
-Average tourist spending is showing signs of clustering on all dimensions (pre-Covid, post-Covid and the recovery rate) as the p-value is below 0.05 and the I statistic is anove 0 in all cases.
+Average tourist spending is showing signs of clustering on all dimensions (pre-Covid, post-Covid and the recovery rate) as the p-value is below 0.05 and the I statistic is above 0 in all cases.
+
+### D.3.3 Global Moran's Test Summary
+
+Based on the results of the testing on the total revenue, number of tourists and spend, we see that the following variables are not exhibiting a random distribution, and show signs of clustering:
+
+1.  Total tourism revenue recovery rate
+
+2.  Total number of tourists recovery rate
+
+3.  Pre-Covid Average spend per Tourist
+
+4.  Post-Covid Average spend per Tourist
+
+5.  Average spend per tourist recovery rate
+
+We will conduct tests for local association to identify the clusters and outliers among provinces for each of these variables.
+
+# E. Testing for Local Spatial Association
+
+In this section, we compute for LISA or local indicators of spatial association which allow us to identify clusters or outliers in the data for the five variables mentioned above.
+
+The measure we will be using is Local Moran I using `local_moran()` which is also included in **sfdep** package. The local version computes for a test statistic and p-value for each observation/province. For each variable, we will perform the following steps:
+
+1.  Run local Moran I for the variable
+
+2.  Observe and visualize test statistic (I) and p values (simulated)
+
+3.  Generate and analyse the LISA map to identify statistically significant clusters and outliers
+
+## E.1 Analysing LISA: Total tourism recovery rate
+
+We first compute for the LISA for the recovery rate of the total number of tourists using `local_moran()` function in the code chunk below.
+
+```{r}
+lisa <- wm_thai %>%
+  mutate(local_moran = local_moran(
+    Revenue_total_recovery, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+```
+
+We can then visualize the test statistic and p-values for each province in a map using tmap package in the code chunk below.
+
+```{r}
+tmap_mode("plot")
+
+tm_shape(lisa) +
+  tm_fill(c("ii", "p_ii_sim"), title = c("Local Moran's I","P Value")) +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) +
+  tm_layout(
+    main.title = "LISA for Total Tourism Recovery Rate",
+    legend.position = c("right", "bottom"),
+    bg.color = "grey90")
+```
+
+Outliers are generally provinces where the test statistic is negative, and clusters where it is positive– if they are significant. We see some potential outliers. We can produce a different set of plots to allow us to identify these types of provinces.
+
+WIP
