@@ -41,7 +41,7 @@ The appropriate technique must be used for these deliverables and all the analys
 The study makes use of the following datasets which are publicly available online.
 
 | Dataset Short Name | Description                                               | Datasource                                                                              |
-|------------------|----------------------|--------------------------------|
+|--------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | THRA               | Thailand road accident data from 2019 to 2022             | [Kaggle](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) |
 | THOSM              | Thailand roads open street map in shapefile format        | [HDX](https://data.humdata.org/dataset/hotosm_tha_roads)                                |
 | THSAB              | Thailand - Subnational Administrative Boudaries shapefile | [HDX](https://data.humdata.org/dataset/cod-ab-tha?)                                     |

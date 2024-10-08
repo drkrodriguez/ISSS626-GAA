@@ -46,7 +46,7 @@ The following data sources are used for this analysis:
 
     4.  `no_tourist_thai` - number of Thai tourists
 
-    5.  `occupancy_rate` - the percentage of occupied travel accommodations
+    5.  `occupancy_rate` - the percentage of occupied travel accommodations (hotel rooms)
 
     6.  `revenue_all` - total tourism revenue, in M-THB (appears as net profit in the raw data)
 
@@ -248,7 +248,7 @@ The resulting chart is consistent with the expectation on the impact and recover
 
 3.  November 2021 onwards: Post-Covid. Travel restrictions have been eased or lifted and tourism revenues have been recovering (Nov 2021 - Feb 2023, 16 months)
 
-Pre- and post-covid, we see that foreign tourists contribute more to the overall revenue, and their contribution has a large amount of variance. Local tourists during the same period have contributed a more stable amount month-on-month. As there is lower contribution and less variance for local tourists, we will exclude them from the analysis, and focus on total and foreign numbers for now.
+Pre- and post-covid, we see that foreign tourists contribute more to the overall revenue, and their contribution has a large amount of variance. Local tourists during the same period have contributed a more stable amount month-on-month.
 
 We can code the three periods mentioned above into the tourism dataset for convenience. We use the `ifelse()` function to do this based on the cutoff dates mentioned above.
 
@@ -271,19 +271,28 @@ tourism_period <- tourism %>%
     PreCovid_Revenue_foreign = sum(Value[Period == "Pre-Covid" & Indicator == "revenue_foreign"], na.rm = TRUE)/13/34.784,
     Covid_Revenue_foreign = sum(Value[Period == "Covid" & Indicator == "revenue_foreign"], na.rm = TRUE)/22/34.784,
     PostCovid_Revenue_foreign = sum(Value[Period == "Post-Covid" & Indicator == "revenue_foreign"], na.rm = TRUE)/16/34.784,
+    PreCovid_Revenue_thai = sum(Value[Period == "Pre-Covid" & Indicator == "revenue_thai"], na.rm = TRUE)/13/34.784,
+    Covid_Revenue_thai = sum(Value[Period == "Covid" & Indicator == "revenue_thai"], na.rm = TRUE)/22/34.784,
+    PostCovid_Revenue_thai = sum(Value[Period == "Post-Covid" & Indicator == "revenue_thai"], na.rm = TRUE)/16/34.784,
     PreCovid_tourists_total = sum(Value[Period == "Pre-Covid" & Indicator == "no_tourist_all"], na.rm = TRUE)/13,
     Covid_tourists_total = sum(Value[Period == "Covid" & Indicator == "no_tourist_all"], na.rm = TRUE)/22,
     PostCovid_tourists_total = sum(Value[Period == "Post-Covid" & Indicator == "no_tourist_all"], na.rm = TRUE)/16,
     PreCovid_tourists_foreign = sum(Value[Period == "Pre-Covid" & Indicator == "no_tourist_foreign"], na.rm = TRUE)/13,
     Covid_tourists_foreign = sum(Value[Period == "Covid" & Indicator == "no_tourist_foreign"], na.rm = TRUE)/22,
-    PostCovid_tourists_foreign = sum(Value[Period == "Post-Covid" & Indicator == "no_tourist_foreign"], na.rm = TRUE)/16
+    PostCovid_tourists_foreign = sum(Value[Period == "Post-Covid" & Indicator == "no_tourist_foreign"], na.rm = TRUE)/16,
+    PreCovid_tourists_thai = sum(Value[Period == "Pre-Covid" & Indicator == "no_tourist_thai"], na.rm = TRUE)/13,
+    Covid_tourists_thai = sum(Value[Period == "Covid" & Indicator == "no_tourist_thai"], na.rm = TRUE)/22,
+    PostCovid_tourists_thai = sum(Value[Period == "Post-Covid" & Indicator == "no_tourist_thai"], na.rm = TRUE)/16
   ) %>%
-  mutate(PreCovidSpend_total = PreCovid_Revenue_total / PreCovid_tourists_total) %>%
-  mutate(CovidSpend_total = Covid_Revenue_total / Covid_tourists_total) %>%
-  mutate(PostCovidSpend_total = PostCovid_Revenue_total / PostCovid_tourists_total) %>%
-  mutate(PreCovidSpend_foreign = PreCovid_Revenue_foreign / PreCovid_tourists_foreign) %>%
-  mutate(CovidSpend_foreign = Covid_Revenue_foreign / Covid_tourists_foreign) %>%
-  mutate(PostCovidSpend_foreign = PostCovid_Revenue_foreign / PostCovid_tourists_foreign)
+  mutate(PreCovidSpend_total = PreCovid_Revenue_total / PreCovid_tourists_total * 1000000) %>%
+  mutate(CovidSpend_total = Covid_Revenue_total / Covid_tourists_total * 1000000) %>%
+  mutate(PostCovidSpend_total = PostCovid_Revenue_total / PostCovid_tourists_total * 1000000) %>%
+  mutate(PreCovidSpend_foreign = PreCovid_Revenue_foreign / PreCovid_tourists_foreign * 1000000) %>%
+  mutate(CovidSpend_foreign = Covid_Revenue_foreign / Covid_tourists_foreign * 1000000) %>%
+  mutate(PostCovidSpend_foreign = PostCovid_Revenue_foreign / PostCovid_tourists_foreign * 1000000) %>%
+  mutate(PreCovidSpend_thai = PreCovid_Revenue_thai / PreCovid_tourists_thai * 1000000) %>%
+  mutate(CovidSpend_thai = Covid_Revenue_thai / Covid_tourists_thai * 1000000) %>%
+  mutate(PostCovidSpend_thai = PostCovid_Revenue_thai / PostCovid_tourists_thai * 1000000)
   
 ```
 
@@ -369,6 +378,98 @@ plot
 
 The top 3 provinces are the same for both, but there are differences further down the list.
 
+We can also show these numbers graphically in a map. Before we do this, let us add one set of measures in tourism_period to indicate the recovery rate. This will be the ratio of the post-covid and pre-covid measures and will indicate how much of the pre-covid level has been achieved. (on average)
+
+We perform this using the code chunk below. We do this for all sets of measures across revenue, number of tourists and the average spending.
+
+```{r}
+tourism_period <- tourism_period %>%
+  mutate(Revenue_total_recovery = PostCovid_Revenue_total / PreCovid_Revenue_total) %>%
+  mutate(Revenue_foreign_recovery = PostCovid_Revenue_foreign / PreCovid_Revenue_foreign) %>%
+  mutate(Revenue_thai_recovery = PostCovid_Revenue_thai / PreCovid_Revenue_thai) %>%
+  mutate(Tourists_total_recovery = PostCovid_tourists_total / PreCovid_tourists_total) %>%
+  mutate(Tourists_foreign_recovery = PostCovid_tourists_foreign / PreCovid_tourists_foreign) %>%
+  mutate(Tourists_thai_recovery = PostCovid_tourists_thai / PreCovid_tourists_thai) %>%
+  mutate(Spend_total_recovery = PostCovidSpend_total / PreCovidSpend_total) %>%
+  mutate(Spend_foreign_recovery = PostCovidSpend_foreign / PreCovidSpend_foreign) %>%
+  mutate(Spend_thai_recovery = PostCovidSpend_thai / PreCovidSpend_thai)
+```
+
+We need to include all the indicators into the sf dataframe. This means merging the `tourism_period` and the `thai_sf` dataframes. Let us first check that the naming is the same for both dataframes by checking which values do not have a match. We use the code below which uses `left_join()` to match and then `filter()` to check those that do not have matches.
+
+```{r}
+# Identify mismatched Province names in tourism_period
+mismatched_values <- tourism_period %>%
+  left_join(thai_sf, by = "Province") %>%
+  filter(is.na(ProvCode)) %>%
+  select(Province)
+
+mismatched_tourism <- mismatched_values$Province
+
+# Identify mismatched Province names in thai_sf
+mismatched_values <- thai_sf %>%
+  left_join(tourism_period, by = "Province") %>%
+  filter(is.na(Covid_Revenue_total)) %>%
+  select(Province)
+
+mismatched_thai <- mismatched_values$Province
+
+# Print the mismatched values
+list(
+  mismatched_in_tourism_period = mismatched_tourism,
+  mismatched_in_thai_sf = mismatched_thai
+)
+
+```
+
+We see that there are 8 mismatched province names for each of the dataframes. We need to standardize these namings to ensure that the indicators are mapped to the correct province. We will opt to keep the descriptions from tourism_period which gives more compact naming. We use `recode()` in the code chunk below to accomplish this in a new dataframe.
+
+```{r}
+thaitourism_sf <- thai_sf %>%
+  mutate(Province = recode(Province,
+                            "Lop Buri" = "Lopburi",
+                            "Chai Nat" = "Chainat",
+                            "Chon Buri" = "Chonburi",
+                            "Prachin Buri" = "Prachinburi",
+                            "Buri Ram" = "Buriram",
+                            "Si Sa Ket" = "Sisaket",
+                            "Nong Bua Lam Phu" = "Nong Bua Lamphu",
+                            "Phangnga" = "Phang Nga"))
+```
+
+We can now use `leftjoin()` in the codechunk below to merge the two datasets.
+
+```{r}
+thaitourism_sf <- left_join(thaitourism_sf, tourism_period,
+                     by=c("Province"="Province"))
+```
+
+The code chunk below confirms that the new object is still an sf dataframe.
+
+```{r}
+class(thaitourism_sf)
+```
+
+We can use the tmap package to produce side-by side maps of Thailand with the average monthly tourism revenue before and after covid using the code chunk below. Given the wide range of values, we will use quantiles for the data classes. We also include the recovery rate of each of the provinces as a third map.
+
+```{r, fig.width=15, fig.height=8}
+tm_shape(thaitourism_sf) +
+  tm_fill(col = c("PreCovid_Revenue_total", "PostCovid_Revenue_total", "Revenue_total_recovery"),
+          style = "quantile",
+          palette = list("viridis", "viridis", "RdYlGn"),
+          title = c("Monthly Revenue - M-USD", "Monthly Revenue - M-USD", "Post vs Pre")) +
+  tm_borders(col = "black") +
+  tm_layout(title = c("Pre Covid", "Post Covid", "Recovery Rate"),
+            title.position = c("right", "top"),
+            legend.position = c("right", "bottom"),
+            bg.color = "grey90")
+
+```
+
+As also seen in the scatterplot, we also see some change in rankings with the maps. For example, some provinces previously in the top 20% have moved down to the next 20%. (e.g., Khon Kaen and Phang Nga)
+
+If we focus on the third map, we also see what seems like a cluster of provinces in the south which are lagging with regards to their recovery on the average tourism revenue. We will watch out for these once we conduct our cluster analyses.
+
 ## C.2 Number of Tourists
 
 The next measure we can look at is the number of tourists. We produce a similar line chart as we did for tourism revenue with the code chunk below. We display the number of tourists in thousands.
@@ -400,3 +501,480 @@ interactive_plot
 ```
 
 The trend for the total follows the same general movement as the chart for revenue, however, it looks like tourist numbers are primarily driven by locals than foreigners.
+
+Similar to the previous section, we can produce an interactive scatterplot to see the number of tourists each province gets on average before and after the pandemic. We do this first for the total number of tourists.
+
+```{r}
+plot <- plot_ly(
+  data = tourism_period,
+  x = ~PreCovid_tourists_total,
+  y = ~PostCovid_tourists_total,
+  type = 'scatter',
+  mode = 'markers',
+  text = ~Province,
+  hoverinfo = 'text'
+) %>%
+  layout(
+    title = 'Monthly Pre- and Post-Covid No of Tourists',
+    xaxis = list(title = 'PreCovid Average'),
+    yaxis = list(title = 'PostCovid Average')
+  )
+
+# Display the plot
+plot
+```
+
+Bangkok, Chonburi and Phuket had the highest number of visitors pre-Covid, but Phuket appears to have dropped off in favor of Kanchanaburi post-covid.
+
+We can also look at the foreign tourists using the code chunk below. We skip local tourists and focus only on foreign ones as they deviate from the overall number.
+
+```{r}
+plot <- plot_ly(
+  data = tourism_period,
+  x = ~PreCovid_tourists_foreign,
+  y = ~PostCovid_tourists_foreign,
+  type = 'scatter',
+  mode = 'markers',
+  text = ~Province,
+  hoverinfo = 'text'
+) %>%
+  layout(
+    title = 'Monthly Pre- and Post-Covid No of Foreign Tourists',
+    xaxis = list(title = 'PreCovid Average'),
+    yaxis = list(title = 'PostCovid Average')
+  )
+
+# Display the plot
+plot
+```
+
+Bangkok, Phuket and Chonburi appear as the top 3 destinations for foreign tourists (in terms of number) before and after Covid. We also see that Krabi dropped from the top 3 post covid.
+
+We can also produce side-by-side maps for the number of tourists and their recovery rates using the code chunk below.
+
+```{r, fig.width=15, fig.height=8}
+tm_shape(thaitourism_sf) +
+  tm_fill(col = c("PreCovid_tourists_total", "PostCovid_tourists_total", "Tourists_total_recovery"),
+          style = "quantile",
+          palette = list("viridis", "viridis", "RdYlGn"),
+          title = c("Monthly Tourists", "Monthly Tourists", "Post vs Pre")) +
+  tm_borders(col = "black") +
+  tm_layout(title = c("Pre Covid", "Post Covid", "Recovery Rate"),
+            title.position = c("right", "top"),
+            legend.position = c("right", "bottom"),
+            bg.color = "grey90")
+
+```
+
+We again see the southern region mostly lagging with regards to their recovery post covid also in terms of the number of visitors.
+
+## C.3 Average Spend Per Visitor
+
+We next look at the average per spend per visitor which is the quotient of the tourism revenue and the total number of tourists. This will tell us whether tourists are spending more or less around the pandemic.
+
+First we produce a similar line graph as before to look at the trend at an overall picture using the code chunk below.
+
+```{r}
+# Subset the data to just the required indicators
+aggregated_data <<- tourism %>%
+  group_by(MonthYear) %>%
+  summarise(
+    Spend_total = sum(Value[Indicator == "revenue_all"]) / sum(Value[Indicator == "no_tourist_all"]) * 1000000 / 34.784,
+    Spend_thai = sum(Value[Indicator == "revenue_thai"]) / sum(Value[Indicator == "no_tourist_thai"]) * 1000000 / 34.784,
+    Spend_foreign = sum(Value[Indicator == "revenue_foreign"]) / sum(Value[Indicator == "no_tourist_foreign"]) * 1000000 / 34.784
+  ) %>%
+  pivot_longer(cols = starts_with("Spend"), names_to = "Indicator", values_to = "TotalValue") %>%
+  mutate(Indicator = case_when(
+    Indicator == "Spend_total" ~ "Spend_total",
+    Indicator == "Spend_thai" ~ "Spend_thai",
+    Indicator == "Spend_foreign" ~ "Spend_foreign"
+  ))
+
+# Create the line chart
+p <- ggplot(aggregated_data, aes(x = MonthYear, y = TotalValue, color = Indicator, group = Indicator)) +
+  geom_line(size = 1) +
+  labs(title = "Thailand Average Spend Per Tourist by Month",
+       y = "Average Spend, USD",
+       x = "Month-Year") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        legend.position = "bottom") +
+  scale_color_manual(values = c("Spend_total" = "blue", "Spend_thai" = "green", "Spend_foreign" = "red"))
+
+# Convert the ggplot chart to an interactive plotly chart
+interactive_plot <- ggplotly(p)
+
+# Display the interactive plot
+interactive_plot
+```
+
+The chart shows that the average spend of foreign tourists are much higher than local ones and appears to be the same before and after Covid. There appears to be a shift in the average spend for all tourists overall which is probably driven by an increase in the contribution for the number of local tourists versus foreign tourists. Local tourists appear to show a step decrease after covid as well in terms of their average spending.
+
+Next, we check the average spending of tourists across provinces using a similar scatterplot as before.
+
+```{r}
+plot <- plot_ly(
+  data = tourism_period,
+  x = ~PreCovidSpend_total,
+  y = ~PostCovidSpend_total,
+  type = 'scatter',
+  mode = 'markers',
+  text = ~Province,
+  hoverinfo = 'text'
+) %>%
+  layout(
+    title = 'Monthly Pre- and Post-Covid Average Spend Per Tourist',
+    xaxis = list(title = 'PreCovid Average $'),
+    yaxis = list(title = 'PostCovid Average $')
+  )
+
+# Display the plot
+plot
+```
+
+Phuket saw the highest average spend pre- and post-covid. Krabi was second highest pre-Covid but drop to third, as Bangkok rose from fourth to second over that period.
+
+We can do the same for foreign tourists as the earlier chart showed that it was very different from the total. We use the code chunk below tor produce a similar scatterplot but taking the foreign tourist figures.
+
+```{r}
+plot <- plot_ly(
+  data = tourism_period,
+  x = ~PreCovidSpend_foreign,
+  y = ~PostCovidSpend_foreign,
+  type = 'scatter',
+  mode = 'markers',
+  text = ~Province,
+  hoverinfo = 'text'
+) %>%
+  layout(
+    title = 'Monthly Pre- and Post-Covid Average Spend Per Foreign Tourist',
+    xaxis = list(title = 'PreCovid Average $'),
+    yaxis = list(title = 'PostCovid Average $')
+  )
+
+# Display the plot
+plot
+```
+
+Phuket, Bangkok and Chonburi have been consistent as top 4 highest spend for foreign tourists. From the chart above, we see that Chiang Rai has risen to the number five spot for highest foreign tourist spending post-Covid.
+
+We can also produce a map visualization of the average spend using **tmap** package. We focus on the total tourist population in the visualization below.
+
+```{r, fig.width=15, fig.height=8}
+tm_shape(thaitourism_sf) +
+  tm_fill(col = c("PreCovidSpend_total", "PostCovidSpend_total", "Spend_total_recovery"),
+          style = "quantile",
+          palette = list("viridis", "viridis", "RdYlGn"),
+          title = c("Average Tourist Spending", "Average Tourist Spending", "Post vs Pre")) +
+  tm_borders(col = "black") +
+  tm_layout(title = c("Pre Covid", "Post Covid", "Recovery Rate"),
+            title.position = c("right", "top"),
+            legend.position = c("right", "bottom"),
+            bg.color = "grey90")
+```
+
+We again see slow recovery in the southern region, but at the same time, this region has the highest average spending pre- and post-covid. (i.e., top 20%)
+
+## C.4 Occupancy Rate
+
+The final single indicator we will look at is the occupancy rate. We have not prepared and included the data for occupancy rate before as this is a ratio measure which be just summed or averaged. In order to be able to aggregate occupancy rate, we not only need the actual occupancy rate from the data, but we also need the number of rooms occupied which is given by the `no_tourist_occupied` indicator in the data, and also the number of rooms in total– which is not included in the data.
+
+The following code chunk prepares a new dataframe from tourist with the following transformation steps:
+
+1.  Retain MonthYear, Province, and records for occupany rate and number of rooms occupied
+
+2.  Keep values for the two indicators as separate columns. We use average just in case a province appears multiple times on the same date (to resolve conflicts)
+
+3.  We compute the total number of rooms as the number of rooms occupied divided by the occupancy rate
+
+4.  We add the tags for the period for pre- and post- covid
+
+```{r}
+occupancy_df <- tourism %>%
+  filter(Indicator %in% c("occupancy_rate", "no_tourist_occupied")) %>%
+  group_by(Date, MonthYear, Province) %>%
+  summarise(
+    occupancy = mean(Value[Indicator == "occupancy_rate"], na.rm = TRUE),
+    occupied_rooms = mean(Value[Indicator == "no_tourist_occupied"], na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  mutate(total_rooms = ifelse(occupancy == 0, 0, occupied_rooms / occupancy * 100))
+
+occupancy_df$Period <- ifelse(occupancy_df$Date < as.Date("2020-02-01"), "Pre-Covid",
+                         ifelse(occupancy_df$Date > as.Date("2021-10-01"), "Post-Covid", "Covid"))
+
+head(occupancy_df)
+```
+
+Before we produce the charts, let us update `thaitourism_sf` with the aggregated occupancy rates by:
+
+1.  Computing Pre- and Post-covid total number of rooms and occupied rooms per province
+2.  Computing Pre- and Post-covid occupancy rate per province based on step 1
+3.  Add the new columns into `thaitourism_sf` using `left_join()`
+
+The first two steps are accomplished in the first code block while the third step is accomplished in the second.
+
+```{r}
+occupancy_summary <- occupancy_df %>%
+  group_by(Province) %>%
+  summarise(
+    PreCovid_occupied_rooms = sum(occupied_rooms[Period == "Pre-Covid"], na.rm = TRUE),
+    PostCovid_occupied_rooms = sum(occupied_rooms[Period == "Post-Covid"], na.rm = TRUE),
+    PreCovid_total_rooms = sum(total_rooms[Period == "Pre-Covid"], na.rm = TRUE),
+    PostCovid_total_rooms = sum(total_rooms[Period == "Post-Covid"], na.rm = TRUE)
+  ) %>%
+  mutate(
+    PreCovid_occupancy = ifelse(PreCovid_total_rooms == 0, 0, (PreCovid_occupied_rooms / PreCovid_total_rooms) * 100),
+    PostCovid_occupancy = ifelse(PostCovid_total_rooms == 0, 0, (PostCovid_occupied_rooms / PostCovid_total_rooms) * 100)
+  )
+
+head(occupancy_summary)
+```
+
+```{r}
+thaitourism_sf <- left_join(thaitourism_sf, occupancy_summary, by = c("Province"="Province"))
+
+class(thaitourism_sf)
+```
+
+Finally, we add a column for the recovery of the occupancy rate using the code chunk below.
+
+```{r}
+thaitourism_sf <- mutate(thaitourism_sf, Occupancy_recovery = ifelse(PreCovid_occupancy == 0, 0, (PostCovid_occupancy / PreCovid_occupancy)), .before = -1)
+```
+
+```{r}
+head(thaitourism_sf)
+```
+
+For the first visualization, let us plot the occupancy rate at a total level. The code below summarizes based on `occupancy_df` and computes a national occupancy rate to plot in a line chart.
+
+```{r}
+aggregated_data <<- occupancy_df %>%
+  group_by(MonthYear) %>%
+  summarise(
+    occupancy_rate = sum(occupied_rooms, na.rm = TRUE) / sum(total_rooms, na.rm = TRUE) * 100
+  )
+
+ggplot(aggregated_data, aes(x = MonthYear, y = occupancy_rate, group = 1)) +
+  geom_line() +
+  labs(
+    title = "Occupancy Rate Over Time",
+    x = "MonthYear",
+    y = "Occupancy Rate (%)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+
+```
+
+The chart shows that occupancy rate has picked up after October 2021 and appears to have more or less reached pre-covid levels in the most recent months.
+
+We can also produce a scatterplot to show pre- and post-covid occupancy rates at a province level. We do this using the code chunk below which produces an interactive plot.
+
+```{r}
+plot <- plot_ly(
+  data = occupancy_summary,
+  x = ~PreCovid_occupancy,
+  y = ~PostCovid_occupancy,
+  type = 'scatter',
+  mode = 'markers',
+  text = ~paste('Province:', Province, '<br>PreCovid Occupancy:', round(PreCovid_occupancy), '<br>PostCovid Occupancy:', round(PostCovid_occupancy)),
+  hoverinfo = 'text'
+) %>%
+  layout(
+    title = 'Monthly Pre- and Post-Covid Occupancy Rate (%)',
+    xaxis = list(title = 'PreCovid Occupancy'),
+    yaxis = list(title = 'PostCovid Occupancy')
+  )
+
+# Display the plot
+plot
+```
+
+The occupancy rates are showing a dispersed pattern as the overall rankings on occupancy rates have significantly changed pre- and post-covid. Bangkok, Chonburi and Suphan Buri reported the highest occupancy rates before covid, but Nan, Chang Rai and Nakhon Phanom have the highest rates post covid.
+
+The next visualization for this measure is a side-by-side map for the pre- and post-covid occupancy rates as well as the recovery rate for occupancy. We use the code chunk below which uses **tmap** package to produce the maps.
+
+```{r, fig.width=15, fig.height=8}
+tm_shape(thaitourism_sf) +
+  tm_fill(col = c("PreCovid_occupancy", "PostCovid_occupancy", "Occupancy_recovery"),
+          style = "quantile",
+          palette = list("viridis", "viridis", "RdYlGn"),
+          title = c("Average Occupancy Rate", "Average Occupancy Rate", "Post vs Pre")) +
+  tm_borders(col = "black") +
+  tm_layout(title = c("Pre Covid", "Post Covid", "Recovery Rate"),
+            title.position = c("right", "top"),
+            legend.position = c("right", "bottom"),
+            bg.color = "grey90")
+```
+
+Before we leave this section, let us try to understand occupancy rate a bit more. Going back to earlier, we want to understand if high occupancy rate post-Covid is being driven by the number of available rooms. To help us answer this, we create a scatterplot of the available rooms against the occupancy rate post-Covid using the code chunk below.
+
+```{r}
+plot <- plot_ly(
+  data = occupancy_summary,
+  x = ~PostCovid_total_rooms,
+  y = ~PostCovid_occupancy,
+  type = 'scatter',
+  mode = 'markers',
+  text = ~paste('Province:', Province, '<br>Number of Rooms:', round(PostCovid_total_rooms), '<br>Occupancy Rate:', round(PostCovid_occupancy)),
+  hoverinfo = 'text'
+) %>%
+  layout(
+    title = 'Post-Covid Number of Rooms and Occupancy Rate (%)',
+    xaxis = list(title = 'Number of Rooms'),
+    yaxis = list(title = 'Occupancy Rate')
+  )
+
+# Display the plot
+plot
+```
+
+Below 10M rooms, there appears to be an upward trend in occupancy rate to the number of rooms. Provinces with more than 10M rooms go against the trend and appear to be capped to 60% occupancy.
+
+# D. Spatial Autocorrelation
+
+Testing for spatial autocorrelation allows us to statistically determine if any of the indicator variables are dependent on space or location. These techniques also are useful for classifying clusters and outliers for particular variables of concern.
+
+## D.1 Variable Selection
+
+We will turn our attention to the first three measures discussed discussed in the previous section: **tourism revenue, number of tourists** and **average tourist spending**. We will not analyse the occupancy rate further as it is highly dependent on the number of rooms.
+
+We will focus on checking signs of spatial autocorrelation or association before and after covid, as well as the recovery rate at the overall level for these three indicators– so we will be looking at 9 variables for our analysis.
+
+## D.2 Deriving the Contiguity and Weight Matrix
+
+For the tests for this section, we need to derive a neighbor list as well as a weight matrix for each province to its neighbors. We do this in the code chunk below which creates a copy of `thai_tourism_sf` and includes a neighbour list `nb` and the weights `wt` using the Queen's criterion and using equal weights. We use the `include_self()` on `st_contiguity()` so that each node will have itself, at the minimum, as its neighbor. We need to ensure that each node has a non-empty neighbor list and this approach still limits neighbors to provinces that share a border.
+
+```{r}
+wm_q <- thaitourism_sf %>%
+  mutate(nb = include_self(st_contiguity(geometry)),
+         wt = st_weights(nb,
+                         style="W"),
+         .before=1)
+```
+
+## D.3 Global Moran's I Test
+
+Global tests of spatial autocorrelation compares the value of each point/province to the overall value in order to conclude on spatial dependence. For this, we will focus on using Global Moran's I which will work on the following general hypotheses:
+
+-   $H_0$ - The value of (variable) is randomly distributed across provinces in Thailand
+
+-   $H_1$ - The value of (variable) is not randomly distributed across provinces in Thailand
+
+Further, the value of the test statistic $I$ will also give indication on the underlying pattern:
+
+-   $I > 0$ - Clustering; observations tend to be similar
+
+-   $I < 0$ - Dispersed / regular; observations tend to be dissimilar
+
+-   Where $I$ close to zero - observations are arranged randomly
+
+To perform Global Moran's I test, with permutations, we use `global_moran_perm()` from **sfdep** package. We will use a 5% significance level for all the testing to be performed, and we will run 100 permutations / simulations for each test.
+
+### D.3.1 Global Moran's Test on Tourism Revenue
+
+The code chunks in the tabs below run the Global Moran's I permutation test on total tourism revenue (per month) pre-Covid, post-Covid and the recovery rate.
+
+::: panel-tabset
+#### Pre-Covid Revenue
+
+```{r}
+global_moran_perm(wm_q$PreCovid_Revenue_total,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+#### Post-Covid Revenue
+
+```{r}
+global_moran_perm(wm_q$PostCovid_Revenue_total,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+#### Revenue Recovery Rate
+
+```{r}
+global_moran_perm(wm_q$Revenue_total_recovery,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+:::
+
+The results show no evidence to reject spatial independence for the total revenue pre- and post-Covid. However, it shows **signs of clustering for the revenue recovery rate** as the p-value is below 0.05 and the statistic is above 1.
+
+### D.3.2 Global Moran's Test on Number of Tourists
+
+The code chunks in the tabs below run the Global Moran's I permutation test on total number of tourists (per month) pre-Covid, post-Covid and the recovery rate.
+
+::: panel-tabset
+#### Pre-Covid Number of Tourists
+
+```{r}
+global_moran_perm(wm_q$PreCovid_tourists_total,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+#### Post-Covid Number of Tourists
+
+```{r}
+global_moran_perm(wm_q$PostCovid_tourists_total,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+#### Number of Tourists Recovery Rate
+
+```{r}
+global_moran_perm(wm_q$Tourists_total_recovery,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+:::
+
+We see similar results here. The results show no evidence to reject spatial independence for the total number of tourists pre- and post-Covid. However, it shows **signs of clustering for the number of tourists recovery rate** as the p-value is below 0.05 and the statistic is above 1.
+
+### D.3.3 Global Moran's Test on Average Tourist Spend
+
+The code chunks in the tabs below run the Global Moran's I permutation test on average tourist spend pre-Covid, post-Covid and the recovery rate.
+
+::: panel-tabset
+#### Pre-Covid Average Spend
+
+```{r}
+global_moran_perm(wm_q$PreCovidSpend_total,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+#### Post-Covid Average Spend
+
+```{r}
+global_moran_perm(wm_q$PostCovidSpend_total,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+#### Average Spend Recovery Rate
+
+```{r}
+global_moran_perm(wm_q$Spend_total_recovery,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+:::
+
+Average tourist spending is showing signs of clustering on all dimensions (pre-Covid, post-Covid and the recovery rate) as the p-value is below 0.05 and the I statistic is anove 0 in all cases.
