@@ -1030,7 +1030,7 @@ The measure we will be using is Local Moran I using `local_moran()` which is als
 
 ## E.1 Analysing LISA: Total tourism recovery rate
 
-We first compute for the LISA for the recovery rate of the total number of tourists using `local_moran()` function in the code chunk below.
+We first compute for the LISA for the recovery rate of the total number of tourists using `local_moran()` function in the code chunk below. The code below uses 100 simulations to produce the test results.
 
 ```{r}
 lisa <- wm_thai %>%
@@ -1050,11 +1050,236 @@ tm_shape(lisa) +
   tm_borders(alpha = 0.5) +
   tm_view(set.zoom.limits = c(6,8)) +
   tm_layout(
-    main.title = "LISA for Total Tourism Recovery Rate",
+    main.title = "LISA for Total Revenue Recovery Rate",
     legend.position = c("right", "bottom"),
     bg.color = "grey90")
 ```
 
 Outliers are generally provinces where the test statistic is negative, and clusters where it is positive– if they are significant. We see some potential outliers. We can produce a different set of plots to allow us to identify these types of provinces.
 
-WIP
+Using a LISA map, we can show graphically the location of clusters and outliers based on this (tourism revenue recovery rate)
+
+```{r}
+lisa_sig <- lisa %>%
+  filter(p_ii_sim < 0.05)
+
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean", title = "LISA Class α=5% ") +
+  tm_borders(alpha = 0.4) +
+  tm_text("Province", size = 0.5) +
+tm_layout(
+    main.title = "Revenue Recovery Rate",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+We can also observe the contents of the object `lisa_sig` to see the statistics for the identified significant provinces. The code chunk below shows each class separately for easier reference.
+
+```{r}
+lisa_sig[lisa_sig$mean == "Low-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-High", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "Low-High", c("Province", "mean")]
+```
+
+We can summarize the findings from this analysis as:
+
+-   There is a cluster of 7 provinces at the south of Thailand that have slower recovery in terms of their average tourism revenue. This includes popular destinations like Phuket and Krabi and their neighboring provinces
+
+-   There is a cluster of 3 provinces in the north that have faster recovery on the same metric. This includes Chiang Rai, Nan and Phayao
+
+-   The analysis revealed two outliers. Chachoengsao has high recovery while neighboring provinces are low. Nakhon Ratchasima has low recovery while neighboring provinces are high
+
+reveal the following
+
+## E.2 Analysing LISA: Number of tourists recovery rate
+
+We compute for the LISA using `local_moran()` function for the number of tourist recovery rate in the code chunk below.
+
+```{r}
+lisa <- wm_thai %>%
+  mutate(local_moran = local_moran(
+    Tourists_total_recovery, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+```
+
+We will go straight to producing the LISA map based on the `lisa` object. Again, we use 0.05 to determine statistical significance.
+
+```{r}
+lisa_sig <- lisa %>%
+  filter(p_ii_sim < 0.05)
+
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean", title = "LISA Class α=5% ") +
+  tm_borders(alpha = 0.4) +
+  tm_text("Province", size = 0.5) +
+tm_layout(
+    main.title = "No of Tourist Recovery Rate",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+To aid interpretation, we display results tabularly as before using the code chunk below.
+
+```{r}
+lisa_sig[lisa_sig$mean == "Low-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-High", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "Low-High", c("Province", "mean")]
+```
+
+The findings can be summarized as:
+
+-   There is a cluster at the south of five provinces with slower recovery with regards to the number of tourists– including Phuket and Krabi (similar to previous metric)
+
+-    Satun at the southern part has high recovery rate while its neighboring provinces are lower
+
+## E.3 Analysing LISA: Pre-Covid Average Spend
+
+We compute for the LISA using `local_moran()` function for the average tourist spending post-Covid in the code chunk below.
+
+```{r}
+lisa <- wm_thai %>%
+  mutate(local_moran = local_moran(
+    PreCovidSpend_total, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+```
+
+We will now produce the LISA map based on the generated `lisa` object. Again, we use 0.05 to determine statistical significance.
+
+```{r}
+lisa_sig <- lisa %>%
+  filter(p_ii_sim < 0.05)
+
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean", title = "LISA Class α=5% ") +
+  tm_borders(alpha = 0.4) +
+  tm_text("Province", size = 0.5) +
+tm_layout(
+    main.title = "Pre-Covid Average Tourist Spend",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+We display the results tabularly using the code chunk below to make it easier to interpret.
+
+```{r}
+lisa_sig[lisa_sig$mean == "Low-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-High", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "Low-High", c("Province", "mean")]
+```
+
+The findings can be summarized as:
+
+-   There are multiple clusters, totaling 10 provinces, in the center of Thailand that have low average spending pre-Covid. These are composed of lesser known tourist destinations
+
+-   Phuket and Phang Nga make up a two-province cluster with high average tourist spending
+
+-   There are no outliers identified in the analysis
+
+## E.4 Analysing LISA: Post-Covid Average Spend
+
+We compute for the LISA using `local_moran()` function for the average tourist spending post-Covid in the code chunk below.
+
+```{r}
+lisa <- wm_thai %>%
+  mutate(local_moran = local_moran(
+    PostCovidSpend_total, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+```
+
+We will now produce the LISA map based on the generated `lisa` object. Again, we use 0.05 to determine statistical significance.
+
+```{r}
+lisa_sig <- lisa %>%
+  filter(p_ii_sim < 0.05)
+
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean", title = "LISA Class α=5% ") +
+  tm_borders(alpha = 0.4) +
+  tm_text("Province", size = 0.5) +
+tm_layout(
+    main.title = "Post-Covid Average Tourist Spend",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+We again display the results tabularly using the code chunk below to make it easier to interpret.
+
+```{r}
+lisa_sig[lisa_sig$mean == "Low-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-High", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "Low-High", c("Province", "mean")]
+```
+
+The results very closely resember the ones for Pre-Covid average spending. One significant change is that the high spend cluster at the south now includes Krabi. (so it now consists of three provinces)
+
+## E.5 Analysing LISA: Average Spend Recovery Rate
+
+We compute for the LISA using `local_moran()` function for the average tourist spending recovery rate in the code chunk below.
+
+```{r}
+lisa <- wm_thai %>%
+  mutate(local_moran = local_moran(
+    Spend_total_recovery, nb, wt, nsim = 99),
+    .before = 1) %>%
+  unnest(local_moran)
+```
+
+We will now produce the LISA map based on the generated `lisa` object. Again, we use 0.05 to determine statistical significance.
+
+```{r}
+lisa_sig <- lisa %>%
+  filter(p_ii_sim < 0.05)
+
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean", title = "LISA Class α=5% ") +
+  tm_borders(alpha = 0.4) +
+  tm_text("Province", size = 0.5) +
+tm_layout(
+    main.title = "Average Tourist Spend Recovery Rate",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+We again display the results tabularly using the code chunk below to make it easier to interpret.
+
+```{r}
+lisa_sig[lisa_sig$mean == "Low-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-High", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "High-Low", c("Province", "mean")]
+lisa_sig[lisa_sig$mean == "Low-High", c("Province", "mean")]
+```
+
+The findings can be summarized as:
+
+-   There are two clusters at the south, totaling 5 provinces, that have slow recovery. This includes the provinces Surat Thani, Nakhon Si Thammarat, Trang, Pattani and Yala
+
+-   There is a cluster of three provinces at the center that have high recovery rate. This includes Kanpaeng Phet, Phichit and Phetchabun
+
+-   Phuket is appearing as an outlier with high tourist spend recovery rate relative to its neighbors.
