@@ -10,7 +10,7 @@ execute:
   freeze: true
 ---
 
-(Exercise Summary)
+We look into the performance of the provinces across Thailand across various tourism indicators like revenue, number of tourists and occupancy rate and see if there is any spatial and spatiotemporal relationship present. We use various techniques to verify spatial randomness, and monotonicity, and where these are violated, identify clusters, outliers and hot or coldspots that can lead to targetted policies to address the problems or learn from the success of such provinces.
 
 # A. Getting Started
 
@@ -1141,7 +1141,7 @@ The findings can be summarized as:
 
 -   There is a cluster at the south of five provinces with slower recovery with regards to the number of tourists– including Phuket and Krabi (similar to previous metric)
 
--    Satun at the southern part has high recovery rate while its neighboring provinces are lower
+-   Satun at the southern part has high recovery rate while its neighboring provinces are lower
 
 ## E.3 Analysing LISA: Pre-Covid Average Spend
 
@@ -1283,3 +1283,515 @@ The findings can be summarized as:
 -   There is a cluster of three provinces at the center that have high recovery rate. This includes Kanpaeng Phet, Phichit and Phetchabun
 
 -   Phuket is appearing as an outlier with high tourist spend recovery rate relative to its neighbors.
+
+# F. Emerging Hot Spot Analysis
+
+Emerging hot-spot analysis or EHSA reveals and describes evolving hot (or cold) spots over time. We will perform this on the main variables (tourism revenue, number of tourists, occupancy) for the total tourist population and on the post-Covid period, as the ongoing period. In addition, we will limit to January 2022 onwards so we minimize the sharp increase coming from the tail end of 2021 as travel restrictions were lifted.
+
+The analysis (for each variable) will consist of four steps:
+
+1.  Constructing the time series cube
+
+2.  Calculating the Getis-Ord local $G_i^*$ statistic for each bin with FDR correction
+
+3.  Evaluating hot and cold spot trends using Mann-Kendall trend test
+
+4.  Categorising each location by the resulting z-scores and p-valuesxx
+
+## F.1 EHSA - Post-covid tourism revenue
+
+We perform EHSA on the post-covid (2022 onwards) values for the total tourism revenue.
+
+We create post-Covid versions of our datasets using the code chunk below so it is easier to refer to them later. We also include a column for the year and month as integers as EHSA requires discrete numeric values as a time variable.
+
+```{r}
+tourism_postCov <- subset(tourism, Date > as.Date("2021-12-31"))
+tourism_postCov$YYYYMM <- as.integer(format(tourism_postCov$Date, "%Y%m"))
+
+occupancy_postCov <- subset(occupancy_df, Date > as.Date("2021-12-31"))
+occupancy_postCov$YYYYMM <- as.integer(format(occupancy_postCov$Date, "%Y%m"))
+```
+
+### F.1.1 Creating spacetime cube
+
+We then create the space-time cube using `spacetime()` for just the post-covid tourism revenue. We use `filter()` to only select the rows for the measure of interest, and then `select()` to limit the original dataframe to only the date, province and variable.
+
+```{r}
+stcube <- spacetime(select(filter(tourism_postCov, tourism_postCov$Indicator == "revenue_all"),
+                           YYYYMM, Province, Value),
+                    thai_sf,
+                    .loc_col = "Province",
+                    .time_col = "YYYYMM")
+```
+
+To check that the object is in the correct format, we can use `is_spacetime_cube()` and confirm that it returns `TRUE`
+
+```{r}
+is_spacetime_cube(stcube)
+```
+
+### F.1.2 Calculating $G_i^*$ statistics
+
+Before computing for the $G_i^*$ statistics, we need to derive the spatial weights. We use the code chunk below to identify the neighbors and to derive inverse distance weights. The `alpha` argument of `st_inverse_distance()` determines the level of distance decay.
+
+```{r}
+stcube_nb <- stcube %>%
+  activate("geometry") %>%
+  mutate(nb = include_self(
+    st_contiguity(geometry)),
+    wt=st_inverse_distance(nb,
+                  geometry,
+                  scale = 1,
+                  alpha = 1),
+    .before = 1) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+We then use the following chunk to calculate the local $G_i^*$ for each location. We do this using `local_gstar_perm()` of **sfdep** package. We then use `unnest()` to unnest the `gi_star` column of the newly created data frame.
+
+```{r}
+gi_stars <- stcube_nb %>%
+  group_by(YYYYMM) %>%
+  mutate(gi_star = local_gstar_perm(
+    Value, nb, wt)) %>%
+  tidyr::unnest(gi_star)
+```
+
+### F.1.3 Identifying Hot- and Cold-spots using Mann Kendall test
+
+The Mann Kendall test checks for signs of monotonicity for a the local $G_i^*$ statistic. Where the results are significant, the test infers that there are signs of monotonicity for that province / observation.
+
+The code chunk below runs the Mann Kendall test (without permutations) on each province for the selected variable using `MannKendall()`. Provinces where the tau value is positive are showing an increasing trend, while negative tau values show decreasing trend.
+
+We display the records with significant test results, and show negative and positive tau values as separate tables.
+
+```{r}
+ehsa <- gi_stars %>%
+  group_by(Province) %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>%
+  tidyr::unnest_wider(mk)
+
+filter(ehsa, sl < 0.05, tau > 0)
+filter(ehsa, sl < 0.05, tau < 0)
+```
+
+The results show that 33 of the 77 provinces are showing significant positive trend– which might be expected as provinces are recovering post-Covid. However, there are 21 provinces which are showing a significant negative trend which might be a concern if any of these are expected to be major tourist destinations.
+
+### F.1.4 Emerging Hot Spot Analysis
+
+We can use `emerging_hot_spot_analysis()` to perform EHSA, including the previous hypothesis testing, and classify provinces based on the test results.
+
+The code chunk below uses `emerging_hot_spot_analysis()` directly on the spacetime cube to run the test with 100 permutations.
+
+```{r}
+#| eval: false
+ehsa <- emerging_hotspot_analysis(
+  x = stcube,
+  .var = "Value",
+  k = 1,
+  nsim = 99
+)
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(ehsa, "data/rds/ehsa1.rds")
+```
+
+```{r}
+#| echo: false
+ehsa = read_rds("data/rds/ehsa1.rds")
+```
+
+We can visualize the number of provinces per category using the code chunk below which utilizes `ggplot()` to build a bar chart.
+
+```{r}
+ggplot(data = ehsa,
+       aes(x = classification)) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "EHSA Classification - PostCovid Tourism Revenue",
+       y = "Number of Provinces", x="") +
+  theme_minimal() +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = 0) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+We can also visualize the hot- and coldspot classifications visually. First, we need to combine the `ehsa` object with the sf dataframe with the code chunk below.
+
+```{r}
+thai_ehsa <- thai_sf %>%
+  left_join(ehsa,
+            by = join_by(Province == location))
+```
+
+Next, we use tmap package to create a choropleth map based on the EHSA classification. We only include provinces that have significant test results and a pattern detected.
+
+```{r}
+ehsa_sig <- filter(thai_ehsa, !(classification == "no pattern detected"), p_value < 0.05)
+
+tmap_mode("plot")
+tm_shape(thai_ehsa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(ehsa_sig) +
+  tm_fill("classification", title = "EHSA Classification") +
+  tm_text("Province", size = 0.5) +
+  tm_borders(alpha = 0.4) +
+tm_layout(
+    main.title = "Post Covid Tourism Revenue",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+We can display the same provinces tabularly using the code chunk below
+
+```{r}
+for (i in unique(ehsa_sig$classification)){
+print(as.matrix(ehsa_sig[ehsa_sig$classification == i, c("Province", "classification")]))
+}
+```
+
+The results identifies Bangkok as an intensifying hotspot, and six others as consecutive hotspots.
+
+There are 13 provinces identified as sporadic coldspots which are locations that are cold spots for less than 90% of the time, but never identified as significant hotspots.
+
+## F.2 EHSA - Post-covid number of tourists
+
+We perform EHSA on the post-covid (2022 onwards) values for the total number of tourists.
+
+### F.2.1 Creating spacetime cube
+
+We then create the space-time cube using `spacetime()` for just the post-covid number of tourists. We use `filter()` to only select the rows for the measure of interest, and then `select()` to limit the original dataframe to only the date, province and variable.
+
+```{r}
+stcube <- spacetime(select(filter(tourism_postCov, tourism_postCov$Indicator == "no_tourist_all"),
+                           YYYYMM, Province, Value),
+                    thai_sf,
+                    .loc_col = "Province",
+                    .time_col = "YYYYMM")
+```
+
+To check that the object is in the correct format, we can use `is_spacetime_cube()` and confirm that it returns `TRUE`
+
+```{r}
+is_spacetime_cube(stcube)
+```
+
+### F.2.2 Calculating $G_i^*$ statistics
+
+Before computing for the $G_i^*$ statistics, we need to derive the spatial weights. We use the code chunk below to identify the neighbors and to derive inverse distance weights. The `alpha` argument of `st_inverse_distance()` determines the level of distance decay.
+
+```{r}
+#| eval: false
+stcube_nb <- stcube %>%
+  activate("geometry") %>%
+  mutate(nb = include_self(
+    st_contiguity(geometry)),
+    wt=st_inverse_distance(nb,
+                  geometry,
+                  scale = 1,
+                  alpha = 1),
+    .before = 1) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+```{r}
+#| echo: false
+#| eval: false
+write_rds(stcube_nb, "data/rds/stcube_nb2.rds")
+```
+
+```{r}
+#| echo: false
+stcube_nb = read_rds("data/rds/stcube_nb2.rds")
+```
+
+We then use the following chunk to calculate the local $G_i^*$ for each location. We do this using `local_gstar_perm()` of **sfdep** package. We then use `unnest()` to unnest the `gi_star` column of the newly created data frame.
+
+```{r}
+gi_stars <- stcube_nb %>%
+  group_by(YYYYMM) %>%
+  mutate(gi_star = local_gstar_perm(
+    Value, nb, wt)) %>%
+  tidyr::unnest(gi_star)
+```
+
+### F.2.3 Identifying Hot- and Cold-spots using Mann Kendall test
+
+The code chunk below runs the Mann Kendall test (without permutations) on each province using `MannKendall()`. Provinces where the tau value is positive are showing an increasing trend, while negative tau values show decreasing trend.
+
+We display the records with significant test results, and show negative and positive tau values as separate tables.
+
+```{r}
+ehsa <- gi_stars %>%
+  group_by(Province) %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>%
+  tidyr::unnest_wider(mk)
+
+filter(ehsa, sl < 0.05, tau > 0)
+filter(ehsa, sl < 0.05, tau < 0)
+```
+
+The results show that 14 of the 77 provinces are showing significant positive trend. However, there are 18 provinces (more) which are showing a significant negative trend.
+
+### F.2.4 Emerging Hot Spot Analysis
+
+We can use `emerging_hot_spot_analysis()` to perform EHSA, including the previous hypothesis testing, and classify provinces based on the test results.
+
+The code chunk below uses `emerging_hot_spot_analysis()` directly on the spacetime cube to run the test with 100 permutations.
+
+```{r}
+#| eval: false
+ehsa <- emerging_hotspot_analysis(
+  x = stcube,
+  .var = "Value",
+  k = 1,
+  nsim = 99
+)
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(ehsa, "data/rds/ehsa2.rds")
+```
+
+```{r}
+#| echo: false
+ehsa = read_rds("data/rds/ehsa2.rds")
+```
+
+We can visualize the number of provinces per category using the code chunk below which utilizes `ggplot()` to build a bar chart.
+
+```{r}
+ggplot(data = ehsa,
+       aes(x = classification)) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "EHSA Classification - PostCovid Tourism Revenue",
+       y = "Number of Provinces", x="") +
+  theme_minimal() +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = 0) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+We can also visualize the hot- and coldspot classifications visually. First, we need to combine the `ehsa` object with the sf dataframe with the code chunk below.
+
+```{r}
+thai_ehsa <- thai_sf %>%
+  left_join(ehsa,
+            by = join_by(Province == location))
+```
+
+Next, we use tmap package to create a choropleth map based on the EHSA classification. We only include provinces that have significant test results and a pattern detected.
+
+```{r}
+ehsa_sig <- filter(thai_ehsa, !(classification == "no pattern detected"), p_value < 0.05)
+
+tmap_mode("plot")
+tm_shape(thai_ehsa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(ehsa_sig) +
+  tm_fill("classification", title = "EHSA Classification") +
+  tm_text("Province", size = 0.5) +
+  tm_borders(alpha = 0.4) +
+tm_layout(
+    main.title = "Post Covid Number of Tourists",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+We can display the same provinces tabularly using the code chunk below
+
+```{r}
+for (i in unique(ehsa_sig$classification)){
+print(as.matrix(ehsa_sig[ehsa_sig$classification == i, c("Province", "classification")]))
+}
+```
+
+The results identifies Phuket and Nakhon Sawan as consecutive hotspots which means they had a single uninterrupted run of being significant hotspots, but have been significant hotspot for less than 90% of the time.
+
+Nonthaburi and Sakon Nakhon are sporadic hotspots, while Lamphun, Ranong and Yala are sporadic coldspots which mean that they have been on-and-off as hot and coldspots for the number of tourists.
+
+## F.3 EHSA - Occupancy Rate
+
+We perform EHSA on the post-covid (2022 onwards) values for the tourist occupancy rates.
+
+### F.3.1 Creating spacetime cube
+
+We then create the space-time cube using `spacetime()` for just the occupancy rates. We use `select()` to limit the original dataframe to only the date, province and variable.
+
+```{r}
+stcube <- spacetime(select(occupancy_postCov,
+                           YYYYMM, Province, occupancy),
+                    thai_sf,
+                    .loc_col = "Province",
+                    .time_col = "YYYYMM")
+```
+
+To check that the object is in the correct format, we can use `is_spacetime_cube()` and confirm that it returns `TRUE`
+
+```{r}
+is_spacetime_cube(stcube)
+```
+
+### F.3.2 Calculating $G_i^*$ statistics
+
+Before computing for the $G_i^*$ statistics, we need to derive the spatial weights. We use the code chunk below to identify the neighbors and to derive inverse distance weights. The `alpha` argument of `st_inverse_distance()` determines the level of distance decay.
+
+```{r}
+#| eval: false
+stcube_nb <- stcube %>%
+  activate("geometry") %>%
+  mutate(nb = include_self(
+    st_contiguity(geometry)),
+    wt=st_inverse_distance(nb,
+                  geometry,
+                  scale = 1,
+                  alpha = 1),
+    .before = 1) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+```{r}
+#| echo: false
+#| eval: false
+write_rds(stcube_nb, "data/rds/stcube_nb3.rds")
+```
+
+```{r}
+#| echo: false
+stcube_nb = read_rds("data/rds/stcube_nb3.rds")
+```
+
+We then use the following chunk to calculate the local $G_i^*$ for each location. We do this using `local_gstar_perm()` of **sfdep** package. We then use `unnest()` to unnest the `gi_star` column of the newly created data frame.
+
+```{r}
+gi_stars <- stcube_nb %>%
+  group_by(YYYYMM) %>%
+  mutate(gi_star = local_gstar_perm(
+    occupancy, nb, wt)) %>%
+  tidyr::unnest(gi_star)
+```
+
+### F.3.3 Identifying Hot- and Cold-spots using Mann Kendall test
+
+The code chunk below runs the Mann Kendall test (without permutations) on each province using `MannKendall()`. Provinces where the tau value is positive are showing an increasing trend, while negative tau values show decreasing trend.
+
+We display the records with significant test results, and show negative and positive tau values as separate tables.
+
+```{r}
+ehsa <- gi_stars %>%
+  group_by(Province) %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>%
+  tidyr::unnest_wider(mk)
+
+filter(ehsa, sl < 0.05, tau > 0)
+filter(ehsa, sl < 0.05, tau < 0)
+```
+
+The results show that 17 of the 77 provinces are showing significant positive trend. However, there are 23 provinces (more) which are showing a significant negative trend.
+
+### F.3.4 Emerging Hot Spot Analysis
+
+We can use `emerging_hot_spot_analysis()` to perform EHSA, including the previous hypothesis testing, and classify provinces based on the test results.
+
+The code chunk below uses `emerging_hot_spot_analysis()` directly on the spacetime cube to run the test with 100 permutations.
+
+```{r}
+#| eval: false
+ehsa <- emerging_hotspot_analysis(
+  x = stcube,
+  .var = "occupancy",
+  k = 1,
+  nsim = 99
+)
+```
+
+```{r}
+#| eval: false
+#| echo: false
+write_rds(ehsa, "data/rds/ehsa3.rds")
+```
+
+```{r}
+#| echo: false
+ehsa = read_rds("data/rds/ehsa3.rds")
+```
+
+We can visualize the number of provinces per category using the code chunk below which utilizes `ggplot()` to build a bar chart.
+
+```{r}
+ggplot(data = ehsa,
+       aes(x = classification)) +
+  geom_bar(fill = "lightblue") +
+  labs(title = "EHSA Classification - PostCovid Tourism Revenue",
+       y = "Number of Provinces", x="") +
+  theme_minimal() +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = 0) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+We can also visualize the hot- and coldspot classifications visually. First, we need to combine the `ehsa` object with the sf dataframe with the code chunk below.
+
+```{r}
+thai_ehsa <- thai_sf %>%
+  left_join(ehsa,
+            by = join_by(Province == location))
+```
+
+Next, we use tmap package to create a choropleth map based on the EHSA classification. We only include provinces that have significant test results and a pattern detected.
+
+```{r}
+ehsa_sig <- filter(thai_ehsa, !(classification == "no pattern detected"), p_value < 0.05)
+
+tmap_mode("plot")
+tm_shape(thai_ehsa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(ehsa_sig) +
+  tm_fill("classification", title = "EHSA Classification") +
+  tm_text("Province", size = 0.5) +
+  tm_borders(alpha = 0.4) +
+tm_layout(
+    main.title = "Post Covid Tourist Occupancy Rate",
+    legend.position = c("right", "bottom"),
+    bg.color = "beige",
+    asp = 0)
+```
+
+We can display the same provinces tabularly using the code chunk below
+
+```{r}
+for (i in unique(ehsa_sig$classification)){
+print(as.matrix(ehsa_sig[ehsa_sig$classification == i, c("Province", "classification")]))
+}
+```
+
+The results identify a number of cold and hotspots. If we focus on the coldspots:
+
+-   we see that Prachin Buri and Phetchaburi are consecutive coldspots
+
+-   A list of 11 provinces, including Chiang Mai, are sporadic coldspots
+
+# G. Conclusion
+
+We have conducted various analyses on the tourism indicators across provinces in Thailand. Among the results, policy makers may want to their attention on provinces that are performing worse than the rest of the country, or their neighbors, in terms of performance or recovery.
+
+-   A cluster in the Southern part of Thailand including Phuket and Krabi is exhibiting slower recovery across revenue, number of tourists, and consequently, the spend per tourist
+
+-   A number of coldspots have been identified specifically for the post-Covid period, and key provinces for tourism among these here need to be identified (e.g., Chiang Mai is appearing as a sporadic coldspot for the occupancy rate)
+
+Further study is needed to understand if there are underlying factors that result to such provinces to be performing or recovering worse than others, and the types of interventions that will address such factors.
