@@ -45,6 +45,8 @@ In each session, we go through a hands-on exercise to revise the readings for th
 
 5.  [Emerging Hot Spot Analysis](In-class/In-class_Ex05/In-class_Ex05.html) (30 Sept '24)
 
+6.  [Geographically Weighted Regression](In-class/In-class_Ex06/In-class_Ex06.html) (14 Oct 2024)
+
 ## Take-Home Exercises
 
 Take-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.

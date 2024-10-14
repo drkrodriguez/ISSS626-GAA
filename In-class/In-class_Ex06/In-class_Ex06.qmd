@@ -1,0 +1,306 @@
+---
+title: "Geographically Weighted Regression Model (sf methods)"
+author: "Federico Jose Rodriguez"
+date: "Oct 14 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this in-class exercise, we learn to use GWR or geographically weighted regression. We use sf methods unlike the ones used in the corresponding hands-oon exercise
+
+# Getting Started
+
+## Data Sources
+
+To datasets will be used for this exercise:
+
+-   2014 Master Plan subzone boundary in shapefile format
+
+-   2015 condo resale prices in csv format
+
+## Installing and launching R packages
+
+This exercise will make use of the following R packages:
+
+-   **olsrr -** for building OLS (ordinary least squares) regression models and performing diagnostic tests
+
+-   **GWmodel -** for calibrating geographically weighted family of models
+
+-   **tmap -** for plotting cartographic quality maps
+
+-   **corrplot** - for multivariate data visualization and analysis
+
+-   **sf** - spatial data handling
+
+-   **tidyverse** - attribute data handling
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary, ggstatsplot, sfdep)
+```
+
+# Data Import and Preparation
+
+## Geospatial data loading and preparation
+
+The code chunk below uses `st_read()` of the **sf** package to load the geospatial data and apply the right EPSG code to convert it to svy21.
+
+```{r}
+mpsz_svy21 = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL") %>%
+  st_transform(3414) %>%
+  st_make_valid()
+```
+
+## Aspatial data loading
+
+The code chunk below uses `read_csv()` of **readr** to import the 2015 condo resale prices from the csv file.
+
+```{r}
+condo_resale = read_csv("data/aspatial/Condo_resale_2015.csv")
+```
+
+## Converting aspatial dataframe into an sf object
+
+To convert the `condo_resale` object into a spatial object, we can use the following code chunk that utilizes `st_as_sf()` from sf package. The final line of the code chunk converts the data frame from wgs84 to svy21 using the indicated crs values.
+
+```{r}
+condo_resale.sf <- st_as_sf(condo_resale,
+                            coords = c("LONGITUDE", "LATITUDE"),
+                            crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+# Exploratory Data Analysis
+
+For the in-class exercise, we focus on analysing if there are any highly correlated variables in the dataset.
+
+## Checking for correlation
+
+In the hands-on exercise, we used `corrplot()` to generate the correlation plot.
+
+An alternative approach is to use `ggcorrmat()` of **ggstatsplot** which requires a simpler line of code.
+
+```{r fig.width=12, fig.height=10}
+ggcorrmat(condo_resale[, 5:23])
+```
+
+# Hedonic Pricing Model
+
+We run the global model using `lm()`. The code chunk below includes all variables.
+
+```{r}
+condo.mlr <- lm(formula = SELLING_PRICE ~ AREA_SQM + AGE    + 
+                  PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE +
+                  PROX_URA_GROWTH_AREA + PROX_HAWKER_MARKET +
+                  PROX_KINDERGARTEN + PROX_MRT  + PROX_PARK +
+                  PROX_PRIMARY_SCH + PROX_TOP_PRIMARY_SCH +
+                  PROX_SHOPPING_MALL + PROX_SUPERMARKET + PROX_BUS_STOP +
+                  NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD + LEASEHOLD_99YR, 
+                data=condo_resale.sf)
+summary(condo.mlr)
+```
+
+The following code gives the results of the model.
+
+```{r}
+summary(condo.mlr)
+```
+
+The mlm object also has some useful objects like `coefficients` which contains the variable coefficients.
+
+```{r}
+condo.mlr$coefficients
+```
+
+## Using olsrr to display results and for VIF
+
+We can use the olsrr package to run diagnostic tests on the model.
+
+We can pass the results to `ols_regress()` to produce a formatted model report, better than the one coming from `summary()`.
+
+```{r}
+ols_regress(condo.mlr)
+```
+
+We can then use `ols_vif_tol()` to run the test for multicollinearity using the VIF or variance inflation factor.
+
+```{r}
+filter(ols_vif_tol(condo.mlr), VIF > 5) # sign of multicollinearity
+filter(ols_vif_tol(condo.mlr), VIF <= 5) # no sign of multicollinearity
+```
+
+As there is no variable with VIF value above 5, we are ensured that there is no signs of multicollinearity using this criterion.
+
+## Using olsrr for variable selection using stepwise regression
+
+Forward stepwise regression adds variables one at a time from an empty model by picking the one with the highest rank for a criteria (and within a threshold) and that improves the model. (i.e., adj R squared) The criteria is typically the significance level (e.g., choose minimum p-value below 0.05)
+
+`ols_step_forward_p()` performs forward stepwise regression using the p-value. Other criteria include AIC, BIC, r-squared. A 0.05 max p-value is defined using the `p_val` argument. The `details` argument instructs whether the results are printed out while each step is run.
+
+```{r}
+condo_fw_mlr <- ols_step_forward_p(condo.mlr, p_val = 0.05, details = FALSE)
+```
+
+We can pass the ols regression object into `plot()` to display the results graphically. The charts show the improvement of four of the model metrics with each variable added.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 10
+plot(condo_fw_mlr)
+```
+
+We can plot the residuals using `ols_plot_resid_fit()` and then passing the `model` object inside the mlr object. This tests for the linearity assumption.
+
+```{r}
+ols_plot_resid_fit(condo_fw_mlr$model)
+```
+
+We can plot the residuals using `ols_plot_resid_hist()` to test for the normality assumption graphically.
+
+```{r}
+ols_plot_resid_hist(condo_fw_mlr$model)
+```
+
+We can also do it using the traditional stats using the following
+
+```{r}
+ols_test_normality(condo_fw_mlr$model)
+```
+
+## Testing spatial autocorrelation
+
+We export the residuals of the hedonic pricing model as a dataframe
+
+```{r}
+mlr_output <- as.data.frame(condo_fw_mlr$model$residuals) %>%
+  rename('FW_MLR_RES' = 'condo_fw_mlr$model$residuals')
+```
+
+We then join the new dataframe to the sf object.
+
+```{r}
+condo_resale.sf <- cbind(condo_resale.sf,
+                         mlr_output$FW_MLR_RES) %>%
+  rename('MLR_RES' = 'mlr_output.FW_MLR_RES')
+```
+
+With this, we can produce an interactive map of the residuals using the sf object.
+
+```{r}
+tmap_mode("view")
+tmap_options(check.and.fix = TRUE) # can be added to the layer with a problem
+
+tm_shape(mpsz_svy21)+
+  tm_polygons(alpha = 0.4) +
+tm_shape(condo_resale.sf) +  
+  tm_dots(col = "MLR_RES",
+          alpha = 0.6,
+          style="quantile", title = "Residual") +
+  tm_view(set.zoom.limits = c(11,14))
+
+tmap_mode("plot")
+```
+
+There appears to be clusters with high residuals– there appears to be signs of spatial autocorrelation.
+
+To prove our suspicions, we conduct Moran's I using the sfdep package (without needing to convert and use spdep as in the hands-on exercise)
+
+```{r}
+condo_resale.sf <- condo_resale.sf %>%
+  mutate(nb = st_knn(geometry, k = 6,
+                     longlat = FALSE),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+We can then run the Global Moran's I permutation test directly on the object
+
+```{r}
+global_moran_perm(condo_resale.sf$MLR_RES,
+                  condo_resale.sf$nb,
+                  condo_resale.sf$wt,
+                  alternative = "two.sided",
+                  nsim = 99)
+```
+
+Since the test p-value is less than 0.05, the result is significant, and as the test statistic is positive, then there are signs of clusters.
+
+As there is spatial autocorrelation, we can build the GWR model.
+
+# Building GWR Model
+
+## Using fixed bandwidth method
+
+The following code chunk derives the optimal fixed bandwidth for the model from the regression method (have to type in full as it cannot take in the ols regression object.
+
+```{r}
+bw_fixed <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE    + 
+                  PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE +
+                  PROX_URA_GROWTH_AREA + PROX_MRT  + PROX_PARK +
+                  PROX_PRIMARY_SCH + PROX_SHOPPING_MALL + PROX_BUS_STOP +
+                  NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD,
+                  data = condo_resale.sf,
+                  approach = "CV",
+                  kernel = "gaussian",
+                  adaptive = FALSE,
+                  longlat = FALSE)
+```
+
+The results show that \~971.3405 is the recommended bandwidth.
+
+The code below calibrates the gwr model using fixed bandwidth
+
+```{r}
+gwr_fixed <- gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE    + 
+                  PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE +
+                  PROX_URA_GROWTH_AREA + PROX_MRT  + PROX_PARK +
+                  PROX_PRIMARY_SCH + PROX_SHOPPING_MALL + PROX_BUS_STOP +
+                  NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD,
+                  data = condo_resale.sf,
+                  bw = bw_fixed,
+                  kernel = "gaussian",
+                  longlat = FALSE)
+```
+
+The output is saved in a list of class gwrm
+
+```{r}
+gwr_fixed
+```
+
+The resulting object has a field named SDF which contains the parameter estimates. To visualize elements of it, we transfer this information into the sf object. (only considering a few columns)
+
+```{r}
+gwr_fixed_output <- as.data.frame(gwr_fixed$SDF) %>%
+  select(-c(2:15))
+
+gwr_sf_fixed <- cbind(condo_resale.sf, gwr_fixed_output)
+```
+
+We can use `glimpse()` to check the contents of the new object
+
+```{r}
+glimpse(gwr_sf_fixed)
+```
+
+We can then plot using tmap
+
+```{r}
+tmap_mode("view")
+
+tm_shape(mpsz_svy21)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(gwr_sf_fixed) +  
+  tm_dots(col = "Local_R2",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+tmap_mode("plot")
+```
