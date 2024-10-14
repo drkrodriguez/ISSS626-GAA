@@ -46,11 +46,6 @@ The code chunk below uses `p_load()` of **pacman** package to check if the packa
 pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary)
 ```
 
-We also define a random seed value for repeatability where of any randomized results.
-
-```{r} set.seed(1234)}
-```
-
 # Data Import and Preparation
 
 ## Geospatial data loading and preparation
@@ -339,7 +334,7 @@ tbl_regression(condo.mlr1,
                 p.value, sigma))
 ```
 
-### Checking for multicolllinearity
+### Checking for multicollinearity
 
 In the code chunk below, we use `ols_vif_tol()` of olsrr package to check for signs of multicollinearity.
 
@@ -420,3 +415,213 @@ tmap_mode("plot")
 ```
 
 The map reveals no clear signs of autocorrelation as there are no clear clusters with high or low residual values.
+
+To verify this conclusion, we can perform Moran's I test.
+
+First, we generate the distance-based weight matrix by using `dnearneigh()` of **spdep** package.
+
+```{r}
+nb <- dnearneigh(coordinates(condo_resale.sp), 0, 1500, longlat = FALSE)
+summary(nb)
+```
+
+Next, we use `nb2listw()` to convert the neighbours into spatial weights.
+
+```{r}
+nb_lw <- nb2listw(nb, style = 'W')
+summary(nb_lw)
+```
+
+Next, we use `lm.morantest()` of **spdep** package to perform Moran's I test for the residual spatial autocorrelation.
+
+```{r}
+lm.morantest(condo.mlr1, nb_lw)
+```
+
+As the p-value is less than our level of confidence α = 0.05, we reject the hypothesis of spatial randomness. As the test statistic I is positive, we infer that the residuals exhibit clustering.
+
+# Building Hedonic Pricing Models using GWmodel
+
+## Building fixed bandwidth GWR model
+
+### Computing fixed bandwidth
+
+In the code chunk below, we use `bw.gwr()` of the **GWR** package to determine an optimal fixed bandwidth. The `adaptive="FALSE"` argument value indicates that we are computing for a fixed bandwidth.
+
+We use the `approach` argument to define the stopping rule which can either be `"CV"` or cross-validation approach, or `"AICc"` or AIC corrected approach. We use the former in the code chunk.
+
+```{r}
+bw.fixed <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
+                     PROX_CHILDCARE + PROX_ELDERLYCARE  + PROX_URA_GROWTH_AREA + 
+                     PROX_MRT   + PROX_PARK + PROX_PRIMARY_SCH + 
+                     PROX_SHOPPING_MALL + PROX_BUS_STOP + NO_Of_UNITS + 
+                     FAMILY_FRIENDLY + FREEHOLD, 
+                   data=condo_resale.sp, 
+                   approach="CV", 
+                   kernel="gaussian", 
+                   adaptive=FALSE, 
+                   longlat=FALSE)
+```
+
+The output shows that the recommended bandwidth is 971.3405 (meters)
+
+### GWModel method - fixed bandwidth
+
+We can calibrate the gwr model using fixed bandwidth and a gaussian kernel using the code chunk below.
+
+```{r}
+gwr.fixed <- gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
+                         PROX_CHILDCARE + PROX_ELDERLYCARE  + PROX_URA_GROWTH_AREA + 
+                         PROX_MRT   + PROX_PARK + PROX_PRIMARY_SCH + 
+                         PROX_SHOPPING_MALL + PROX_BUS_STOP + NO_Of_UNITS + 
+                         FAMILY_FRIENDLY + FREEHOLD, 
+                       data=condo_resale.sp, 
+                       bw=bw.fixed, 
+                       kernel = 'gaussian', 
+                       longlat = FALSE)
+```
+
+The object contains the output and is in class gwrm. Calling the object displays the model output.
+
+```{r}
+gwr.fixed
+```
+
+The report shows that the AICc of the gwr is signigicantly smaller than that of the global multiple lm (42263.61 \< 42967.1)
+
+## Building adaptive bandwidth GWR model
+
+### Computing adaptive bandwidth
+
+We again use `bw.gwr()` of the **GWR** package to determine the bandwidth. This time `adaptive="TRUE"` argument value indicates that we are computing for an adaptive bandwidth.
+
+```{r}
+bw.adaptive <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE  + 
+                        PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE    + 
+                        PROX_URA_GROWTH_AREA + PROX_MRT + PROX_PARK + 
+                        PROX_PRIMARY_SCH + PROX_SHOPPING_MALL   + PROX_BUS_STOP + 
+                        NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD, 
+                      data=condo_resale.sp, 
+                      approach="CV", 
+                      kernel="gaussian", 
+                      adaptive=TRUE, 
+                      longlat=FALSE)
+```
+
+The output shows that 30 is the recommended data points to be used.
+
+### GWModel method - adaptive bandwidth
+
+We can calibrate the gwr model using adaptive bandwidth and a gaussian kernel using the code chunk below.
+
+```{r}
+gwr.adaptive <- gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + 
+                            PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE + 
+                            PROX_URA_GROWTH_AREA + PROX_MRT + PROX_PARK + 
+                            PROX_PRIMARY_SCH + PROX_SHOPPING_MALL + PROX_BUS_STOP + 
+                            NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD, 
+                          data=condo_resale.sp, bw=bw.adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE, 
+                          longlat = FALSE)
+```
+
+The object contains the output and is in class gwrm. Calling the object displays the model output.
+
+```{r}
+gwr.adaptive
+```
+
+## Visualizing GWR Output
+
+The output table includes various fields aside from the residuals and are all stored in the SpatialPointsDataFrame or SpatialPolygonsDataFrame object in an object called SDF.
+
+### Converting SDF into SF dataframe
+
+To visualize the fields in SDF, we first convert it into an sf dataframe using the code chunks below
+
+```{r}
+condo_resale.sf.adaptive <- st_as_sf(gwr.adaptive$SDF) %>%
+  st_transform(crs=3414)
+```
+
+```{r}
+condo_resale.sf.adaptive.svy21 <- st_transform(condo_resale.sf.adaptive, 3414)
+```
+
+```{r}
+gwr.adaptive.output <- as.data.frame(gwr.adaptive$SDF)
+condo_resale.sf.adaptive <- cbind(condo_resale.res.sf, as.matrix(gwr.adaptive.output))
+```
+
+We then use `glimpse()` to check the contents of the last object.
+
+```{r}
+glimpse(condo_resale.sf.adaptive)
+```
+
+There are 77 fields that are included in the dataframe. We can use `summary()` to check the statistics of the `yhat` field as below.
+
+```{r}
+summary(gwr.adaptive$SDF$yhat)
+```
+
+### Visualizing local R2
+
+The code chunk below is used to create an interactive point symbol map based on the `Local_R2` values.
+
+```{r}
+tmap_mode("view")
+
+tm_shape(mpsz_svy21)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(condo_resale.sf.adaptive) +  
+  tm_dots(col = "Local_R2",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+tmap_mode("plot")
+```
+
+### Visualizing coefficient estimates
+
+The code chunk below creates side-by-side interactive map of the standard error and t-value of the `AREA_SQM` variable.
+
+```{r}
+tmap_mode("view")
+
+AREA_SQM_SE <- tm_shape(mpsz_svy21)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(condo_resale.sf.adaptive) +  
+  tm_dots(col = "AREA_SQM_SE",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+AREA_SQM_TV <- tm_shape(mpsz_svy21)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(condo_resale.sf.adaptive) +  
+  tm_dots(col = "AREA_SQM_TV",
+          border.col = "gray60",
+          border.lwd = 1) +
+  tm_view(set.zoom.limits = c(11,14))
+
+tmap_arrange(AREA_SQM_SE, AREA_SQM_TV, 
+             asp=1, ncol=2,
+             sync = TRUE)
+
+tmap_mode("plot")
+```
+
+We can also focus on a particular region like the central region and show the R2 values using the code chunk below
+
+```{r}
+tm_shape(mpsz_svy21[mpsz_svy21$REGION_N=="CENTRAL REGION", ])+
+  tm_polygons()+
+tm_shape(condo_resale.sf.adaptive) + 
+  tm_bubbles(col = "Local_R2",
+           size = 0.15,
+           border.col = "gray60",
+           border.lwd = 1)
+```
