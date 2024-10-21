@@ -1,0 +1,17 @@
+{
+  "hash": "897fe37bb3c38f69cd7c2800496b6084",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Geographically Weighted Modeling of Financial Inclusion in Tanzania\"\nauthor: \"Federico Jose Rodriguez\"\ndate: \"Oct 21 2024\"\ndate-modified: \"last-modified\"\nexecute: \n  eval: true\n  echo: true\n  message: false\n  freeze: true\n---\n\n\n\n\nWIP.\n\n# A. Getting Started\n\n## A.1 Background\n\nWIP.\n\nDefine financial inclusion\n\nDescribe state and statistics in Africa and Tanzania\n\n## A.2 Objectives\n\nWIP.\n\n## A.3 Data Sources\n\nThe following data sources are used for this analysis:\n\n-   XXX from [Finscope Tanzania](https://www.fsdt.or.tz/finscope/)\n\n-   District-level boundaries in Tanzania as a shapefile from [geoBoundaries.org](https://www.geoboundaries.org/) portal\n\n## A.4 Importing and Launching R Packages\n\nFor this study, the following R packages will be used. A description of the packages and the code, using `p_load()` of the **pacman** package, to import them is given below.\n\n::: panel-tabset\n#### Package Description\n\nThe loaded packages include:\n\n-   **sf -** package for importing, managing and processing vector-based geospatial data\n\n-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization\n\n-   **tmap -** package with functions for plotting cartographic quality maps\n\n-   **sfdep** - for handling spatial data\n\n-   **coorplot, ggpubr, heatmaply, factoextra** - packages for multivariate data visualization and analysis\n\n-   **cluster, ClustGeo, NbClust** - packages for performing cluster analysis\n\n#### Import Code\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(sf, tmap, spdep, sfdep, tidyverse,\n               ggpubr, heatmaply, factoextra,\n               NbClust, cluster, ClustGeo)\n```\n:::\n\n\n\n:::\n\nAs we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nset.seed(1234)\n```\n:::\n\n\n\n\n# B. Data Loading and Preparation\n\n## B.1. Tanzania District boundaries\n\nTBC.\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\ntz_dist <- st_read(dsn=\"data/geospatial\", \n                   layer=\"geoBoundaries-TZA-ADM3\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `geoBoundaries-TZA-ADM3' from data source \n  `C:\\drkrodriguez\\ISSS626-GAA\\Take-home\\Take-home_Ex03\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 3644 features and 5 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 29.59019 ymin: -11.7457 xmax: 40.44514 ymax: -0.9857875\nGeodetic CRS:  WGS 84\n```\n\n\n:::\n:::\n\n\n\n\nxxx\n\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nqtm(tz_dist)\n```\n\n::: {.cell-output-display}\n![](Take-home_Ex03_files/figure-html/unnamed-chunk-4-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "Take-home_Ex03_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

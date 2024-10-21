@@ -1,0 +1,364 @@
+---
+title: "Geospatially Weighted Forecasting Model"
+author: "Federico Jose Rodriguez"
+date: "Oct 21 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this in-class exercise, we go through some of the steps to work on HDB data and then revise the hands-on exercise.
+
+# Preparing the HDB data
+
+## Loading Packages
+
+The following code chunk loads five packages for this exercise. We use the three of them for the first time:
+
+-   **httr** - allows us to let R "talk to http"
+
+-   **rvest** - is used for crawling websites (https://rvest.tidyverse.org)
+
+-   **jsonlite** - to be able to work with the crawled data which is returned in JSON format
+
+```{r}
+pacman::p_load(tidyverse, sf, httr, jsonlite, rvest)
+```
+
+## Loading and Preparing Aspatial Data
+
+We use the following code chunk to load the latest HDB resale prices from [data.gov.sg](https://data.gov.sg/datasets/d_8b84c4ee58e3cfc0ece0d773c8ca6abc/view). For the problem, we are only concerned with 2023 information and onwards, so we apply a filter in the pipeline.
+
+```{r}
+resale <- read_csv("data/aspatial/resale.csv") %>%
+  filter(month >= "2023-01" & month <= "2024-09")
+```
+
+We can take a look at the data using `head()`
+
+```{r}
+head(resale)
+```
+
+It is worth noting that there are no exact locations readily present in the data set. There are towns and block numbers, but there are no postcodes.
+
+The code chunk below produces an address column, and remaining lease columns. We produce the address column to try to use it for reverse geocoding later.
+
+```{r}
+resale_tidy <- resale %>%
+  mutate(address = paste(block,street_name)) %>%
+  mutate(remaining_lease_yr = as.integer(
+    str_sub(remaining_lease, 0, 2)))%>%
+  mutate(remaining_lease_mth = as.integer(
+    str_sub(remaining_lease, 9, 11)))
+```
+
+We will only demonstrate geocoding via API and web crawling, we limit the data to just a single month. (Sept 2024)
+
+```{r}
+resale_selected <- resale_tidy %>%
+  filter(month == "2024-09")
+```
+
+Since we only need to pass an address once for reverse geocoding, we reduce the data to unique addresses and then sort them.
+
+```{r}
+add_list <- sort(unique(resale_selected$address))
+```
+
+With this list, we can crawl onemap.gov.sg to perform the reverse geocoding for each address on at a time. It passes each address into the search field one at a time and then appends the first nonNIL result into `postal_coords` The following code chunk creates the function to perform this.
+
+```{r}
+get_coords <- function(add_list){
+  
+  # Create a data frame to store all retrieved coordinates
+  postal_coords <- data.frame()
+    
+  for (i in add_list){
+    #print(i)
+
+    r <- GET('https://www.onemap.gov.sg/api/common/elastic/search?',
+           query=list(searchVal=i,
+                     returnGeom='Y',
+                     getAddrDetails='Y'))
+    data <- fromJSON(rawToChar(r$content))
+    found <- data$found
+    res <- data$results
+    
+    # Create a new data frame for each address
+    new_row <- data.frame()
+    
+    # If single result, append 
+    if (found == 1){
+      postal <- res$POSTAL 
+      lat <- res$LATITUDE
+      lng <- res$LONGITUDE
+      new_row <- data.frame(address= i, 
+                            postal = postal, 
+                            latitude = lat, 
+                            longitude = lng)
+    }
+    
+    # If multiple results, drop NIL and append top 1
+    else if (found > 1){
+      # Remove those with NIL as postal
+      res_sub <- res[res$POSTAL != "NIL", ]
+      
+      # Set as NA first if no Postal
+      if (nrow(res_sub) == 0) {
+          new_row <- data.frame(address= i, 
+                                postal = NA, 
+                                latitude = NA, 
+                                longitude = NA)
+      }
+      
+      else{
+        top1 <- head(res_sub, n = 1)
+        postal <- top1$POSTAL 
+        lat <- top1$LATITUDE
+        lng <- top1$LONGITUDE
+        new_row <- data.frame(address= i, 
+                              postal = postal, 
+                              latitude = lat, 
+                              longitude = lng)
+      }
+    }
+
+    else {
+      new_row <- data.frame(address= i, 
+                            postal = NA, 
+                            latitude = NA, 
+                            longitude = NA)
+    }
+    
+    # Add the row
+    postal_coords <- rbind(postal_coords, new_row)
+  }
+  return(postal_coords)
+}
+```
+
+We then use the following code chunk to run the function.
+
+```{r eval=FALSE}
+coords <- get_coords(add_list)
+```
+
+```{r eval=FALSE}
+write_rds(coords, "data/rds/coords.rds")
+
+```
+
+# Revising Hands-on Exercise
+
+We load packages and include **tidymodels** for the in-class exercise.
+
+```{r}
+pacman::p_load(sf, spdep, GWmodel, SpatialML, 
+               tmap, rsample, Metrics, tidyverse, tidymodels, knitr, see, easystats)
+```
+
+We load the rds file into `mdata`.
+
+```{r}
+mdata <- read_rds("data/rds/mdata.rds")
+```
+
+We use `initial_split()` to prepare the splits and then access the splits using `training()` and `testing()`
+
+```{r}
+set.seed
+resale_split <- initial_split(mdata,
+                              prop = 6.5/10)
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
+```
+
+We can use `ggcorrmat()` to produce the correlation plot
+
+```{r fig.width= 20}
+mdata_nogeo <- mdata %>%
+  st_drop_geometry()
+
+ggstatsplot::ggcorrmat(mdata_nogeo)
+```
+
+## Prediction using MLR
+
+We can use `lm()` to produce the non-spatial multiple linear regression model. We then use **olsrr** package to produce a publication level report
+
+```{r}
+price_mlr <- lm(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                data=train_data)
+
+olsrr::ols_regress(price_mlr)
+```
+
+Aside from olsrr, we can also use the **performance** package to diagnose the model. The code chunk below checks for multicollinearity using the VIF. This is also in the easystats package.
+
+```{r eval=FALSE}
+vif <- performance::check_collinearity(price_mlr)
+kable(vif,
+      caption = "Variable Inflation Factor Results") %>%
+  kable_styling(font_size = 18)
+```
+
+```{r eval=FALSE}
+plot(vif) +
+  theme(axis.text.x = element_text(angle =45, hjust = 1))
+```
+
+Calculating adaptive bandwidth is done using `bw.gwr()` Note that the function can already work with sf format.
+
+```{r eval=FALSE}
+bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                  data=train_data,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+
+We see that the recommended bandwidth is 41. We write the results into an RDS file so we do not need to rerun the code block.
+
+```{r eval=FALSE}
+write_rds(bw_adaptive, "data/rds/bw_adaptive.rds")
+```
+
+```{r echo=FALSE}
+read_rds("data/rds/bw_adaptive.rds")
+```
+
+Calibrating the model is then done with the computed adaptive bandwidth through the `gwr.basic()` function
+
+```{r eval=FALSE}
+gwr_adaptive <- gwr.basic(formula = resale_price ~
+                            floor_area_sqm + storey_order +
+                            remaining_lease_mths + PROX_CBD + 
+                            PROX_ELDERLYCARE + PROX_HAWKER +
+                            PROX_MRT + PROX_PARK + PROX_MALL + 
+                            PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                            WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                            WITHIN_1KM_PRISCH,
+                          data=train_data,
+                          bw=bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE,
+                          longlat = FALSE)
+```
+
+Predicting test data is done with the `gwr.predict()` function
+
+```{r eval=FALSE}
+gwr_pred <- gwr.predict(formula = resale_price ~
+                          floor_area_sqm + storey_order +
+                          remaining_lease_mths + PROX_CBD + 
+                          PROX_ELDERLYCARE + PROX_HAWKER + 
+                          PROX_MRT + PROX_PARK + PROX_MALL + 
+                          PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                          WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+                          WITHIN_1KM_PRISCH, 
+                        data=train_data, 
+                        predictdata = test_data, 
+                        bw=bw_adaptive, 
+                        kernel = 'gaussian', 
+                        adaptive=TRUE, 
+                        longlat = FALSE,
+                        dMat1 = dmat_gwr)
+```
+
+## Prediction models with random forests
+
+SpatialML needs the coordinate information in order to perform training and predictions.
+
+```{r}
+coords <- st_coordinates(mdata)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+We also need to remove the geometry from the datasets to ensure that they are simple dataframes and not sf dataframes.
+
+```{r}
+train_data_nogeom <- train_data %>% 
+  st_drop_geometry()
+
+test_data_nogeom <- test_data %>% 
+  st_drop_geometry()
+```
+
+We can calibrate the non-spatial model using `ranger()`
+
+```{r eval=FALSE}
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
+               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + 
+               PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + 
+               PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+               WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+               WITHIN_1KM_PRISCH,
+             data=train_data_nogeom)
+rf
+```
+
+We can calibrate the spatial model using `grf()`
+
+```{r eval=FALSE}
+set.seed(1234)
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order +
+                       remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE +
+                       PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL +
+                       PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                       WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                       WITHIN_1KM_PRISCH,
+                     dframe=train_data_nogeom, 
+                     bw=bw_adaptive,
+                     kernel="adaptive",
+                     coords=coords_train)
+```
+
+```{r eval=FALSE}
+write_rds(gwRF_adaptive, "data/rds/gwRF_adaptive.rds")
+```
+
+```{r echo=FALSE, eval=FALSE}
+gwRF_adaptive <- read_rds("data/rds/gwRF_adaptive.rds")
+```
+
+Predicting test data values first needs including the coordinates into the test data set before passing it into `predict.grf()`
+
+```{r eval=FALSE}
+test_data_nogeom <- cbind(test_data_nogeom, coords_test)
+
+gwRF_pred <- predict.grf(gwRF_adaptive, 
+                           test_data_nogeom, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+The returned object is a list. We convert it into a dataframe to be able to work with it for visualizations and calculations. We then combine it with the original dataset
+
+```{r eval=FALSE}
+GRF_pred_df <- as.data.frame(gwRF_pred)
+
+test_data_p <- cbind(test_data_nogeom, GRF_pred_df)
+```
+
+We can then compute the RMSE and plot the actual and predicted values.

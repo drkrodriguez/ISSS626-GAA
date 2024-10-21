@@ -1,0 +1,88 @@
+---
+title: "Geographically Weighted Modeling of Financial Inclusion in Tanzania"
+author: "Federico Jose Rodriguez"
+date: "Oct 21 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+WIP.
+
+# A. Getting Started
+
+## A.1 Background
+
+WIP.
+
+Define financial inclusion
+
+Describe state and statistics in Africa and Tanzania
+
+## A.2 Objectives
+
+WIP.
+
+## A.3 Data Sources
+
+The following data sources are used for this analysis:
+
+-   XXX from [Finscope Tanzania](https://www.fsdt.or.tz/finscope/)
+
+-   District-level boundaries in Tanzania as a shapefile from [geoBoundaries.org](https://www.geoboundaries.org/) portal
+
+## A.4 Importing and Launching R Packages
+
+For this study, the following R packages will be used. A description of the packages and the code, using `p_load()` of the **pacman** package, to import them is given below.
+
+::: panel-tabset
+#### Package Description
+
+The loaded packages include:
+
+-   **sf -** package for importing, managing and processing vector-based geospatial data
+
+-   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+
+-   **tmap -** package with functions for plotting cartographic quality maps
+
+-   **sfdep** - for handling spatial data
+
+-   **coorplot, ggpubr, heatmaply, factoextra** - packages for multivariate data visualization and analysis
+
+-   **cluster, ClustGeo, NbClust** - packages for performing cluster analysis
+
+#### Import Code
+
+```{r}
+pacman::p_load(sf, tmap, spdep, sfdep, tidyverse,
+               ggpubr, heatmaply, factoextra,
+               NbClust, cluster, ClustGeo)
+```
+:::
+
+As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.
+
+```{r}
+set.seed(1234)
+```
+
+# B. Data Loading and Preparation
+
+## B.1. Tanzania District boundaries
+
+TBC.
+
+```{r}
+tz_dist <- st_read(dsn="data/geospatial", 
+                   layer="geoBoundaries-TZA-ADM3")
+```
+
+xxx
+
+```{r}
+qtm(tz_dist)
+```
