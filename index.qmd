@@ -31,6 +31,8 @@ Hands-on exercises are assigned before each lesson to give us hands-on experienc
 
 10. [Geographically Weighted Regression Models](Hands-on/Hands-on_Ex10/Hands-on_Ex10.html) (for Session 7, 14 Oct 2024)
 
+11. [Geographically Weighted Predictive Models](Hands-on/Hands-on_Ex11/Hands-on_Ex11.html) (for Session 8, 21 Oct 2024)
+
 ## In-Class Exercises
 
 In each session, we go through a hands-on exercise to revise the readings for the lesson. The objective of these is to further reinforce the concepts and tools learned in the readings and in the take-home exercise. These will also go further into the analysis and interpretation of results.
