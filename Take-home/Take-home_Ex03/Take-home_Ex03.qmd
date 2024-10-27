@@ -18,7 +18,7 @@ WIP.
 
 WIP.
 
-Define financial inclusion
+Financial inclusion des
 
 Describe state and statistics in Africa and Tanzania
 
@@ -30,7 +30,13 @@ WIP.
 
 The following data sources are used for this analysis:
 
--   XXX from [Finscope Tanzania](https://www.fsdt.or.tz/finscope/)
+-   Finscope Tanzania 2023 individual survey data from [Finscope Tanzania](https://www.fsdt.or.tz/finscope/)
+
+    -   The dataset is contained in a csv and translates the responses from 9,915 individuals who answered the survey
+
+    -   The respondents are all adults aged 16 years and above take across Tanzania
+
+    -   The dataset also includes derived fields
 
 -   District-level boundaries in Tanzania as a shapefile from [geoBoundaries.org](https://www.geoboundaries.org/) portal
 
@@ -43,24 +49,22 @@ For this study, the following R packages will be used. A description of the pack
 
 The loaded packages include:
 
--   **sf -** package for importing, managing and processing vector-based geospatial data
+-   **olsrr -** for building OLS (ordinary least squares) regression models and performing diagnostic tests
 
--   **tidyverse -** collection of packages for performing data importation, wrangling and visualization
+-   **GWmodel -** for calibrating geographically weighted family of models
 
--   **tmap -** package with functions for plotting cartographic quality maps
+-   **tmap -** for plotting cartographic quality maps
 
--   **sfdep** - for handling spatial data
+-   **corrplot** - for multivariate data visualization and analysis
 
--   **coorplot, ggpubr, heatmaply, factoextra** - packages for multivariate data visualization and analysis
+-   **sf** - spatial data handling
 
--   **cluster, ClustGeo, NbClust** - packages for performing cluster analysis
+-   **tidyverse** - attribute data handling
 
 #### Import Code
 
 ```{r}
-pacman::p_load(sf, tmap, spdep, sfdep, tidyverse,
-               ggpubr, heatmaply, factoextra,
-               NbClust, cluster, ClustGeo)
+pacman::p_load(olsrr, corrplot, sf, GWmodel, tmap, tidyverse)
 ```
 :::
 
@@ -72,17 +76,29 @@ set.seed(1234)
 
 # B. Data Loading and Preparation
 
-## B.1. Tanzania District boundaries
+## B.1. Loading Tanzania District boundaries
 
-TBC.
+We load the district level boundaries in the following code chunk using `st_read()` and indicating the appropriate layer name. (i.e., the level 2 map)
 
 ```{r}
 tz_dist <- st_read(dsn="data/geospatial", 
-                   layer="geoBoundaries-TZA-ADM3")
+                   layer="geoBoundaries-TZA-ADM2")
 ```
 
-xxx
+The output shows that there are 170 objects loaded which corresponds to individual districts. The object is also of multipolygon class which could indicate that there are districts with discontinuous land areas, like islands.
+
+We can create a simple map to visualize the boundaries using `qtm()` from **tmap**.
 
 ```{r}
-qtm(tz_dist)
+qtm(tz_dist, text = "shapeName", text.size = 0.4)
 ```
+
+## B.2 Loading Finscope Tanzania 2023 Respondent Data
+
+We can use `read_csv()` in the code chunk below to load the raw respondent data into an R object.
+
+```{r}
+fstz23_raw <- read_csv("data/aspatial/FinScope Tanzania 2023_Individual Main Data_FINAL.csv")
+```
+
+There are 9915 rows or records, and 721 columns or fields. Most of these columns should not be relevant in meeting our objective, so it is advised to limit the data we work with to those meaningful variable. These variables should be our variable(s) of concern, or the dependent variable(s), and the variables that may contribute to it, or the independent variables.
