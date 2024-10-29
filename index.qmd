@@ -55,6 +55,8 @@ In each session, we go through a hands-on exercise to revise the readings for th
 
 7.  [Geographically Weighted Forecasting](In-class/In-class_Ex07/In-class_Ex07.html) (21 Oct 2024)
 
+8.  [Geographic Accessibility](In-class/In-class_Ex08/In-class_Ex08.html) (28 Oct 2024)
+
 ## Take-Home Exercises
 
 Take-home exercises are where we students are able to apply the methods and techniques learned in class in real-world cases– using real-world data and aim to generate real insights.
