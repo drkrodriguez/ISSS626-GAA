@@ -35,7 +35,7 @@ Hands-on exercises are assigned before each lesson to give us hands-on experienc
 
 12. [Modelling Geographic Accessibility](Hands-on/Hands-on_Ex12/Hands-on_Ex12.html) (for Session 9, 28 Oct 2024)
 
-13. Coming Soon (for Session 10, 4 Nov 2024)
+13. [Spatial Interaction Models](Hands-on/Hands-on_Ex13/Hands-on_Ex13.html) (for Session 10, 4 Nov 2024)
 
 ## In-Class Exercises
 

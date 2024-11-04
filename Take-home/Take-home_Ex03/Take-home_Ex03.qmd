@@ -10,21 +10,33 @@ execute:
   freeze: true
 ---
 
-WIP.
+(WIP) We look into financial inclusion in Tanzania based on a 2023 survey of close to 10 thousand residents.
 
 # A. Getting Started
 
 ## A.1 Background
 
-WIP.
+The [World Bank](https://www.worldbank.org/en/topic/financialinclusion/overview) defines **financial inclusion** as the state of having access to useful and affordable financial products to meet one's needs. Financial inclusion is an enabler to 7 of the Sustainable Development Goals, and is seen as the key enabler to reduce extreme poverty.
 
-Financial inclusion des
+One key dimension of financial inclusion that the World Bank looked at in their latest [Global Findex Database 2021](https://www.worldbank.org/en/publication/globalfindex) is the ownership of bank accounts for adults. In this report, 76% of the global adult population have their own accounts, but only 71% of the developing nations' do. In some countries like Tanzania this number is even lower at 52%. Banking is just one traditional dimension. Other vehicles like mobile payments can bridge the gap in access to services for some of these nations.
 
-Describe state and statistics in Africa and Tanzania
+Tanzania recognizes the importance of financial inclusion in promoting economic growth and with the Bank of Tanzania, the country's central bank, the Microfinance Policy of 2000 was developed and focused on expanding financial services for low-income individuals.
+
+The program behind financial inclusion has been structured from 2014 with the first National Financial Inclusion Framework for 2014-2016, with the latest version being the third framework for 2023-2028. While there has been significant progress, (e.g., access to financial services has risen from 42% in 2013 to 89% in 2023) the country continues to aim for inclusion for the whole population by increasing access, encouraging usage and enhancing the quality of financial services.
 
 ## A.2 Objectives
 
-WIP.
+Finscope Tanzania 2023 is a public-private sector collaboration and aimed, among others, to understand and describe the financial behavior of individuals in the country and to establish an updated view of the level of financial inclusion across various measures. A large part of the findings is showing the change (improvements) of the overall measures against the previous 2017 report.
+
+The objective of this study is to build on the Finscope Tanzania 2023 by identifying influential variables and identifying if geospatial factors influence the effect of those variables.
+
+In order to satisfy this, the specific deliverables for the study will be:
+
+-   to build a global or non-spatial explanatory model for the level of financial inclusion across Tanzania;
+
+-   to build a geographically weighted explanatory model for the same response variables; and,
+
+-   to assess the advantage of the geographically weighted model and to analyse the geographically weighted model
 
 ## A.3 Data Sources
 
@@ -36,7 +48,7 @@ The following data sources are used for this analysis:
 
     -   The respondents are all adults aged 16 years and above take across Tanzania
 
-    -   The dataset also includes derived fields
+    -   The dataset also includes derived fields which include different indicators for financial inclusion based on different criteria
 
 -   District-level boundaries in Tanzania as a shapefile from [geoBoundaries.org](https://www.geoboundaries.org/) portal
 
@@ -55,7 +67,7 @@ The loaded packages include:
 
 -   **tmap -** for plotting cartographic quality maps
 
--   **corrplot** - for multivariate data visualization and analysis
+-   **ggstatsplot** - for multivariate data visualization and analysis
 
 -   **sf** - spatial data handling
 
@@ -64,19 +76,13 @@ The loaded packages include:
 #### Import Code
 
 ```{r}
-pacman::p_load(olsrr, corrplot, sf, GWmodel, tmap, tidyverse)
+pacman::p_load(olsrr, sf, GWmodel, tmap, tidyverse, ggstatsplot)
 ```
 :::
 
-As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.
-
-```{r}
-set.seed(1234)
-```
-
 # B. Data Loading and Preparation
 
-## B.1. Loading Tanzania District boundaries
+## B.1 Loading Tanzania District boundaries
 
 We load the district level boundaries in the following code chunk using `st_read()` and indicating the appropriate layer name. (i.e., the level 2 map)
 
@@ -98,7 +104,126 @@ qtm(tz_dist, text = "shapeName", text.size = 0.4)
 We can use `read_csv()` in the code chunk below to load the raw respondent data into an R object.
 
 ```{r}
-fstz23_raw <- read_csv("data/aspatial/FinScope Tanzania 2023_Individual Main Data_FINAL.csv")
+fstz23 <- read_csv("data/aspatial/FinScope Tanzania 2023_Individual Main Data_FINAL.csv", show_col_types = FALSE)
 ```
 
 There are 9915 rows or records, and 721 columns or fields. Most of these columns should not be relevant in meeting our objective, so it is advised to limit the data we work with to those meaningful variable. These variables should be our variable(s) of concern, or the dependent variable(s), and the variables that may contribute to it, or the independent variables.
+
+## B.3 Preparing Finscope Tanzania 2023 Respondent Data
+
+### B.3.1 Selecting potential variables
+
+The first step in preparing the dataset is to reduce the data by keeping only the potentially relevant fields. This means identifying fields that can be used as is or to derive both the response variable(s) and the explanatory variables.
+
+This is performed by scanning the datamap file (i.e., data dictionary) that accompanies the dataset. From there, we decide to keep only the following XXX variables. We also change the variable names to a shorter and more recognizable one.
+
+::: panel-tabset
+#### Financial Inclusion
+
+| Variable Name | Description | New Variable Name |
+|:-------------:|:-----------:|:-----------------:|
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+
+#### Geographic (4)
+
+|  Variable   |                 Description                 | New Variable Name |
+|:-----------:|:-------------------------------------------:|:-----------------:|
+|  reg_name   |                 Region name                 |      region       |
+|  dist_name  |                District name                |     district      |
+|  ward_name  |                  Ward name                  |       ward        |
+| clustertype | Indicates if in rural (1) or urban (2) area |       urban       |
+|             |                                             |                   |
+|             |                                             |                   |
+|             |                                             |                   |
+|             |                                             |                   |
+|             |                                             |                   |
+|             |                                             |                   |
+
+#### Demographic (11)
+
+| Variable Name | Description | New Variable Name |
+|:--:|:--:|:--:|
+| c8c | Age | age |
+| c9 | Gender: male (1). or female (2) | female |
+| c10 | Marital status: married (1), divorced (2), widowed (3), single (4) | maritalstatus |
+| c11 | Highest level education (10 levels of values) | education |
+| c2 | Head of household: respondent (1), not the respondent (2) | head_hh |
+| c8n_a1 | Visually impaired: Yes (1), No (2) | visual_impaaired |
+| c8n_b1 | Hearing impaired: Yes (1), No (2) | hearing_impaired |
+| c8n_c1 | Communication impaired: Yes (1), No (2) | comm_impaired |
+| c8n_d1 | Movement impaired: Yes (1), No (2) | move_impaired |
+| c8n_e1 | Difficulty with daily activities: Yes (1), No (2) | daily_impaired |
+| c8n_f1 | Difficulty remembering and concentrating: Yes (1), No (2) | cogn_impaired |
+
+#### Economic
+
+| Variable Name | Description | New Variable Name |
+|:--:|:--:|:--:|
+| c12_1 | Land ownership (6 levels) | land_own |
+| c14 | Family involved in agriculture, fishing or aquaculture: Yes (1), No (2) | agricultural |
+| c18_2 | Primary source of funds (12 levels) | source_of_funds |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+
+#### Technographic ()
+
+| Variable Name | Description | New Variable Name |
+|:--:|:--:|:--:|
+| c23\_\_1 | Access to mobile phone: No (0), Yes (1) | mobile |
+| c23\_\_2 | Access to internet: No (0), Yes (1) | internet |
+| c24_1 | Personally own mobile phone: No (0), Yes (1) | own_mobile |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+|  |  |  |
+
+#### XXXX
+
+| Variable Name | Description | New Variable Name |
+|:-------------:|:-----------:|:-----------------:|
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+|               |             |                   |
+:::
+
+The code block below compiles the XXX variables and their new names in two separate objects.
+
+```{r}
+colstokeep <- c("reg_name", "dist_name", "ward_name", "clustertype",
+                "c8c", "c9", "c10", "c11", "c2",
+                "c8n_a1", "c8n_b1", "c8n_c1", "c8n_d1", "c8n_e1", "c8n_f1",
+                "c12_1", "c14", "c18_2",
+                "c23__1", "c23__2", "c24_1")
+newnames <- c("region", "district", "ward", "urban",
+              "age", "female", "maritalstatus", "education", "head_hh",
+              "visual_impaired", "hearing_impaired", "comm_impaired",
+              "move_impaired", "daily_impaired", "cogn_impaired",
+              "land_own", "agricultural", "source_of_funds",
+              "mobile", "internet", "own_mobile")
+length(colstokeep)
+length(newnames)
+```

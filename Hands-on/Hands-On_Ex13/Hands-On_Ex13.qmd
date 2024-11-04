@@ -1,0 +1,721 @@
+---
+title: "Spatial Interaction Models"
+author: "Federico Jose Rodriguez"
+date: "Nov 3 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+In this hands-on exercise, we apply functions for modeling spatial interaction using R. We cover both the processing and visualizing of flow data and the calibration of spatial interaction models in this exercise.
+
+This exercise is based on Chapters 15 and 16 of Dr Kam's online book which can be accessed [here](https://r4gdsa.netlify.app/ "R for Geospatial Data Science and Analytics by Dr Kam").
+
+# Getting Started
+
+## Data Sources
+
+For this exercise, we will be using the following two sources:
+
+-   Passenger volume by origin and destination bus stops from the [LTA Data Mall](https://datamall.lta.gov.sg/content/datamall/en.html)
+
+-   Bus stop locations based on data from the last quarter of 2022
+
+-   URA Masterplan 2019 Planning Subzone boundary which is already converted into sf dataframe format and saved in an rds file
+
+## Installing and launching R packages
+
+This exercise will make use of nine R packages.
+
+-   sf - for importing and processing geospatial data
+
+-   tidyverse - for data importing and wrangling
+
+-   tmap - for creating thematic maps
+
+-   stplanr - for solving common problems in transport planning
+
+-   DT - provides an R interface for JavaScript linrary DataTables
+
+The code chunk below uses `p_load()` of **pacman** package to check if the packages are installed in the computer. It installs them first if they are not. It then loads them into R.
+
+```{r}
+pacman::p_load(tmap, sf, sp,
+               performance, reshape2,
+               ggpubr, tidyverse,
+               DT, stplanr)
+```
+
+# Processing and Visualizing Flow Data
+
+The first part of the exercise is building an OD matrix based on the first datasource.
+
+## Preparing the Flow Data
+
+### Importing the OD Data
+
+We first load the passenger volume data by using `read_csv()` of readr package.
+
+```{r}
+odbus <- read_csv("data/aspatial/origin_destination_bus_202210.csv")
+```
+
+We can use `glimpse()` to inspect the contents of the `odbus` object.
+
+```{r}
+glimpse(odbus)
+```
+
+The origin and destination codes are imported as numeric data type. We use the following code chunk to convert them into characters or categorical type.
+
+```{r}
+odbus$ORIGIN_PT_CODE <- as.factor(odbus$ORIGIN_PT_CODE)
+odbus$DESTINATION_PT_CODE <- as.factor(odbus$DESTINATION_PT_CODE) 
+```
+
+### Extracting the study data
+
+For this study, we focus on the activity on weekdays between 6pm and 9pm. The code chunk below extracts the relevant data based on that.
+
+```{r}
+odbus6_9 <- odbus %>%
+  filter(DAY_TYPE == "WEEKDAY") %>%
+  filter(TIME_PER_HOUR >= 6 &
+           TIME_PER_HOUR <= 9) %>%
+  group_by(ORIGIN_PT_CODE,
+           DESTINATION_PT_CODE) %>%
+  summarise(TRIPS = sum(TOTAL_TRIPS))
+```
+
+We can display the contents as a table using the following code which uses the **DT** package.
+
+```{r}
+datatable(odbus6_9)
+```
+
+We can save the output for future use using the code chunk below
+
+```{r eval=FALSE}
+write_rds(odbus6_9, "data/rds/odbus6_9.rds")
+```
+
+The following code chunk reloads the same data.
+
+```{r eval=FALSE}
+odbus6_9 <- read_rds("chap15/data/rds/odbus6_9.rds")
+```
+
+## Importing Geospatial Data
+
+We use the code chunk below to load the bus stop locations into R.
+
+```{r}
+busstop <- st_read(dsn = "data/geospatial",
+                   layer = "BusStop") %>%
+  st_transform(crs = 3414)
+```
+
+The following code chunk loads the masterplan subzone boudaries
+
+```{r}
+mpsz <- st_read(dsn = "data/geospatial",
+                   layer = "MPSZ-2019") %>%
+  st_transform(crs = 3414)
+```
+
+## Geospatial Data wrangling
+
+The code chunk below combines the `busstop` and `mpsz` data by populating the planning subzone code into the `busstop` object.
+
+```{r}
+busstop_mpsz <- st_intersection(busstop, mpsz) %>%
+  select(BUS_STOP_N, SUBZONE_C) %>%
+  st_drop_geometry()
+```
+
+```{r}
+datatable(busstop_mpsz)
+```
+
+We can save the output into an rds file to save our work up to this point.
+
+```{r eval=FALSE}
+write_rds(busstop_mpsz, "data/rds/busstop_mpsz.rds")  
+```
+
+Next, we use the code chunk below to append the planning subzone code of the origin onto `odbus6_9`
+
+```{r}
+od_data <- left_join(odbus6_9 , busstop_mpsz,
+            by = c("ORIGIN_PT_CODE" = "BUS_STOP_N")) %>%
+  rename(ORIGIN_BS = ORIGIN_PT_CODE,
+         ORIGIN_SZ = SUBZONE_C,
+         DESTIN_BS = DESTINATION_PT_CODE)
+```
+
+We check if there are any duplicated records using the code chunk below
+
+```{r}
+duplicate <- od_data %>%
+  group_by_all() %>%
+  filter(n()>1) %>%
+  ungroup()
+```
+
+```{r}
+datatable(duplicate)
+```
+
+We see that there are quite a number of duplicated records. We use the code chunk below to remove duplicates
+
+```{r}
+od_data <- unique(od_data)
+```
+
+We then update the object with the planning subzone code of the destination using the code chunk below and then remove any duplicates
+
+```{r}
+od_data <- left_join(od_data , busstop_mpsz,
+            by = c("DESTIN_BS" = "BUS_STOP_N")) 
+```
+
+```{r}
+od_data <- unique(od_data)
+```
+
+```{r}
+od_data <- od_data %>%
+  rename(DESTIN_SZ = SUBZONE_C) %>%
+  drop_na() %>%
+  group_by(ORIGIN_SZ, DESTIN_SZ) %>%
+  summarise(MORNING_PEAK = sum(TRIPS))
+```
+
+We can save this into an rds file to be able to preserve our work so far.
+
+```{r eval=FALSE}
+write_rds(od_data, "data/rds/od_data_fii.rds")
+```
+
+```{r}
+od_data_fii <- read_rds("data/rds/od_data.rds")
+```
+
+## Visualizing Spatial Interaction
+
+In this section, we learn about using the **stplanr** package to prepare desire lines
+
+### Removing intra-zonal flows
+
+We are not interested in intra-zonal flows. As such, we use the code below to remove them
+
+```{r}
+od_data_fij <- od_data[od_data$ORIGIN_SZ!=od_data$DESTIN_SZ,]
+```
+
+### Creating desire lines
+
+In the code below, we use `od2line()` of stplanr package to create the desire lines
+
+```{r}
+flowLine <- od2line(flow = od_data_fii, 
+                    zones = mpsz,
+                    zone_code = "SUBZONE_C")
+```
+
+Visualizing the desire lines
+
+To visualize the desire lines, the code chunk below can be used.
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+flowLine %>%  
+tm_shape() +
+  tm_lines(lwd = "MORNING_PEAK",
+           style = "quantile",
+           scale = c(0.1, 1, 3, 5, 7, 10),
+           n = 6,
+           alpha = 0.3)
+```
+
+When there are too many flow lines rendering the visualization ineffective, it is wise to just focus on a subset of flows. The code chunk below just shows the flows with value of at least 5000
+
+```{r}
+tm_shape(mpsz) +
+  tm_polygons() +
+flowLine %>%  
+  filter(MORNING_PEAK >= 5000) %>%
+tm_shape() +
+  tm_lines(lwd = "MORNING_PEAK",
+           style = "quantile",
+           scale = c(0.1, 1, 3, 5, 7, 10),
+           n = 6,
+           alpha = 0.3)
+```
+
+# Calibrating Spatial Interaction Models with R
+
+Spatial interaction models or SIMs are models for estimating flows between entitites and has four main types:
+
+-   Unconstrained
+
+-   Production-constrained
+
+-   Attraction-coonstrained
+
+-   Doubly-constrained
+
+We continue working with the same data to determine factors affecting public bus passenger flows during morning peak hours.
+
+## Computing the Distance Matrix
+
+### Converting the sf data table to SpatialPolygonsDataFrame
+
+The distance matrix can be computed using sf or sp. Previous runs have shown that computing the distance matrix using sp rather than sf is faster so we will be using that here.
+
+First, we convert the subzone boundaries into a SpatialPolygonsDataFrame using the following code chunk
+
+```{r}
+mpsz_sp <- as(mpsz, "Spatial")
+mpsz_sp
+```
+
+### Computing the distance matrix
+
+We can use `spDists()` of **sp** package in the code chunk below to compute for the Euclidean distance between centroids of the subzones.
+
+```{r}
+dist <- spDists(mpsz_sp, 
+                longlat = FALSE)
+```
+
+```{r}
+head(dist, n=c(10, 10))
+```
+
+### Labeling row and column names
+
+We first create a sorted list according to the distance matrix based on the planning zone subcode
+
+```{r}
+sz_names <- mpsz$SUBZONE_C
+```
+
+Next we attach the subzone names to the row and column headers
+
+```{r}
+colnames(dist) <- paste0(sz_names)
+rownames(dist) <- paste0(sz_names)
+```
+
+### Pivoting distance value by subzone name
+
+We use the code chunk below to unpivot the distance matrix into a long table by using the subzone codes
+
+```{r}
+distPair <- melt(dist) %>%
+  rename(dist = value)
+head(distPair, 10)
+```
+
+We see that intrazone distances appear as zero here
+
+### Updating intrazonal distances
+
+We use this section to raplce the intrazonal distance with another constant
+
+We first use `summary()` to select and fin the minim value of the distance
+
+```{r}
+distPair %>%
+  filter(dist > 0) %>%
+  summary()
+```
+
+Next, we replace the distance with a value of 50 if its current is zero
+
+```{r}
+distPair$dist <- ifelse(distPair$dist == 0,
+                        50, distPair$dist)
+```
+
+The code chunk below checks the resulting dataframe
+
+```{r}
+distPair %>%
+  summary()
+```
+
+We then use the following to rename the origin and the destination fields
+
+```{r}
+distPair <- distPair %>%
+  rename(orig = Var1,
+         dest = Var2)
+```
+
+## Preparing the flow data
+
+We will start with the `od_data_fii` object for this step.
+
+We compute the total number of passenger trips between and within subzone using the code chunk below
+
+```{r}
+flow_data <- od_data_fii %>%
+  group_by(ORIGIN_SZ, DESTIN_SZ) %>% 
+  summarize(TRIPS = sum(MORNING_PEAK)) 
+```
+
+We show the first ten records using the code chunk below
+
+```{r}
+head(flow_data, 10)
+```
+
+### Separating intra-flow from passenger volume
+
+We use the code chunk below to create three new fields in the dataframe
+
+```{r}
+flow_data$FlowNoIntra <- ifelse(
+  flow_data$ORIGIN_SZ == flow_data$DESTIN_SZ, 
+  0, flow_data$TRIPS)
+flow_data$offset <- ifelse(
+  flow_data$ORIGIN_SZ == flow_data$DESTIN_SZ, 
+  0.000001, 1)
+```
+
+### Combining passenger volume data with distance value
+
+We first need to convert the data type of the origin and destinations into factors using the code chunk below
+
+```{r}
+flow_data$ORIGIN_SZ <- as.factor(flow_data$ORIGIN_SZ)
+flow_data$DESTIN_SZ <- as.factor(flow_data$DESTIN_SZ)
+```
+
+Next, we combine `flow_data` and `distPair` using `left_join()`
+
+```{r}
+flow_data1 <- flow_data %>%
+  left_join (distPair,
+             by = c("ORIGIN_SZ" = "orig",
+                    "DESTIN_SZ" = "dest"))
+```
+
+## Preparing Origin and Destination Attributes
+
+### Importing population data
+
+```{r}
+pop <- read_csv("data/aspatial/pop.csv")
+```
+
+```{r}
+pop1 <- pop %>%
+  left_join(st_drop_geometry(mpsz), by = c(SZ = "SUBZONE_N"))
+```
+
+### Preparing origin and destination attribute
+
+```{r}
+flow_data1 <- flow_data1 %>%
+  left_join(pop1,
+            by = c(ORIGIN_SZ = "SUBZONE_C")) %>%
+  rename(ORIGIN_AGE7_12 = AGE7_12,
+         ORIGIN_AGE13_24 = AGE13_24,
+         ORIGIN_AGE25_64 = AGE25_64) %>%
+  select(-c(PA))
+
+flow_data1 <- flow_data1 %>%
+  left_join(pop1,
+            by = c(DESTIN_SZ = "SUBZONE_C")) %>%
+  rename(DESTIN_AGE7_12 = AGE7_12,
+         DESTIN_AGE13_24 = AGE13_24,
+         DESTIN_AGE25_64 = AGE25_64) %>%
+  select(-c(PA))
+```
+
+## Calibrating Spatial Interaction models
+
+### Importing the modelling data
+
+We rename the last object to indicate it as the modeling data
+
+```{r}
+SIM_data <- flow_data1
+```
+
+### Visualizing the dependent variable
+
+We can plot the distribution of the dependent variable using ggplot package
+
+```{r}
+ggplot(data = SIM_data,
+       aes(x = TRIPS)) +
+  geom_histogram()
+```
+
+The distribution is highly skewed and far from normal
+
+We can visualize the relationship between the dependent variable and an independent variable like distance using the code chunk below
+
+```{r}
+ggplot(data = SIM_data,
+       aes(x = dist,
+           y = TRIPS)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+The plot doesn't show a linear relationship between these variables
+
+Alternatively, we can use a log transformed version of these variables and see the relationship of those
+
+```{r}
+ggplot(data = SIM_data,
+       aes(x = log(dist),
+           y = log(TRIPS))) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+### Checking for variables with zero values
+
+Since the log of a zero value is underfined, it is important to ensure that there are no zeros especially for Poisson regression.
+
+The code chunk below displays summary statistics for all numeric variables.
+
+```{r}
+summary(SIM_data)
+```
+
+The report shows some variables that have zero values. We use the code chunk below to replace any zero values for those variables with 0.99
+
+```{r}
+SIM_data$DESTIN_AGE7_12 <- ifelse(
+  SIM_data$DESTIN_AGE7_12 == 0,
+  0.99, SIM_data$DESTIN_AGE7_12)
+SIM_data$DESTIN_AGE13_24 <- ifelse(
+  SIM_data$DESTIN_AGE13_24 == 0,
+  0.99, SIM_data$DESTIN_AGE13_24)
+SIM_data$DESTIN_AGE25_64 <- ifelse(
+  SIM_data$DESTIN_AGE25_64 == 0,
+  0.99, SIM_data$DESTIN_AGE25_64)
+SIM_data$ORIGIN_AGE7_12 <- ifelse(
+  SIM_data$ORIGIN_AGE7_12 == 0,
+  0.99, SIM_data$ORIGIN_AGE7_12)
+SIM_data$ORIGIN_AGE13_24 <- ifelse(
+  SIM_data$ORIGIN_AGE13_24 == 0,
+  0.99, SIM_data$ORIGIN_AGE13_24)
+SIM_data$ORIGIN_AGE25_64 <- ifelse(
+  SIM_data$ORIGIN_AGE25_64 == 0,
+  0.99, SIM_data$ORIGIN_AGE25_64)
+```
+
+### Unconstrained spatial interaction model
+
+The code chunk below uses `glm()` to calibrate a spatial interaction model
+
+```{r}
+uncSIM <- glm(formula = TRIPS ~ 
+                log(ORIGIN_AGE25_64) + 
+                log(DESTIN_AGE25_64) +
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+uncSIM
+```
+
+### R-squared function
+
+We write a function to compute for the R-squared value in order to measure the variation in the number of trips accounted for by the model
+
+```{r}
+CalcRSquared <- function(observed,estimated){
+  r <- cor(observed,estimated)
+  R2 <- r^2
+  R2
+}
+```
+
+We compute for the R-squared of the unconstrained SIM using the code chunk below
+
+```{r}
+CalcRSquared(uncSIM$data$TRIPS, uncSIM$fitted.values)
+```
+
+```{r}
+r2_mcfadden(uncSIM)
+```
+
+### Origin constrained SIM
+
+The code chunk below fits an origin constrained model
+
+```{r}
+orcSIM <- glm(formula = TRIPS ~ 
+                 ORIGIN_SZ +
+                 log(DESTIN_AGE25_64) +
+                 log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(orcSIM)
+```
+
+We can also examine the R-squared using the function we prepared
+
+```{r}
+CalcRSquared(orcSIM$data$TRIPS, orcSIM$fitted.values)
+```
+
+### Destination Constrained SIM
+
+The following code chunk fits a destination constrained model
+
+```{r}
+decSIM <- glm(formula = TRIPS ~ 
+                DESTIN_SZ + 
+                log(ORIGIN_AGE25_64) + 
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(decSIM)
+```
+
+We can compute for the R-squared with the following
+
+```{r}
+CalcRSquared(decSIM$data$TRIPS, decSIM$fitted.values)
+```
+
+### Doubly constrained SIM
+
+The code chunk below calibrates a doubly constrained SIM
+
+```{r}
+dbcSIM <- glm(formula = TRIPS ~ 
+                ORIGIN_SZ + 
+                DESTIN_SZ + 
+                log(dist),
+              family = poisson(link = "log"),
+              data = SIM_data,
+              na.action = na.exclude)
+summary(dbcSIM)
+```
+
+We can compute for the R-squared using the following
+
+```{r}
+CalcRSquared(dbcSIM$data$TRIPS, dbcSIM$fitted.values)
+```
+
+### Model comparison
+
+Model performance can also be measured using the RMSE or root mean square error. We can use the performance package to compare different models' performance using metrics like RMSE
+
+First, we create an object containing the models to be compared
+
+```{r}
+model_list <- list(unconstrained=uncSIM,
+                   originConstrained=orcSIM,
+                   destinationConstrained=decSIM,
+                   doublyConstrained=dbcSIM)
+```
+
+Next, we compute for the RMSE for the models and show the results
+
+```{r}
+compare_performance(model_list,
+                    metrics = "RMSE")
+```
+
+The output shows that the doubly constrained model has the best performance using RMSE as it has the lowest value among the four
+
+### Visualizing fitted values
+
+In this last section, we learn to visualize the fitted versus the actual values
+
+Forst, we need to extract the fitted values of the unconstrained model
+
+```{r}
+df <- as.data.frame(uncSIM$fitted.values) %>%
+  round(digits = 0)
+```
+
+Next, we join this with the object `SIM_data`
+
+```{r}
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(uncTRIPS = "uncSIM$fitted.values")
+```
+
+We repeat the same for every model.
+
+```{r}
+df <- as.data.frame(orcSIM$fitted.values) %>%
+  round(digits = 0)
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(orcTRIPS = "orcSIM$fitted.values")
+```
+
+```{r}
+df <- as.data.frame(decSIM$fitted.values) %>%
+  round(digits = 0)
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(decTRIPS = "decSIM$fitted.values")
+```
+
+```{r}
+df <- as.data.frame(dbcSIM$fitted.values) %>%
+  round(digits = 0)
+SIM_data <- SIM_data %>%
+  cbind(df) %>%
+  rename(dbcTRIPS = "dbcSIM$fitted.values")
+```
+
+We then prepare the different plots and store them into separate objects
+
+```{r}
+unc_p <- ggplot(data = SIM_data,
+                aes(x = uncTRIPS,
+                    y = TRIPS)) +
+  geom_point() +
+  geom_smooth(method = lm)
+
+orc_p <- ggplot(data = SIM_data,
+                aes(x = orcTRIPS,
+                    y = TRIPS)) +
+  geom_point() +
+  geom_smooth(method = lm)
+
+dec_p <- ggplot(data = SIM_data,
+                aes(x = decTRIPS,
+                    y = TRIPS)) +
+  geom_point() +
+  geom_smooth(method = lm)
+
+dbc_p <- ggplot(data = SIM_data,
+                aes(x = dbcTRIPS,
+                    y = TRIPS)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+Next, we display the plots in a 2x2 grid so they can be easily compared against one another
+
+```{r}
+ggarrange(unc_p, orc_p, dec_p, dbc_p,
+          ncol = 2,
+          nrow = 2)
+```
