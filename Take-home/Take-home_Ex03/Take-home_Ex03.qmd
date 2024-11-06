@@ -99,6 +99,55 @@ We can create a simple map to visualize the boundaries using `qtm()` from **tmap
 qtm(tz_dist, text = "shapeName", text.size = 0.4)
 ```
 
+## B.2 Deriving District centroids
+
+Before we load the aspatial data, we will process the district boundary map to be able to use it for future operations with the other dataset. One step that needs to be done is to define representative points, which can be the centroids for the boundary map. The primary purpose of this is to be able to map the aspatial data for a district into a single location. In order to do this, the first step is to convert the multipolygon layer object into a polygon object which will allow for proper centroid calculations for each district.
+
+We use the code chunk below to convert the sf object into polygons using `st_cast()` and then create a column for each individual polygon's area using `mutate()` with `st_area()`. We then use `groupby()` to reduce back the object to one row per district and then `filter()` to keep only the largest polygon for each district.
+
+```{r}
+tz_dist_poly <- tz_dist %>%
+  st_cast("POLYGON") %>%
+  mutate(area = st_area(.)) %>%
+  group_by(shapeName) %>%
+  filter(area == max(area)) %>%
+  ungroup() %>%
+  select(-area) %>%
+  select(shapeName)
+```
+
+We can produce a map with tmap package to see if the operation had any irregular effects on the geography. In order to see the difference between the original map and the polygon map, we add the original map as the first layer in red, and then overlay the polygon map. The areas which now appear red are the polygons or areas that have been excluded from the original map to the polygon map.
+
+```{r}
+tm_shape(tz_dist) +
+  tm_polygons("red") +
+tm_shape(tz_dist_poly) +
+  tm_polygons("grey") +
+  tm_layout(title = "Full vs Poly Map",
+            title.position = c("left", "bottom"))
+```
+
+From the output, we see that in addition to a few small islands, there are three inland areas that have been excluded from the original map. While this produces holes in the new map, this might not be a big concern right now as long as the centroids we get from the remaining geometries is meaningful.
+
+In order to generate the centroids, we can now use `st_centroid()` to compute them across each district's largest polygon.
+
+```{r}
+tz_dist_centroids <- st_centroid(tz_dist_poly)
+```
+
+We can check the location of the centroids by plotting them as a layer on top of the original district boundary layer using tmap package in the code below.
+
+```{r}
+tm_shape(tz_dist) +
+  tm_polygons("grey") +
+tm_shape(tz_dist_centroids) +
+  tm_dots("green", size = 0.2) +
+  tm_layout(title = "District Centroids",
+            title.position = c("left", "bottom"))
+```
+
+The centroid locations look mostly acceptable, with a few exceptions where they might be lying somewhere away from the district boundaries given some of the districts have odd, nonconvex shapes.
+
 ## B.2 Loading Finscope Tanzania 2023 Respondent Data
 
 We can use `read_csv()` in the code chunk below to load the raw respondent data into an R object.
@@ -109,121 +158,101 @@ fstz23 <- read_csv("data/aspatial/FinScope Tanzania 2023_Individual Main Data_FI
 
 There are 9915 rows or records, and 721 columns or fields. Most of these columns should not be relevant in meeting our objective, so it is advised to limit the data we work with to those meaningful variable. These variables should be our variable(s) of concern, or the dependent variable(s), and the variables that may contribute to it, or the independent variables.
 
-## B.3 Preparing Finscope Tanzania 2023 Respondent Data
+## B.4 Preparing Finscope Tanzania 2023 Respondent Data
 
-### B.3.1 Selecting potential variables
+### B.4.1 Selecting potential variables
 
 The first step in preparing the dataset is to reduce the data by keeping only the potentially relevant fields. This means identifying fields that can be used as is or to derive both the response variable(s) and the explanatory variables.
 
-This is performed by scanning the datamap file (i.e., data dictionary) that accompanies the dataset. From there, we decide to keep only the following XXX variables. We also change the variable names to a shorter and more recognizable one.
+This is performed by scanning the datamap file (i.e., data dictionary) that accompanies the dataset. From there, we decide to keep only the following variables. We also change the variable names to a shorter and more recognizable one.
 
 ::: panel-tabset
-#### Financial Inclusion
+#### Financial Inclusion (3)
 
 | Variable Name | Description | New Variable Name |
-|:-------------:|:-----------:|:-----------------:|
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
+|:----------------------:|:----------------------:|:----------------------:|
+| BANKED | Classified as: Banked; Not Banked | fi_banked |
+| OVERALL_FORMAL | Classified as using formal instruments: Yes, No | fi_formal |
+| INFORMAL | Classified as using informal instruments: Yes, No | fi_informal |
 
 #### Geographic (4)
 
-|  Variable   |                 Description                 | New Variable Name |
-|:-----------:|:-------------------------------------------:|:-----------------:|
-|  reg_name   |                 Region name                 |      region       |
-|  dist_name  |                District name                |     district      |
-|  ward_name  |                  Ward name                  |       ward        |
-| clustertype | Indicates if in rural (1) or urban (2) area |       urban       |
-|             |                                             |                   |
-|             |                                             |                   |
-|             |                                             |                   |
-|             |                                             |                   |
-|             |                                             |                   |
-|             |                                             |                   |
+|  Variable   |          Description           | New Variable Name |
+|:-----------:|:------------------------------:|:-----------------:|
+|  reg_name   |          Region name           |      region       |
+|  dist_name  |         District name          |     district      |
+|  ward_name  |           Ward name            |       ward        |
+| clustertype | Indicates if in rural or urban |       urban       |
 
 #### Demographic (11)
 
 | Variable Name | Description | New Variable Name |
-|:--:|:--:|:--:|
+|:----------------------:|:----------------------:|:----------------------:|
 | c8c | Age | age |
-| c9 | Gender: male (1). or female (2) | female |
-| c10 | Marital status: married (1), divorced (2), widowed (3), single (4) | maritalstatus |
+| c9 | Gender: male. or female | female |
+| c10 | Marital status: married, divorced, widowed, single (4 levels) | maritalstatus |
 | c11 | Highest level education (10 levels of values) | education |
-| c2 | Head of household: respondent (1), not the respondent (2) | head_hh |
-| c8n_a1 | Visually impaired: Yes (1), No (2) | visual_impaaired |
-| c8n_b1 | Hearing impaired: Yes (1), No (2) | hearing_impaired |
-| c8n_c1 | Communication impaired: Yes (1), No (2) | comm_impaired |
-| c8n_d1 | Movement impaired: Yes (1), No (2) | move_impaired |
-| c8n_e1 | Difficulty with daily activities: Yes (1), No (2) | daily_impaired |
-| c8n_f1 | Difficulty remembering and concentrating: Yes (1), No (2) | cogn_impaired |
+| c2 | Head of household: respondent, not the respondent | head_hh |
+| c8n_a1 | Visually impaired: Yes, No | visual_impaired |
+| c8n_b1 | Hearing impaired: Yes, No | hearing_impaired |
+| c8n_c1 | Communication impaired: Yes, No | comm_impaired |
+| c8n_d1 | Movement impaired: Yes, No | move_impaired |
+| c8n_e1 | Difficulty with daily activities: Yes, No | daily_impaired |
+| c8n_f1 | Difficulty remembering and concentrating: Yes, No | cogn_impaired |
 
-#### Economic
+#### Economic (8)
 
 | Variable Name | Description | New Variable Name |
-|:--:|:--:|:--:|
+|:----------------------:|:----------------------:|:----------------------:|
 | c12_1 | Land ownership (6 levels) | land_own |
-| c14 | Family involved in agriculture, fishing or aquaculture: Yes (1), No (2) | agricultural |
+| c14 | Family involved in agriculture, fishing or aquaculture: Yes, No | agricultural |
 | c18_2 | Primary source of funds (12 levels) | source_of_funds |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
+| c27\_\_17 | Has some form of ID: Yes, No | has_id |
+| D2_1\_\_1 | Receives salary from regular job: Yes, No | reg_job |
+| D2_1\_\_2 | Receives money from selling goods produced: Yes, No | production |
+| D2_1\_\_11 | Does not receive income: Yes, No | no_income |
+| IncomeMain | Derived variable for main source of income (14 levels) | income_source |
 
-#### Technographic ()
+#### Technographic (3)
 
-| Variable Name | Description | New Variable Name |
-|:--:|:--:|:--:|
-| c23\_\_1 | Access to mobile phone: No (0), Yes (1) | mobile |
-| c23\_\_2 | Access to internet: No (0), Yes (1) | internet |
-| c24_1 | Personally own mobile phone: No (0), Yes (1) | own_mobile |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-|  |  |  |
-
-#### XXXX
-
-| Variable Name | Description | New Variable Name |
-|:-------------:|:-----------:|:-----------------:|
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
-|               |             |                   |
+| Variable Name |             Description              | New Variable Name |
+|:-------------:|:------------------------------------:|:-----------------:|
+|   c23\_\_1    |   Access to mobile phone: No, Yes    |      mobile       |
+|   c23\_\_2    |     Access to internet: No, Yes      |     internet      |
+|     c24_1     | Personally own mobile phone: No, Yes |    own_mobile     |
 :::
 
-The code block below compiles the XXX variables and their new names in two separate objects.
+The code block below compiles the 29 variables and their new names in two separate objects. These will be used in the succeeding steps for data preparation.
 
 ```{r}
 colstokeep <- c("reg_name", "dist_name", "ward_name", "clustertype",
                 "c8c", "c9", "c10", "c11", "c2",
                 "c8n_a1", "c8n_b1", "c8n_c1", "c8n_d1", "c8n_e1", "c8n_f1",
                 "c12_1", "c14", "c18_2",
-                "c23__1", "c23__2", "c24_1")
+                "c23__1", "c23__2", "c24_1", "c27__17",
+                "D2_1__1", "D2_1__2", "D2_1__11",
+                "BANKED", "OVERALL_FORMAL", "INFORMAL", "IncomeMain")
 newnames <- c("region", "district", "ward", "urban",
               "age", "female", "maritalstatus", "education", "head_hh",
               "visual_impaired", "hearing_impaired", "comm_impaired",
               "move_impaired", "daily_impaired", "cogn_impaired",
               "land_own", "agricultural", "source_of_funds",
-              "mobile", "internet", "own_mobile")
+              "mobile", "internet", "own_mobile", "has_id",
+              "reg_job", "production", "no_income",
+              "fi_banked", "fi_formal", "fi_informal", "income_source")
 length(colstokeep)
 length(newnames)
 ```
+
+We then use the code chunk below to keep the selected variables using `select()` and then to rename the variable or column names using `colnames()`
+
+```{r}
+fstz23_sf <- fstz23 %>%
+  select(all_of(colstokeep))
+
+colnames(fstz23_sf) <- newnames
+```
+
+## B.4.2 Recoding of variables
+
+XXX
