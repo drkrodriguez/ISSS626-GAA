@@ -276,7 +276,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#b.-data-loading-and-preparation" id="toc-b.-data-loading-and-preparation" class="nav-link" data-scroll-target="#b.-data-loading-and-preparation">B. Data Loading and Preparation</a>
   <ul class="collapse">
-  <li><a href="#b.1.-tanzania-district-boundaries" id="toc-b.1.-tanzania-district-boundaries" class="nav-link" data-scroll-target="#b.1.-tanzania-district-boundaries">B.1. Tanzania District boundaries</a></li>
+  <li><a href="#b.1-loading-tanzania-district-boundaries" id="toc-b.1-loading-tanzania-district-boundaries" class="nav-link" data-scroll-target="#b.1-loading-tanzania-district-boundaries">B.1 Loading Tanzania District boundaries</a></li>
+  <li><a href="#b.2-deriving-district-centroids" id="toc-b.2-deriving-district-centroids" class="nav-link" data-scroll-target="#b.2-deriving-district-centroids">B.2 Deriving District centroids</a></li>
+  <li><a href="#b.2-loading-finscope-tanzania-2023-respondent-data" id="toc-b.2-loading-finscope-tanzania-2023-respondent-data" class="nav-link" data-scroll-target="#b.2-loading-finscope-tanzania-2023-respondent-data">B.2 Loading Finscope Tanzania 2023 Respondent Data</a></li>
+  <li><a href="#b.4-preparing-finscope-tanzania-2023-respondent-data" id="toc-b.4-preparing-finscope-tanzania-2023-respondent-data" class="nav-link" data-scroll-target="#b.4-preparing-finscope-tanzania-2023-respondent-data">B.4 Preparing Finscope Tanzania 2023 Respondent Data</a>
+  <ul class="collapse">
+  <li><a href="#b.4.1-selecting-potential-variables" id="toc-b.4.1-selecting-potential-variables" class="nav-link" data-scroll-target="#b.4.1-selecting-potential-variables">B.4.1 Selecting potential variables</a></li>
+  </ul></li>
+  <li><a href="#b.4.2-recoding-of-variables" id="toc-b.4.2-recoding-of-variables" class="nav-link" data-scroll-target="#b.4.2-recoding-of-variables">B.4.2 Recoding of variables</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -321,24 +328,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>WIP.</p>
+<p>(WIP) We look into financial inclusion in Tanzania based on a 2023 survey of close to 10 thousand residents.</p>
 <section id="a.-getting-started" class="level1">
 <h1>A. Getting Started</h1>
 <section id="a.1-background" class="level2">
 <h2 class="anchored" data-anchor-id="a.1-background">A.1 Background</h2>
-<p>WIP.</p>
-<p>Define financial inclusion</p>
-<p>Describe state and statistics in Africa and Tanzania</p>
+<p>The <a href="https://www.worldbank.org/en/topic/financialinclusion/overview">World Bank</a> defines <strong>financial inclusion</strong> as the state of having access to useful and affordable financial products to meet one’s needs. Financial inclusion is an enabler to 7 of the Sustainable Development Goals, and is seen as the key enabler to reduce extreme poverty.</p>
+<p>One key dimension of financial inclusion that the World Bank looked at in their latest <a href="https://www.worldbank.org/en/publication/globalfindex">Global Findex Database 2021</a> is the ownership of bank accounts for adults. In this report, 76% of the global adult population have their own accounts, but only 71% of the developing nations’ do. In some countries like Tanzania this number is even lower at 52%. Banking is just one traditional dimension. Other vehicles like mobile payments can bridge the gap in access to services for some of these nations.</p>
+<p>Tanzania recognizes the importance of financial inclusion in promoting economic growth and with the Bank of Tanzania, the country’s central bank, the Microfinance Policy of 2000 was developed and focused on expanding financial services for low-income individuals.</p>
+<p>The program behind financial inclusion has been structured from 2014 with the first National Financial Inclusion Framework for 2014-2016, with the latest version being the third framework for 2023-2028. While there has been significant progress, (e.g., access to financial services has risen from 42% in 2013 to 89% in 2023) the country continues to aim for inclusion for the whole population by increasing access, encouraging usage and enhancing the quality of financial services.</p>
 </section>
 <section id="a.2-objectives" class="level2">
 <h2 class="anchored" data-anchor-id="a.2-objectives">A.2 Objectives</h2>
-<p>WIP.</p>
+<p>Finscope Tanzania 2023 is a public-private sector collaboration and aimed, among others, to understand and describe the financial behavior of individuals in the country and to establish an updated view of the level of financial inclusion across various measures. A large part of the findings is showing the change (improvements) of the overall measures against the previous 2017 report.</p>
+<p>The objective of this study is to build on the Finscope Tanzania 2023 by identifying influential variables and identifying if geospatial factors influence the effect of those variables.</p>
+<p>In order to satisfy this, the specific deliverables for the study will be:</p>
+<ul>
+<li><p>to build a global or non-spatial explanatory model for the level of financial inclusion across Tanzania;</p></li>
+<li><p>to build a geographically weighted explanatory model for the same response variables; and,</p></li>
+<li><p>to assess the advantage of the geographically weighted model and to analyse the geographically weighted model</p></li>
+</ul>
 </section>
 <section id="a.3-data-sources" class="level2">
 <h2 class="anchored" data-anchor-id="a.3-data-sources">A.3 Data Sources</h2>
 <p>The following data sources are used for this analysis:</p>
 <ul>
-<li><p>XXX from <a href="https://www.fsdt.or.tz/finscope/">Finscope Tanzania</a></p></li>
+<li><p>Finscope Tanzania 2023 individual survey data from <a href="https://www.fsdt.or.tz/finscope/">Finscope Tanzania</a></p>
+<ul>
+<li><p>The dataset is contained in a csv and translates the responses from 9,915 individuals who answered the survey</p></li>
+<li><p>The respondents are all adults aged 16 years and above take across Tanzania</p></li>
+<li><p>The dataset also includes derived fields which include different indicators for financial inclusion based on different criteria</p></li>
+</ul></li>
 <li><p>District-level boundaries in Tanzania as a shapefile from <a href="https://www.geoboundaries.org/">geoBoundaries.org</a> portal</p></li>
 </ul>
 </section>
@@ -351,59 +371,408 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>The loaded packages include:</p>
 <ul>
-<li><p><strong>sf -</strong> package for importing, managing and processing vector-based geospatial data</p></li>
-<li><p><strong>tidyverse -</strong> collection of packages for performing data importation, wrangling and visualization</p></li>
-<li><p><strong>tmap -</strong> package with functions for plotting cartographic quality maps</p></li>
-<li><p><strong>sfdep</strong> - for handling spatial data</p></li>
-<li><p><strong>coorplot, ggpubr, heatmaply, factoextra</strong> - packages for multivariate data visualization and analysis</p></li>
-<li><p><strong>cluster, ClustGeo, NbClust</strong> - packages for performing cluster analysis</p></li>
+<li><p><strong>olsrr -</strong> for building OLS (ordinary least squares) regression models and performing diagnostic tests</p></li>
+<li><p><strong>GWmodel -</strong> for calibrating geographically weighted family of models</p></li>
+<li><p><strong>tmap -</strong> for plotting cartographic quality maps</p></li>
+<li><p><strong>ggstatsplot</strong> - for multivariate data visualization and analysis</p></li>
+<li><p><strong>sf</strong> - spatial data handling</p></li>
+<li><p><strong>tidyverse</strong> - attribute data handling</p></li>
 </ul>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, tmap, spdep, sfdep, tidyverse,</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>               ggpubr, heatmaply, factoextra,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>               NbClust, cluster, ClustGeo)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(olsrr, sf, GWmodel, tmap, tidyverse, ggstatsplot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
-</div>
-<p>As we will be performing simulations in the analysis later, it is good practice to define a random seed to be used so that results are consistent for viewers of this report, and the results can be reproduced.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="b.-data-loading-and-preparation" class="level1">
 <h1>B. Data Loading and Preparation</h1>
-<section id="b.1.-tanzania-district-boundaries" class="level2">
-<h2 class="anchored" data-anchor-id="b.1.-tanzania-district-boundaries">B.1. Tanzania District boundaries</h2>
-<p>TBC.</p>
+<section id="b.1-loading-tanzania-district-boundaries" class="level2">
+<h2 class="anchored" data-anchor-id="b.1-loading-tanzania-district-boundaries">B.1 Loading Tanzania District boundaries</h2>
+<p>We load the district level boundaries in the following code chunk using <code>st_read()</code> and indicating the appropriate layer name. (i.e., the level 2 map)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tz_dist <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">layer=</span><span class="st">"geoBoundaries-TZA-ADM3"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tz_dist <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">layer=</span><span class="st">"geoBoundaries-TZA-ADM2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Reading layer `geoBoundaries-TZA-ADM3' from data source 
+<pre><code>Reading layer `geoBoundaries-TZA-ADM2' from data source 
   `C:\drkrodriguez\ISSS626-GAA\Take-home\Take-home_Ex03\data\geospatial' 
   using driver `ESRI Shapefile'
-Simple feature collection with 3644 features and 5 fields
+Simple feature collection with 170 features and 5 fields
 Geometry type: MULTIPOLYGON
 Dimension:     XY
-Bounding box:  xmin: 29.59019 ymin: -11.7457 xmax: 40.44514 ymax: -0.9857875
+Bounding box:  xmin: 29.58953 ymin: -11.76235 xmax: 40.44473 ymax: -0.983143
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-<p>xxx</p>
+<p>The output shows that there are 170 objects loaded which corresponds to individual districts. The object is also of multipolygon class which could indicate that there are districts with discontinuous land areas, like islands.</p>
+<p>We can create a simple map to visualize the boundaries using <code>qtm()</code> from <strong>tmap</strong>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qtm</span>(tz_dist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qtm</span>(tz_dist, <span class="at">text =</span> <span class="st">"shapeName"</span>, <span class="at">text.size =</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="b.2-deriving-district-centroids" class="level2">
+<h2 class="anchored" data-anchor-id="b.2-deriving-district-centroids">B.2 Deriving District centroids</h2>
+<p>Before we load the aspatial data, we will process the district boundary map to be able to use it for future operations with the other dataset. One step that needs to be done is to define representative points, which can be the centroids for the boundary map. The primary purpose of this is to be able to map the aspatial data for a district into a single location. In order to do this, the first step is to convert the multipolygon layer object into a polygon object which will allow for proper centroid calculations for each district.</p>
+<p>We use the code chunk below to convert the sf object into polygons using <code>st_cast()</code> and then create a column for each individual polygon’s area using <code>mutate()</code> with <code>st_area()</code>. We then use <code>groupby()</code> to reduce back the object to one row per district and then <code>filter()</code> to keep only the largest polygon for each district.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>tz_dist_poly <span class="ot">&lt;-</span> tz_dist <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="st">"POLYGON"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">st_area</span>(.)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(shapeName) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(area <span class="sc">==</span> <span class="fu">max</span>(area)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>area) <span class="sc">%&gt;%</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(shapeName)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in st_cast.sf(., "POLYGON"): repeating attributes for all
+sub-geometries for which they may not be constant</code></pre>
+</div>
+</div>
+<p>We can produce a map with tmap package to see if the operation had any irregular effects on the geography. In order to see the difference between the original map and the polygon map, we add the original map as the first layer in red, and then overlay the polygon map. The areas which now appear red are the polygons or areas that have been excluded from the original map to the polygon map.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tz_dist) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tz_dist_poly) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"grey"</span>) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"Full vs Poly Map"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the output, we see that in addition to a few small islands, there are three inland areas that have been excluded from the original map. While this produces holes in the new map, this might not be a big concern right now as long as the centroids we get from the remaining geometries is meaningful.</p>
+<p>In order to generate the centroids, we can now use <code>st_centroid()</code> to compute them across each district’s largest polygon.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>tz_dist_centroids <span class="ot">&lt;-</span> <span class="fu">st_centroid</span>(tz_dist_poly)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: st_centroid assumes attributes are constant over geometries</code></pre>
+</div>
+</div>
+<p>We can check the location of the centroids by plotting them as a layer on top of the original district boundary layer using tmap package in the code below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tz_dist) <span class="sc">+</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="st">"grey"</span>) <span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tz_dist_centroids) <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="st">"green"</span>, <span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">title =</span> <span class="st">"District Centroids"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The centroid locations look mostly acceptable, with a few exceptions where they might be lying somewhere away from the district boundaries given some of the districts have odd, nonconvex shapes.</p>
+</section>
+<section id="b.2-loading-finscope-tanzania-2023-respondent-data" class="level2">
+<h2 class="anchored" data-anchor-id="b.2-loading-finscope-tanzania-2023-respondent-data">B.2 Loading Finscope Tanzania 2023 Respondent Data</h2>
+<p>We can use <code>read_csv()</code> in the code chunk below to load the raw respondent data into an R object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fstz23 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/FinScope Tanzania 2023_Individual Main Data_FINAL.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat &lt;- vroom(...)
+  problems(dat)</code></pre>
+</div>
+</div>
+<p>There are 9915 rows or records, and 721 columns or fields. Most of these columns should not be relevant in meeting our objective, so it is advised to limit the data we work with to those meaningful variable. These variables should be our variable(s) of concern, or the dependent variable(s), and the variables that may contribute to it, or the independent variables.</p>
+</section>
+<section id="b.4-preparing-finscope-tanzania-2023-respondent-data" class="level2">
+<h2 class="anchored" data-anchor-id="b.4-preparing-finscope-tanzania-2023-respondent-data">B.4 Preparing Finscope Tanzania 2023 Respondent Data</h2>
+<section id="b.4.1-selecting-potential-variables" class="level3">
+<h3 class="anchored" data-anchor-id="b.4.1-selecting-potential-variables">B.4.1 Selecting potential variables</h3>
+<p>The first step in preparing the dataset is to reduce the data by keeping only the potentially relevant fields. This means identifying fields that can be used as is or to derive both the response variable(s) and the explanatory variables.</p>
+<p>This is performed by scanning the datamap file (i.e., data dictionary) that accompanies the dataset. From there, we decide to keep only the following variables. We also change the variable names to a shorter and more recognizable one.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Financial Inclusion (3)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Geographic (4)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">Demographic (11)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">Economic (8)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false">Technographic (3)</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Variable Name</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">New Variable Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">BANKED</td>
+<td style="text-align: center;">Classified as: Banked; Not Banked</td>
+<td style="text-align: center;">fi_banked</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">OVERALL_FORMAL</td>
+<td style="text-align: center;">Classified as using formal instruments: Yes, No</td>
+<td style="text-align: center;">fi_formal</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">INFORMAL</td>
+<td style="text-align: center;">Classified as using informal instruments: Yes, No</td>
+<td style="text-align: center;">fi_informal</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: center;">Variable</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">New Variable Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">reg_name</td>
+<td style="text-align: center;">Region name</td>
+<td style="text-align: center;">region</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">dist_name</td>
+<td style="text-align: center;">District name</td>
+<td style="text-align: center;">district</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">ward_name</td>
+<td style="text-align: center;">Ward name</td>
+<td style="text-align: center;">ward</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">clustertype</td>
+<td style="text-align: center;">Indicates if in rural or urban</td>
+<td style="text-align: center;">urban</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Variable Name</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">New Variable Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">c8c</td>
+<td style="text-align: center;">Age</td>
+<td style="text-align: center;">age</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c9</td>
+<td style="text-align: center;">Gender: male. or female</td>
+<td style="text-align: center;">female</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c10</td>
+<td style="text-align: center;">Marital status: married, divorced, widowed, single (4 levels)</td>
+<td style="text-align: center;">maritalstatus</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c11</td>
+<td style="text-align: center;">Highest level education (10 levels of values)</td>
+<td style="text-align: center;">education</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c2</td>
+<td style="text-align: center;">Head of household: respondent, not the respondent</td>
+<td style="text-align: center;">head_hh</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c8n_a1</td>
+<td style="text-align: center;">Visually impaired: Yes, No</td>
+<td style="text-align: center;">visual_impaired</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c8n_b1</td>
+<td style="text-align: center;">Hearing impaired: Yes, No</td>
+<td style="text-align: center;">hearing_impaired</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c8n_c1</td>
+<td style="text-align: center;">Communication impaired: Yes, No</td>
+<td style="text-align: center;">comm_impaired</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c8n_d1</td>
+<td style="text-align: center;">Movement impaired: Yes, No</td>
+<td style="text-align: center;">move_impaired</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c8n_e1</td>
+<td style="text-align: center;">Difficulty with daily activities: Yes, No</td>
+<td style="text-align: center;">daily_impaired</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c8n_f1</td>
+<td style="text-align: center;">Difficulty remembering and concentrating: Yes, No</td>
+<td style="text-align: center;">cogn_impaired</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Variable Name</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">New Variable Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">c12_1</td>
+<td style="text-align: center;">Land ownership (6 levels)</td>
+<td style="text-align: center;">land_own</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c14</td>
+<td style="text-align: center;">Family involved in agriculture, fishing or aquaculture: Yes, No</td>
+<td style="text-align: center;">agricultural</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c18_2</td>
+<td style="text-align: center;">Primary source of funds (12 levels)</td>
+<td style="text-align: center;">source_of_funds</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c27__17</td>
+<td style="text-align: center;">Has some form of ID: Yes, No</td>
+<td style="text-align: center;">has_id</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">D2_1__1</td>
+<td style="text-align: center;">Receives salary from regular job: Yes, No</td>
+<td style="text-align: center;">reg_job</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">D2_1__2</td>
+<td style="text-align: center;">Receives money from selling goods produced: Yes, No</td>
+<td style="text-align: center;">production</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">D2_1__11</td>
+<td style="text-align: center;">Does not receive income: Yes, No</td>
+<td style="text-align: center;">no_income</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">IncomeMain</td>
+<td style="text-align: center;">Derived variable for main source of income (14 levels)</td>
+<td style="text-align: center;">income_source</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 52%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Variable Name</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">New Variable Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">c23__1</td>
+<td style="text-align: center;">Access to mobile phone: No, Yes</td>
+<td style="text-align: center;">mobile</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">c23__2</td>
+<td style="text-align: center;">Access to internet: No, Yes</td>
+<td style="text-align: center;">internet</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">c24_1</td>
+<td style="text-align: center;">Personally own mobile phone: No, Yes</td>
+<td style="text-align: center;">own_mobile</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>The code block below compiles the 29 variables and their new names in two separate objects. These will be used in the succeeding steps for data preparation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>colstokeep <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"reg_name"</span>, <span class="st">"dist_name"</span>, <span class="st">"ward_name"</span>, <span class="st">"clustertype"</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">"c8c"</span>, <span class="st">"c9"</span>, <span class="st">"c10"</span>, <span class="st">"c11"</span>, <span class="st">"c2"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                <span class="st">"c8n_a1"</span>, <span class="st">"c8n_b1"</span>, <span class="st">"c8n_c1"</span>, <span class="st">"c8n_d1"</span>, <span class="st">"c8n_e1"</span>, <span class="st">"c8n_f1"</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">"c12_1"</span>, <span class="st">"c14"</span>, <span class="st">"c18_2"</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                <span class="st">"c23__1"</span>, <span class="st">"c23__2"</span>, <span class="st">"c24_1"</span>, <span class="st">"c27__17"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">"D2_1__1"</span>, <span class="st">"D2_1__2"</span>, <span class="st">"D2_1__11"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                <span class="st">"BANKED"</span>, <span class="st">"OVERALL_FORMAL"</span>, <span class="st">"INFORMAL"</span>, <span class="st">"IncomeMain"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>newnames <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"region"</span>, <span class="st">"district"</span>, <span class="st">"ward"</span>, <span class="st">"urban"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>              <span class="st">"age"</span>, <span class="st">"female"</span>, <span class="st">"maritalstatus"</span>, <span class="st">"education"</span>, <span class="st">"head_hh"</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>              <span class="st">"visual_impaired"</span>, <span class="st">"hearing_impaired"</span>, <span class="st">"comm_impaired"</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>              <span class="st">"move_impaired"</span>, <span class="st">"daily_impaired"</span>, <span class="st">"cogn_impaired"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>              <span class="st">"land_own"</span>, <span class="st">"agricultural"</span>, <span class="st">"source_of_funds"</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>              <span class="st">"mobile"</span>, <span class="st">"internet"</span>, <span class="st">"own_mobile"</span>, <span class="st">"has_id"</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>              <span class="st">"reg_job"</span>, <span class="st">"production"</span>, <span class="st">"no_income"</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>              <span class="st">"fi_banked"</span>, <span class="st">"fi_formal"</span>, <span class="st">"fi_informal"</span>, <span class="st">"income_source"</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(colstokeep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 29</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(newnames)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 29</code></pre>
+</div>
+</div>
+<p>We then use the code chunk below to keep the selected variables using <code>select()</code> and then to rename the variable or column names using <code>colnames()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fstz23_sf <span class="ot">&lt;-</span> fstz23 <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(colstokeep))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(fstz23_sf) <span class="ot">&lt;-</span> newnames</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="b.4.2-recoding-of-variables" class="level2">
+<h2 class="anchored" data-anchor-id="b.4.2-recoding-of-variables">B.4.2 Recoding of variables</h2>
+<p>XXX</p>
 
 
 </section>
