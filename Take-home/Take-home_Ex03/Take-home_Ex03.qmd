@@ -10,7 +10,7 @@ execute:
   freeze: true
 ---
 
-(WIP) We look into financial inclusion in Tanzania based on a 2023 survey of close to 10 thousand residents.
+We look into financial inclusion in Tanzania based on a 2023 survey of close to 10 thousand residents. We achieve this by calibrating global and geographically weighted models in R using the **GWModel** package for the latter. We identified key factors that are linked to higher levels or probability of financial inclusion that include access to technology and education. The geographically weighted models then revealed districts where an inverse relationship is observed, and need to be studied further.
 
 # A. Getting Started
 
@@ -178,7 +178,7 @@ This is performed by scanning the datamap file (i.e., data dictionary) that acco
 #### Financial Inclusion (3)
 
 | Variable Name | Description | New Variable Name |
-|:----------------------:|:----------------------:|:----------------------:|
+|:--:|:--:|:--:|
 | BANKED | Classified as: Banked; Not Banked | fi_banked |
 | OVERALL_FORMAL | Classified as using formal instruments: Yes, No | fi_formal |
 | INFORMAL | Classified as using informal instruments: Yes, No | fi_informal |
@@ -195,7 +195,7 @@ This is performed by scanning the datamap file (i.e., data dictionary) that acco
 #### Demographic (11)
 
 | Variable Name | Description | New Variable Name |
-|:----------------------:|:----------------------:|:----------------------:|
+|:--:|:--:|:--:|
 | c8c | Age | age |
 | c9 | Gender: male. or female | female |
 | c10 | Marital status: married, divorced, widowed, single (4 levels) | maritalstatus |
@@ -211,7 +211,7 @@ This is performed by scanning the datamap file (i.e., data dictionary) that acco
 #### Economic (8)
 
 | Variable Name | Description | New Variable Name |
-|:----------------------:|:----------------------:|:----------------------:|
+|:--:|:--:|:--:|
 | c12_1 | Land ownership (6 levels) | land_own |
 | c14 | Family involved in agriculture, fishing or aquaculture: Yes, No | agricultural |
 | c18_2 | Primary source of funds (12 levels) | source_of_funds |
@@ -1185,3 +1185,179 @@ write_rds(gwr_fixed, "data/rds/gwr_fixed.rds")
 ```{r echo=FALSE}
 gwr_fixed <- read_rds("data/rds/gwr_fixed.rds")
 ```
+
+We can show the results by calling the object as in the code chunk below.
+
+```{r}
+gwr_fixed
+```
+
+The output shows an improvement with the gleographically weighted model across the different performance measures. AICc improved from 7627.7 to 7558.832. The pseudo R-squared value improved from 0.31359 to 0.3583282.
+
+The output also shows that the coefficient values vary widely across the local models. For some variables, there is also a change in sign across those value ranges– which implies that for some variables like mobile and internet access, they are detrimental to the respondent's level of financial inclusion depending on their location.
+
+We can analyze the gwr model further by accessing the details in the output.
+
+## E.4 Importing gwr model results into an sf dataframe
+
+The gwr output includes details for every local model in an object called `SDF`. We can combine this with the geospatial information in order to be able to visualize the values of coefficients, residuals and fit measures at an individual location level. We use the following code chunk to extract `SDF` as a dataframe and then combine it with with `fstz23_sf` using `cbind()`. The code only retains the district names and the gwr model output by using `select()` to specify those columns.
+
+```{r}
+gwr_fixed_output <- as.data.frame(gwr_fixed$SDF) %>%
+  select(-c(geometry))
+
+gwr_sf_fixed <- cbind(fstz23_sf, gwr_fixed_output) %>%
+  select(2, (ncol(fstz23_sf)):(ncol(fstz23_sf)+ncol(gwr_fixed_output))) %>%
+  st_drop_geometry()
+```
+
+As the local models might not be relevant on their own, we can summarize all of the model values by district and then visualize these variables by district rather than by individual data point. We use the following code chunk to compute for the average of each of the variables by district name using the following code chunk. The code uses `group_by()` to aggregate by district. Columns with the mean for each variable are then added by using `across()` and `everything()` to compute the mean for each variable.
+
+```{r}
+gwr_sf_fixed_by_dist <- gwr_sf_fixed %>%
+  group_by(district) %>%
+  summarise(across(everything(), ~ mean(.x, na.rm = TRUE)))
+```
+
+We then import to the district boundary map using left_join`()` on `district`.
+
+```{r}
+tz_dist_stat <- tz_dist_stat %>%
+  left_join(gwr_sf_fixed_by_dist, by= "district")
+```
+
+## E.5 Visualizing model coefficients and metrics
+
+We can visualize the patterns in the model coefficients or of other metrics with the updated sf dataframe.
+
+### E.5.1 Visualizing model coefficients
+
+For model coefficients, we focus on the following that have a wide range of values: `has_id`, `mobile`, `internet`, `no_income`, education (all levels), `head_hh`.
+
+::: panel-tabset
+#### With ID
+
+The code chunk below produces a choropleth map for the average coefficient of `has_id` in each district.
+
+```{r}
+tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$has_id.1),]) +
+  tm_polygons("has_id.1", title = "ß has_id")
+```
+
+The chart shows that the coefficient of `has_id` is negative across most of Tanzania. There are only a few districts where it is positive. This result seems surprising as ID's may be treated as a way of getting access to financial services. There is likely more to this and the absence of an ID for some of the respondents might be link to another condition which is not appearing here. (e.g., those on welfare that do not have access to banking might all have IDs)
+
+#### Mobile Access
+
+The code chunk below produces a choropleth map for the average coefficient of `mobile` in each district. We highlight districts with negative (average) coefficients with a red border.
+
+```{r}
+tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$mobile.1),]) +
+  tm_polygons("mobile.1", title = "ß mobile") +
+tm_shape(tz_dist_stat[(!is.na(tz_dist_stat$mobile.1) & (tz_dist_stat$mobile.1) < 0),]) +
+  tm_borders("red")
+```
+
+The output shows increased incidence of financial inclusion for respondents with access to a mobile phone. However, there is a cluster of districts on the northeast and another on the west that shows a negative correlation between mobile phone access and financial inclusion. This needs to be investigated as access is linked to access to mobile banking. These clusters might have low adoption, or limited access to such services which might be causing the results to appear as such.
+
+#### Internet Access
+
+The code chunk below produces a choropleth map for the average coefficient of `internet` in each district. We highlight districts with negative (average) coefficients with a red border.
+
+```{r}
+tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$internet.1),]) +
+  tm_polygons("internet.1", title = "ß internet") +
+tm_shape(tz_dist_stat[(!is.na(tz_dist_stat$internet.1) & (tz_dist_stat$internet.1) < 0),]) +
+  tm_borders("red")
+```
+
+We see a similar state as mobile access. In general, probability of being financially included with internet access, but for some regions, this is not the case. There is a cluster in the north and in the west-southwest that are showing a negative correlation between financial inclusion and internet access. These also appear to be different regions districts compared to the ones for mobiel access. This needs to be investigated as to why internet access is not bringing higher levels of financial inclusion to these districts.
+
+#### Lack of income sources
+
+The code chunk below produces a choropleth map for the average coefficient of `no_income` in each district.
+
+```{r}
+tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$no_income.1),]) +
+  tm_polygons("no_income.1", title = "ß no_income") +
+tm_shape(tz_dist_stat[(!is.na(tz_dist_stat$no_income.1) & (tz_dist_stat$no_income.1) > 0),]) +
+  tm_borders("darkgreen")
+```
+
+With the exception of a cluster of five districts in the centre of Tanzania, the lack of a source of income, unsurprisingly, relates to higher probability of not being financially included. What we want to focus on are districts where the impact is higher. There is a cluster in the southwest, another in the north that appear to be more impacted. These might indicate more vulnerable populations-- either a high degree of unemployment, or a much lower level (quality) of welfare or government support compared to the rest of the country.
+
+#### Education
+
+The code chunk below produces a row of three choropleth maps for the average coefficient of each of the three education variables in each district. Each variable's map is created using tmap and then stored in an object which are then displayed in a row using `tmap_arrange()`.
+
+```{r fig.width=15}
+prim <- tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$educ_primary.1),]) +
+  tm_polygons("educ_primary.1", title = "ß educ_primary", palette = "Greens")
+
+sec <- tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$educ_secondary.1),]) +
+  tm_polygons("educ_secondary.1", title = "ß educ_secondary", palette = "Greens")
+
+ter <- tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$educ_tertiary.1),]) +
+  tm_polygons("educ_tertiary.1", title = "ß educ_tertiary", palette = "Greens")
+
+tmap_arrange(prim, sec, ter, ncol = 3)
+
+```
+
+The output shows that education increases the chances of being financially included. The degree of impact also increases, generally, by the level of education.
+
+#### Heads of household
+
+The code chunk below produces a choropleth map for the average coefficient of `head_hh` in each district. We highlight districts with negative (average) coefficients with a red border.
+
+```{r}
+tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$head_hh.1),]) +
+  tm_polygons("head_hh.1", title = "ß head_hh") +
+tm_shape(tz_dist_stat[(!is.na(tz_dist_stat$head_hh.1) & (tz_dist_stat$head_hh.1) < 0),]) +
+  tm_borders("red")
+```
+
+For most of the districts, it appears that the head of the household is more likely to be financially included (compared to non-heads of household) However, there are districts which are showing a negative coefficient. While there may be valid reasons for this (e.g., the head of household just stays home and might not be active in managing the funds) the aim is to make sure that no resident is excluded. Further investigation is needed if this can and needs to be addressed.
+:::
+
+### E.5.2 Visualizing model residuals
+
+We can also visualize the model residuals using the same approach. We can use the following code chunk to display the avrage residuals beside the level of financial inclusion in the district (which is simply the proportion of the indivudals that are financially included) to see if there is any pattern in the residuals and if they are related to the level of FI in a district.
+
+```{r fig.width=10}
+y <- tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$y),]) +
+  tm_polygons("y", title = "Formal FI", palette="-viridis") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$y) & tz_dist_stat$y < 0.4,]) +
+  tm_text("district")
+
+res <- tm_shape(tz_dist)+
+  tm_polygons("grey") +
+tm_shape(tz_dist_stat[!is.na(tz_dist_stat$residual),]) +
+  tm_polygons("residual", title = "Residual")
+
+tmap_arrange(y, res, ncol = 2)
+
+```
+
+The output shows that most of the districts that have the most negative residuals also are the ones that have low financial inclusion. (50% and below) This may indicate that the calibrated model, which was based on the global calibration, is not as appropriate for them. There may be other factors that explain the level of financial inclusion in these districts.
+
+# F. Conclusion and Recommendations
+
+Through this study we were able to show that the effect of various factors on the level of financial inclusion in Tanzania is a function of the individuals location. The key factors identified include mobile access, internet access, ID ownership, education, access to income, and being the head of the household. Some of the variables have an inverse relationship to the level fo financial inclusion when viewed in one district vs another. These include mobile and internet access. Further investigation is recommended to see why access to such technology appears detrimental to some districts. There may be issues like the adoption of the the financial services using these technologies, the quality of such services in these districts, or other issues that the country would want to address. We have also observed that the calibrated model's performance appears to be poorer in districts with low incidence of financial inclusion. A dedicated study on those districts or region may be undertaken to understand any other factors that might be driving the lower level of financial inclusion in those districts.
