@@ -178,7 +178,7 @@ This is performed by scanning the datamap file (i.e., data dictionary) that acco
 #### Financial Inclusion (3)
 
 | Variable Name | Description | New Variable Name |
-|:--:|:--:|:--:|
+|:----------------------:|:----------------------:|:----------------------:|
 | BANKED | Classified as: Banked; Not Banked | fi_banked |
 | OVERALL_FORMAL | Classified as using formal instruments: Yes, No | fi_formal |
 | INFORMAL | Classified as using informal instruments: Yes, No | fi_informal |
@@ -195,7 +195,7 @@ This is performed by scanning the datamap file (i.e., data dictionary) that acco
 #### Demographic (11)
 
 | Variable Name | Description | New Variable Name |
-|:--:|:--:|:--:|
+|:----------------------:|:----------------------:|:----------------------:|
 | c8c | Age | age |
 | c9 | Gender: male. or female | female |
 | c10 | Marital status: married, divorced, widowed, single (4 levels) | maritalstatus |
@@ -211,7 +211,7 @@ This is performed by scanning the datamap file (i.e., data dictionary) that acco
 #### Economic (8)
 
 | Variable Name | Description | New Variable Name |
-|:--:|:--:|:--:|
+|:----------------------:|:----------------------:|:----------------------:|
 | c12_1 | Land ownership (6 levels) | land_own |
 | c14 | Family involved in agriculture, fishing or aquaculture: Yes, No | agricultural |
 | c18_2 | Primary source of funds (12 levels) | source_of_funds |
@@ -821,8 +821,6 @@ summary(fstz23_sf$age)
 ```
 
 The outputs show that the ages range from 16 to 100 and is right skewed. The distribution has a mean of \~40yrs and a mode of 30 yrs. Given the shape of the distribution, we can consider scaled versions of the variable when we calibrate the model later.
-
-xxx
 
 ## C.2 Financial Inclusion Measures
 
